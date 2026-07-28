@@ -1,7 +1,5 @@
 import { API_ENDPOINTS } from "../../constants/apiEndpoints";
-import { API_BASE_URL } from "../../constants/config";
-import { RequestServer } from "../../utils/services";
-import { getStorageItem } from "../../utils/storageUtils";
+import { RequestServer, RequestServerBlob } from "../../utils/services";
 import { fetchTranscriptById } from "../transcripts/transcriptsService";
 import type {
   CreateRazorpayOrderPayload,
@@ -19,12 +17,8 @@ type BackendOrderSummary = {
   createdAt: string;
 };
 
-// Real order history for the Profile page — GET /api/orders only returns
-// transcript ids, not full transcript objects, so each paid order's items
-// are hydrated via the public GET /api/transcripts/:id endpoint. Some
-// pre-existing orders (from before transcripts were a real backend resource)
-// have missing/stale transcript ids, so each order is resolved independently
-// — one bad/deleted transcript reference shouldn't hide every other order.
+// Hydrates each paid order's transcript ids into full items; a bad/deleted
+// id shouldn't hide the rest of the order.
 export const fetchOrders = async (): Promise<Order[]> => {
   const backendOrders = await RequestServer<BackendOrderSummary[]>(
     API_ENDPOINTS.orders,
@@ -66,10 +60,7 @@ export const verifyRazorpayPayment = async (
 ): Promise<VerifyPaymentResponse> =>
   RequestServer(API_ENDPOINTS.orderVerify, "POST", payload);
 
-// Authoritative "has this user paid for transcript X" check, straight from
-// the backend — unlike the `orders`/CartItem shape above, GET /api/orders
-// only returns transcript ids, not full transcript objects, so this is kept
-// separate rather than reshaping Order to fit.
+// Purchased-transcript-id check, straight from the backend.
 export const fetchPurchasedTranscriptIds = async (): Promise<string[]> => {
   const orders = await RequestServer<BackendOrderSummary[]>(
     API_ENDPOINTS.orders,
@@ -81,12 +72,9 @@ export const fetchPurchasedTranscriptIds = async (): Promise<string[]> => {
 };
 
 export const viewOrderReceipt = async (orderId: string): Promise<void> => {
-  const token = getStorageItem<string>("token");
-  const response = await fetch(
-    `${API_BASE_URL}${API_ENDPOINTS.orderReceipt.replace(":id", orderId)}`,
-    { headers: token ? { Authorization: `Bearer ${token}` } : {} },
+  const blob = await RequestServerBlob(
+    API_ENDPOINTS.orderReceipt.replace(":id", orderId),
+    "Failed to load receipt",
   );
-  if (!response.ok) throw new Error(`Failed to load receipt: ${response.status}`);
-  const blob = await response.blob();
   window.open(URL.createObjectURL(blob), "_blank");
 };

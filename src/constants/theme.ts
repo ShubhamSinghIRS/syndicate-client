@@ -1,6 +1,6 @@
 import { createTheme } from "@mui/material/styles";
-import { defaultFormTheme } from "../common/defaultFormTheme";
+import type { PaletteMode } from "@mui/material";
+import { getDefaultFormTheme } from "../common/defaultFormTheme";
 
-const appTheme = createTheme(defaultFormTheme);
-
-export default appTheme;
+export const getAppTheme = (mode: PaletteMode) =>
+  createTheme(getDefaultFormTheme(mode));

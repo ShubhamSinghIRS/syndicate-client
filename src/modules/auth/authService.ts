@@ -14,12 +14,14 @@ export const signIn = async (data: SignInFormValues): Promise<AuthResponse> =>
 
 export const register = async (
   data: RegisterFormValues,
+  otp: string,
 ): Promise<AuthResponse> =>
   RequestServer(API_ENDPOINTS.register, "POST", {
     name: data.fullName,
     email: data.workEmail,
     password: data.password,
     companyName: data.companyName || undefined,
+    otp,
   });
 
 export const sendForgotPasswordLink = async (email: string): Promise<void> =>
@@ -27,13 +29,3 @@ export const sendForgotPasswordLink = async (email: string): Promise<void> =>
 
 export const sendRegisterOtp = async (email: string): Promise<void> =>
   RequestServer(API_ENDPOINTS.registerOtpSend, "POST", { email });
-
-export const verifyRegisterOtp = async (
-  email: string,
-  otp: string,
-): Promise<boolean> =>
-  RequestServer<{ verified: boolean }>(
-    API_ENDPOINTS.registerOtpVerify,
-    "POST",
-    { email, otp },
-  ).then((res) => res.verified);

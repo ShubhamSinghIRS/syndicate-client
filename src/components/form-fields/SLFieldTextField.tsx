@@ -91,7 +91,11 @@ const Component = <T extends FieldValues>({
             }
 
             if (triggerErrorOnBlur) {
-              await trigger?.(name);
+              try {
+                await trigger?.(name);
+              } catch (error) {
+                console.error("Failed to validate field on blur:", error);
+              }
             }
           })}
           onChange={callAll(onChangeI, onChangeRef.current)}

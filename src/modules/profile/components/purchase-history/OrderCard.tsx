@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import PurchaseActions from "../../../transcripts/components/purchase-actions/PurchaseActions";
+import DownloadTranscriptButton from "../../../transcripts/components/download-transcript-button/DownloadTranscriptButton";
 import { APP_ROUTES } from "../../../../constants/appRoutes";
 import type { Order } from "../../../orders/types";
 
@@ -9,7 +9,7 @@ type OrderCardProps = {
 
 export default function OrderCard({ order }: OrderCardProps) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-main-background p-6">
+    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-6">
       <div className="flex flex-col gap-3">
         {order.items.map((item) => (
           <div
@@ -27,7 +27,7 @@ export default function OrderCard({ order }: OrderCardProps) {
             </div>
             <div className="flex shrink-0 items-center gap-3">
               <span className="text-sm text-text-secondary">${item.price}</span>
-              <PurchaseActions transcript={item} />
+              <DownloadTranscriptButton transcript={item} />
             </div>
           </div>
         ))}

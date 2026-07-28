@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { APP_ROUTES } from "../../constants/appRoutes";
 import { useAuthDialog } from "../../modules/auth/context/AuthDialogContext";
 import AccountMenu from "./AccountMenu";
+import ThemeToggle from "../theme-toggle/ThemeToggle";
 import SearchBar from "../searchbar/SearchBar";
 import { isLoggedIn } from "../../utils/authUtils";
 import { getStorageItem } from "../../utils/storageUtils";
@@ -27,10 +28,7 @@ export default function Header({
   component,
 }: HeaderProps) {
   const { openAuthDialog } = useAuthDialog();
-  // Read fresh on every render (not cached in useState) — matches the
-  // Infollion/ValueChain header pattern, so this never shows stale
-  // logged-out state after auth changes elsewhere (e.g. the SSO handoff
-  // RootLayout processes, or AuthDialog closing after a successful sign-in).
+  // Read fresh every render so auth changes elsewhere aren't shown stale.
   const loggedIn = isLoggedIn();
   const userName = getStorageItem<string>("userName");
   const { items: cartItems } = useCart();
@@ -51,7 +49,7 @@ export default function Header({
   }, [searchParams]);
 
   return (
-    <header className="sticky top-0 z-50 bg-header-background border-b border-gray-100">
+    <header className="sticky top-0 z-50 bg-header-background border-b border-gray-100 dark:border-gray-800">
       <div className="flex items-center justify-between gap-6 px-6 py-3">
         <Link to={APP_ROUTES.home} className="flex shrink-0 items-center">
           <img
@@ -78,6 +76,8 @@ export default function Header({
 
         <nav className="flex shrink-0 items-center gap-4 text-sm text-text-primary">
           {!isSearch && isExtraComponent && component}
+
+          <ThemeToggle />
 
           <Link
             to={APP_ROUTES.cart}

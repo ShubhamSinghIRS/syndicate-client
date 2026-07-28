@@ -8,9 +8,7 @@ import type {
   TranscriptsFilterPayload,
 } from "./types";
 
-// Builds the request query for GET /api/transcripts — only non-default
-// filters are included, matching Infollion's getProfileDetails
-// payload-building style.
+// Builds the query for GET /api/transcripts, omitting default filters.
 export const buildTranscriptsFilterPayload = (
   search: string,
   filters: SidebarFilterPayload,

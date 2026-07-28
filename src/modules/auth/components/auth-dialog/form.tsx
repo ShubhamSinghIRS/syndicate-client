@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { defaultFormTheme } from "../../../../common/defaultFormTheme";
+import { getDefaultFormTheme } from "../../../../common/defaultFormTheme";
+import { useThemeMode } from "../../../../context/ThemeModeContext";
+import { LoadingContext } from "../../../../components/loading/context";
 import {
   signIn,
   register as registerUser,
   sendForgotPasswordLink,
   sendRegisterOtp,
-  verifyRegisterOtp,
 } from "../../authService";
 import { processToken } from "../../../../utils/authUtils";
 import { useCart } from "../../../cart/hooks/useCart";
@@ -56,11 +57,15 @@ export default function AuthForm({
   const registerOtpMethods = useForm<RegisterOtpFormValues>({
     defaultValues: registerOtpDefaultValues,
   });
-  const defaultTheme = createTheme(defaultFormTheme);
+  const { mode: themeMode } = useThemeMode();
+  const defaultTheme = useMemo(
+    () => createTheme(getDefaultFormTheme(themeMode)),
+    [themeMode],
+  );
   const { mergeGuestCartAfterAuth } = useCart();
+  const { setLoading } = useContext(LoadingContext);
 
-  // Sign-up is a two-step flow: collect details, send an OTP to the given
-  // email, then only actually create the account once that OTP is verified.
+  // Sign-up is two steps: collect details, then verify OTP to create the account.
   const [registerStep, setRegisterStep] = useState<"details" | "otp">(
     "details",
   );
@@ -68,8 +73,7 @@ export default function AuthForm({
     useState<RegisterFormValues | null>(null);
   const [isResetLinkSent, setIsResetLinkSent] = useState(false);
 
-  // Reset multi-step state whenever the dialog switches away from that mode,
-  // so re-opening register/forgot-password always starts from the beginning.
+  // Reset multi-step state on mode change so reopening starts fresh.
   useEffect(() => {
     if (mode !== "register") {
       setRegisterStep("details");
@@ -84,43 +88,68 @@ export default function AuthForm({
   }, [mode]);
 
   const onSignIn = async (data: SignInFormValues) => {
-    const response = await signIn(data);
-    processToken(response.token, response.user);
-    await mergeGuestCartAfterAuth();
-    handleSubmitClose();
+    setLoading(true);
+    try {
+      const response = await signIn(data);
+      processToken(response.token, response.user);
+      await mergeGuestCartAfterAuth();
+      handleSubmitClose();
+    } catch (error) {
+      signInMethods.setError("password", {
+        message: (error as Error).message,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onRegisterDetailsSubmit = async (data: RegisterFormValues) => {
-    await sendRegisterOtp(data.workEmail);
-    setPendingRegisterData(data);
-    setRegisterStep("otp");
+    setLoading(true);
+    try {
+      await sendRegisterOtp(data.workEmail);
+      setPendingRegisterData(data);
+      setRegisterStep("otp");
+    } catch (error) {
+      registerMethods.setError("workEmail", {
+        message: (error as Error).message,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onVerifyRegisterOtp = async ({ otp }: RegisterOtpFormValues) => {
     if (!pendingRegisterData) return;
 
-    const verified = await verifyRegisterOtp(
-      pendingRegisterData.workEmail,
-      otp,
-    );
-    if (!verified) {
+    setLoading(true);
+    try {
+      const response = await registerUser(pendingRegisterData, otp);
+      processToken(response.token, response.user);
+      await mergeGuestCartAfterAuth();
+      handleSubmitClose();
+    } catch (error) {
       registerOtpMethods.setError("otp", {
-        message: "Incorrect OTP, please try again",
+        message: (error as Error).message,
       });
-      return;
+    } finally {
+      setLoading(false);
     }
-
-    const response = await registerUser(pendingRegisterData);
-    processToken(response.token, response.user);
-    await mergeGuestCartAfterAuth();
-    handleSubmitClose();
   };
 
   const onForgotPasswordSubmit = async ({
     email,
   }: ForgotPasswordFormValues) => {
-    await sendForgotPasswordLink(email);
-    setIsResetLinkSent(true);
+    setLoading(true);
+    try {
+      await sendForgotPasswordLink(email);
+      setIsResetLinkSent(true);
+    } catch (error) {
+      forgotPasswordMethods.setError("email", {
+        message: (error as Error).message,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (mode === "signin") {
@@ -191,9 +220,15 @@ export default function AuthForm({
           >
             <RegisterOtpFields
               email={pendingRegisterData?.workEmail ?? ""}
-              onResend={() =>
-                sendRegisterOtp(pendingRegisterData?.workEmail ?? "")
-              }
+              onResend={() => {
+                sendRegisterOtp(pendingRegisterData?.workEmail ?? "").catch(
+                  (error) => {
+                    registerOtpMethods.setError("otp", {
+                      message: (error as Error).message,
+                    });
+                  },
+                );
+              }}
               onBack={() => setRegisterStep("details")}
             />
           </form>

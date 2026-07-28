@@ -36,16 +36,14 @@ export default function TranscriptCard({
   const isInCart = cartItems.some((item) => item.id === transcript.id);
   const [suppressCartTooltip, setSuppressCartTooltip] = useState(false);
 
-  // Show at most 4 domain chips on the top line. Any remaining tags (e.g. 5th tag) go into [+1 more].
+  // Show at most 4 tags; the rest collapse into "+N more".
   const visibleCount = Math.min(4, transcript.tags.length);
   const visibleTags = transcript.tags.slice(0, visibleCount);
   const remainingTags = transcript.tags.slice(visibleCount);
   const remainingTagCount = remainingTags.length;
 
   const goToBuyNowCheckout = () => {
-    // Stored in sessionStorage (not router state) so it survives any full
-    // navigation regardless of login state, without ever touching the
-    // shared cart.
+    // Bypasses the cart; sessionStorage survives navigation.
     setBuyNowItem(transcript);
     navigate(APP_ROUTES.checkout);
   };
@@ -56,9 +54,7 @@ export default function TranscriptCard({
       return;
     }
 
-    // Open the sign-in dialog right here on the current page instead of
-    // routing through /checkout (which would bounce to the home page via
-    // RequireAuth) — proceed straight to checkout once signed in.
+    // Sign in here, then continue straight to checkout.
     openAuthDialog("signin", goToBuyNowCheckout);
   };
 
@@ -67,15 +63,15 @@ export default function TranscriptCard({
     : `${transcript.preview.replace(/\.+$/, "")}...`;
 
   return (
-    <div className="relative rounded-lg border border-gray-200 bg-main-background p-4.5">
+    <div className="relative rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-4.5">
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-wrap items-center gap-1.5 min-w-0 flex-1">
           <Typography variant="body2" component="span" sx={domainLabelSx}>
             Domain:
           </Typography>
           {visibleTags.map((tag) => {
-            const isLong = tag.length > 25;
-            const displayLabel = isLong ? `${tag.slice(0, 25)}...` : tag;
+            const isLong = tag.length > 40;
+            const displayLabel = isLong ? `${tag.slice(0, 40)}...` : tag;
             return (
               <Tooltip key={tag} title={tag} arrow disableHoverListener={!isLong}>
                 <Chip

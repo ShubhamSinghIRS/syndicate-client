@@ -17,6 +17,7 @@ import PreviewSection from "../components/detail/PreviewSection";
 import PurchaseCard from "../components/detail/PurchaseCard";
 import AuthorCard from "../components/detail/AuthorCard";
 import RelatedTranscripts from "../components/detail/RelatedTranscripts";
+import TranscriptDetailSkeleton from "../components/detail/TranscriptDetailSkeleton";
 
 export default function TranscriptDetail() {
   const { id } = useParams<{ id: string }>();
@@ -68,21 +69,11 @@ export default function TranscriptDetail() {
   }
 
   if (!transcript) {
-    return (
-      <div className="flex min-h-screen flex-col">
-        <Header />
-        <div className="flex-1">
-          <p className="p-6">Loading...</p>
-        </div>
-        <Footer />
-      </div>
-    );
+    return <TranscriptDetailSkeleton />;
   }
 
   const goToBuyNowCheckout = () => {
-    // Stored in sessionStorage (not router state) so it survives any full
-    // navigation regardless of login state, without ever touching the
-    // shared cart.
+    // Bypasses the cart; sessionStorage survives navigation.
     setBuyNowItem(transcript);
     navigate(APP_ROUTES.checkout);
   };
@@ -93,9 +84,7 @@ export default function TranscriptDetail() {
       return;
     }
 
-    // Open the sign-in dialog right here on the current page instead of
-    // routing through /checkout (which would bounce to the home page via
-    // RequireAuth) — proceed straight to checkout once signed in.
+    // Sign in here, then continue straight to checkout.
     openAuthDialog("signin", goToBuyNowCheckout);
   };
 

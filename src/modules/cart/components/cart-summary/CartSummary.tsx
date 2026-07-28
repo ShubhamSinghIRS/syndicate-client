@@ -25,14 +25,12 @@ export default function CartSummary({ itemCount, total }: CartSummaryProps) {
       return;
     }
 
-    // Open the sign-in dialog right here on the cart page instead of
-    // navigating to /checkout (which would bounce to the home page via
-    // RequireAuth) — proceed straight to checkout once signed in.
+    // Sign in here, then continue straight to checkout.
     openAuthDialog("signin", goToCheckout);
   };
 
   return (
-    <div className="sticky top-6 rounded-lg border border-gray-200 bg-main-background p-6">
+    <div className="sticky top-6 rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-6">
       <h2 className="text-lg font-bold text-text-primary">Summary</h2>
 
       <div className="mt-4 flex items-center justify-between text-sm text-text-secondary">
@@ -42,7 +40,7 @@ export default function CartSummary({ itemCount, total }: CartSummaryProps) {
         <span>${total}</span>
       </div>
 
-      <div className="mt-4 flex items-center justify-between border-t border-gray-200 pt-4">
+      <div className="mt-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-800 pt-4">
         <span className="font-semibold text-text-primary">Total</span>
         <span className="text-lg font-bold text-text-primary">
           USD ${total}

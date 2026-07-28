@@ -5,6 +5,7 @@ import { useTranscripts } from "../hooks/useTranscripts";
 import { usePurchasedTranscriptIds } from "../../orders/hooks/usePurchasedTranscriptIds";
 import { buildTranscriptsFilterPayload } from "../transcriptsService";
 import TranscriptCard from "../components/cards/TranscriptCard";
+import TranscriptCardSkeleton from "../components/cards/TranscriptCardSkeleton";
 import FilterSidebar from "../components/filter-sidebar/FilterSidebar";
 import Button from "../../../components/button/Button";
 import Header from "../../../components/header/Header";
@@ -14,7 +15,7 @@ import RequestTopicDialog from "../components/request-topic-dialog";
 import WarningDialog from "../../../components/form-close-warning/WarningDialog";
 import { useBoolean } from "../../../utils/hooks/useBoolean";
 import { DEFAULT_SIDEBAR_FILTERS } from "../components/filter-sidebar/constants";
-import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from "./transcriptsListConstants";
+import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from "./constants";
 import type {
   PriceFilterValue,
   PublishedDateFilterValue,
@@ -167,14 +168,19 @@ export default function TranscriptsList() {
                 All transcripts
               </h1>
 
-              {isLoading && <p className="mt-4">Loading transcripts...</p>}
-              {error && <p className="mt-4">{error}</p>}
-
-              {!isLoading && !error && visibleTranscripts.length === 0 ? (
-                <div className="mt-8 flex flex-col items-center justify-center    py-16 text-center">
+              {isLoading ? (
+                <div className="mt-4 flex flex-col gap-3 pr-2">
+                  <TranscriptCardSkeleton />
+                  <TranscriptCardSkeleton />
+                  <TranscriptCardSkeleton />
+                </div>
+              ) : error ? (
+                <p className="mt-4">{error}</p>
+              ) : visibleTranscripts.length === 0 ? (
+                <div className="mt-8 flex flex-col items-center justify-center py-16 text-center">
                   <p className="text-lg font-semibold text-text-primary">
                     {purchasedOnly
-                      ? "No purchased transcripts on this page."
+                      ? "No purchased transcripts "
                       : "No results found."}
                   </p>
                 </div>

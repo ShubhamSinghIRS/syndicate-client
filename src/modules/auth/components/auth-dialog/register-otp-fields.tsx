@@ -64,7 +64,7 @@ export default function RegisterOtpFields({
         <button
           type="button"
           onClick={onBack}
-          className="cursor-pointer text-sm font-medium text-gray-700 underline"
+          className="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 underline"
         >
           Back
         </button>
@@ -72,7 +72,7 @@ export default function RegisterOtpFields({
           type="button"
           onClick={handleResend}
           disabled={secondsLeft > 0}
-          className="cursor-pointer text-sm font-medium text-gray-700 underline disabled:cursor-not-allowed disabled:text-gray-400 disabled:no-underline"
+          className="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 underline disabled:cursor-not-allowed disabled:text-gray-400 dark:disabled:text-gray-600 disabled:no-underline"
         >
           {secondsLeft > 0 ? `Resend OTP in ${secondsLeft}s` : "Resend OTP"}
         </button>

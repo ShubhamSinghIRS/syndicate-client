@@ -15,11 +15,8 @@ import {
 } from "../cartService";
 import type { CartItem } from "../types";
 
-// Cart items are persisted to localStorage (see cartSlice.ts) so they
-// survive refreshes — the guest-cart-cookie equivalent. Cross-device sync
-// and the account-cart merge are wired below via cartService.ts, but that
-// service is still a local no-op until its /api/cart endpoints are
-// uncommented on the backend.
+// Cart is persisted to localStorage (see cartSlice.ts) and synced to the
+// server via cartService.ts.
 export const useCart = () => {
   const dispatch = useDispatch<AppDispatch>();
   const items = useSelector((state: RootState) => state.cart.items);
@@ -28,33 +25,47 @@ export const useCart = () => {
   return {
     items,
     total,
-    addToCart: (item: CartItem) => {
+    addToCart: async (item: CartItem) => {
       dispatch(addToCart(item));
-      void syncAddCartItem(item);
+      try {
+        await syncAddCartItem(item);
+      } catch (err) {
+        console.error("Failed to sync add-to-cart:", err);
+      }
     },
-    removeFromCart: (id: string) => {
+    removeFromCart: async (id: string) => {
       dispatch(removeFromCart(id));
-      void syncRemoveCartItem(id);
+      try {
+        await syncRemoveCartItem(id);
+      } catch (err) {
+        console.error("Failed to sync remove-from-cart:", err);
+      }
     },
-    clearCart: () => {
+    clearCart: async () => {
       dispatch(clearCart());
-      void syncClearCart();
+      try {
+        await syncClearCart();
+      } catch (err) {
+        console.error("Failed to sync clear-cart:", err);
+      }
     },
-    // Call once right after a successful sign-in OR sign-up (see form.tsx —
-    // both onSignIn and onVerifyRegisterOtp call this) to fold the local
-    // guest cart into the account's cart, mirroring how Amazon merges a
-    // guest cart the moment you authenticate, regardless of which flow.
+    // Folds the guest cart into the account cart; call right after sign-in/sign-up.
     mergeGuestCartAfterAuth: async () => {
-      const merged = await mergeGuestCartIntoAccount(items);
-      dispatch(setCartItems(merged));
+      try {
+        const merged = await mergeGuestCartIntoAccount(items);
+        dispatch(setCartItems(merged));
+      } catch (err) {
+        console.error("Failed to merge guest cart:", err);
+      }
     },
-    // Hydrates the local cart from the server on app load — needed for an
-    // already-logged-in session on a fresh device/browser, where
-    // mergeGuestCartAfterAuth (which only runs right after an active
-    // sign-in) never fires.
+    // Hydrates the cart from the server on app load.
     loadCart: async () => {
-      const serverItems = await fetchCart();
-      if (serverItems) dispatch(setCartItems(serverItems));
+      try {
+        const serverItems = await fetchCart();
+        if (serverItems) dispatch(setCartItems(serverItems));
+      } catch (err) {
+        console.error("Failed to load cart:", err);
+      }
     },
   };
 };

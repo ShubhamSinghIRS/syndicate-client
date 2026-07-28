@@ -41,6 +41,7 @@ export function getPaperSx({
     alignItems: "center",
     borderRadius: borderRadius,
     backgroundColor: backgroundColor,
+    border: "1px solid var(--color-section-background)",
     boxShadow: boxShadow,
     maxWidth: maxWidth || "500px",
     minWidth: minWidth || {

@@ -134,6 +134,7 @@ const SearchBar = React.forwardRef<SearchBarHandle, Props>(
                 src={SEARCH_ICON_SRC}
                 width={height === "56px" ? "18px" : "14px"}
                 style={{ opacity: "0.5" }}
+                className="dark:invert"
               />
             </Box>
           )}

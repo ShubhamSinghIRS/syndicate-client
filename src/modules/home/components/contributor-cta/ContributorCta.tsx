@@ -34,7 +34,7 @@ export default function ContributorCta() {
   }, []);
 
   return (
-    <div className="flex items-stretch gap-8 overflow-hidden rounded-2xl border-2 border-gray-100 bg-main-background py-10 pl-10 shadow-sm">
+    <div className="flex items-stretch gap-8 overflow-hidden rounded-2xl border-2 border-gray-100 dark:border-gray-800 bg-main-background py-10 pl-10 shadow-sm">
       <div className="flex-[1.4]">
         <h2
           className={`text-balance text-3xl font-bold text-text-primary transition-all duration-500 ease-in-out sm:text-4xl ${
@@ -62,7 +62,7 @@ export default function ContributorCta() {
             />
           </Link>
           <Link
-            href="https://p.infollion.com/login"
+            href="https://webapp.infollion.com/login"
             target="_blank"
             rel="noopener noreferrer"
             underline="none"

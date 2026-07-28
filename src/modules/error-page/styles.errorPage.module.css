@@ -98,3 +98,7 @@
   color: #092532;
   margin-top: 50px;
 }
+
+:global(.dark) .wrongPara {
+  color: #e5e7eb;
+}

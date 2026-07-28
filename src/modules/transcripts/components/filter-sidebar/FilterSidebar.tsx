@@ -9,7 +9,7 @@ import {
   PRICE_OPTIONS,
   PUBLISHED_DATE_OPTIONS,
 } from "./constants";
-import { purchasedOnlySwitchSx } from "./FilterSidebar.styles";
+import { purchasedOnlySwitchSx } from "./filter-sidebar.styles";
 import type {
   PriceFilterValue,
   PublishedDateFilterValue,
@@ -30,7 +30,7 @@ export default function FilterSidebar({
   setPurchasedOnly,
 }: FilterSidebarProps) {
   return (
-    <div className="w-80 shrink-0 rounded-lg border border-gray-200 bg-main-background p-6">
+    <div className="w-80 shrink-0 rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-6">
       <div className="flex items-center justify-between">
         <h2 className="text-base font-bold text-text-primary">Filters</h2>
         <button
@@ -43,7 +43,7 @@ export default function FilterSidebar({
       </div>
 
       {isLoggedIn() && (
-        <div className="mt-4 flex items-center justify-between border-b border-gray-200 pb-4">
+        <div className="mt-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-4">
           <span className="text-sm font-medium text-text-primary">
             Purchased only
           </span>

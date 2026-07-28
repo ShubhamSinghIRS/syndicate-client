@@ -1,6 +1,4 @@
 .heroBackground {
-  background-image: url('/assets/bg_imag1.png');
-  background-size: cover;
-  background-position: top center;
-  background-repeat: no-repeat;
+  background-image: radial-gradient(circle 800px at 50% -100px, rgba(236, 147, 36, 0.12), transparent);
+  background-color: var(--color-main-background);
 }

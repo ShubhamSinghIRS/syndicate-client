@@ -14,7 +14,7 @@ const getInitials = (name: string): string =>
 
 export default function AuthorCard({ author }: AuthorCardProps) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-main-background p-6">
+    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-6">
       <p className="text-sm font-semibold text-text-primary">
         About the Author
       </p>

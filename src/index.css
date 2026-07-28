@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-main-background: #ffffff;
   --color-accent: #fbb017;
@@ -9,6 +11,29 @@
   --color-text-secondary: #4b5563;
   --color-header-background: #ffffff;
   --color-layout-background: #f5f4f4;
+}
+
+:root {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+  --color-main-background: #121212;
+  --color-accent: #fbb017;
+  --color-accent-2: #ec9324;
+  --color-section-background: #1e1e1e;
+  --color-text-primary: #f3f4f6;
+  --color-text-secondary: #a3a3a3;
+  --color-header-background: #121212;
+  --color-layout-background: #0a0a0a;
+}
+
+html,
+body {
+  background-color: var(--color-layout-background);
+  color: var(--color-text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Orange scrollbar styles */

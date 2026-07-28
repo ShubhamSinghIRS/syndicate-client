@@ -33,11 +33,7 @@ export type SidebarFilterPayload = {
   publishedDate: PublishedDateFilterValue;
 };
 
-// Wire-payload schema for the future POST /api/transcripts call. Follows the
-// same request convention as Infollion's `experts/filters` endpoint
-// (infollionfefork/src/organisms/expert-cards/helper.ts:getProfileDetails):
-// one combined payload per request, non-default filters only, list-type
-// filters sent as a comma-joined `in___<field>` key.
+// Query payload for GET /api/transcripts; list filters use `in___<field>`.
 export type TranscriptsFilterPayload = {
   page: number;
   pageSize: number;

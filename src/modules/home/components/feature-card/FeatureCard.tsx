@@ -21,7 +21,7 @@ export default function FeatureCard({
   const Icon = ICONS[icon];
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-main-background p-8 shadow-sm flex flex-col items-center text-center gap-4 transition-shadow hover:shadow-md">
+    <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-main-background p-8 shadow-sm flex flex-col items-center text-center gap-4 transition-shadow hover:shadow-md">
       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/15 text-accent-2">
         <Icon fontSize="medium" />
       </div>

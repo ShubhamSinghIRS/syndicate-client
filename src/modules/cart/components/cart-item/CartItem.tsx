@@ -4,7 +4,6 @@ import Tooltip from "../../../../components/tooltip/Tooltip";
 import Chip from "../../../../components/chip/Chip";
 import DeleteIcon from "../../../../icons/Delete/Delete";
 import { APP_ROUTES } from "../../../../constants/appRoutes";
-import { COLORS } from "../../../../constants/colors";
 import type { CartItem } from "../../types";
 
 type CartItemRowProps = {
@@ -12,11 +11,11 @@ type CartItemRowProps = {
   onRemove: () => void;
 };
 
-export default function CartItemRow({ item, onRemove }: CartItemRowProps) {
+export default function CartItem({ item, onRemove }: CartItemRowProps) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-lg border border-gray-200 bg-main-background p-4">
+    <div className="flex items-center justify-between gap-4 rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-4">
       <div>
-        <Chip label={item.domain} variant="outlined" size="small" />
+        {/* <Chip label={item.domain} variant="outlined" size="small" /> */}
         <Link to={APP_ROUTES.transcriptDetail.replace(":id", item.id)}>
           <h3 className="mt-2 font-semibold text-text-primary hover:underline">
             {item.title}
@@ -32,7 +31,7 @@ export default function CartItemRow({ item, onRemove }: CartItemRowProps) {
           <IconButton
             aria-label="Remove"
             onClick={onRemove}
-            sx={{ color: COLORS.textSecondary }}
+            sx={{ color: "text.secondary" }}
           >
             <DeleteIcon fontSize="small" />
           </IconButton>

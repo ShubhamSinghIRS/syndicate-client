@@ -1,6 +1,9 @@
+import { useContext, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { defaultFormTheme } from "../../../../common/defaultFormTheme";
+import { getDefaultFormTheme } from "../../../../common/defaultFormTheme";
+import { useThemeMode } from "../../../../context/ThemeModeContext";
+import { LoadingContext } from "../../../../components/loading/context";
 import Fields from "./fields";
 import type { RequestTopicFormValues } from "./types";
 import { API_ENDPOINTS } from "../../../../constants/apiEndpoints";
@@ -27,17 +30,36 @@ export default function RequestTopicForm({
   handleSubmitClose,
 }: RequestTopicFormProps) {
   const methods = useForm<RequestTopicFormValues>({ defaultValues });
-  const defaultTheme = createTheme(defaultFormTheme);
+  const { mode } = useThemeMode();
+  const defaultTheme = useMemo(
+    () => createTheme(getDefaultFormTheme(mode)),
+    [mode],
+  );
+  const { setLoading } = useContext(LoadingContext);
 
   const onSubmit = async (data: RequestTopicFormValues) => {
-    await RequestServer(API_ENDPOINTS.topicsRequest, "POST", data);
-    handleSubmitClose();
+    setLoading(true);
+    try {
+      await RequestServer(API_ENDPOINTS.topicsRequest, "POST", data);
+      handleSubmitClose();
+    } catch (error) {
+      methods.setError("root", {
+        message: (error as Error).message || "Something went wrong. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <FormProvider {...methods}>
       <ThemeProvider theme={defaultTheme}>
         <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
+          {methods.formState.errors.root && (
+            <p className="mb-2 text-sm text-red-600 dark:text-red-400">
+              {methods.formState.errors.root.message}
+            </p>
+          )}
           <Fields
             handleClose={handleClose}
             handleFormChange={handleFormChange}

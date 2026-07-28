@@ -14,12 +14,7 @@ export const getStorageItem = <T>(key: string, defaultValue?: T): T | null => {
 
 export const setStorageItem = (key: string, value: any): boolean => {
   try {
-    // Always JSON-encode, even for strings — getStorageItem always tries
-    // JSON.parse on read, so an unquoted numeric-looking string (e.g. a
-    // userId of "1") would otherwise come back as the number 1 instead of
-    // the string "1". JSON-encoding here keeps the round-trip lossless; the
-    // JSON.parse failure fallback in getStorageItem still handles reading
-    // any legacy unquoted values already sitting in storage.
+    // JSON-encode always, so reads via JSON.parse round-trip correctly.
     localStorage.setItem(key, JSON.stringify(value));
     return true;
   } catch {

@@ -16,7 +16,7 @@ export default function FloatingSupport() {
     <ClickAwayListener onClickAway={() => setIsOpen(false)}>
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
         {isOpen && (
-          <div className="mb-3 w-[380px] max-w-[calc(100vw-2rem)] rounded-2xl border border-gray-100 bg-white p-6 shadow-2xl">
+          <div className="mb-3 w-[380px] max-w-[calc(100vw-2rem)] rounded-2xl border border-gray-100 dark:border-gray-800 bg-main-background p-6 shadow-2xl">
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="text-lg font-bold text-text-primary">
@@ -29,7 +29,7 @@ export default function FloatingSupport() {
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
               >
                 <CloseIcon fontSize="small" />
               </button>

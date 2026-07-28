@@ -5,9 +5,9 @@ import CalendarTodayIcon from "../../../../icons/CalendarToday/CalendarToday";
 import PublicIcon from "../../../../icons/Public/Public";
 import CheckCircleIcon from "../../../../icons/CheckCircle/CheckCircle";
 import Button from "../../../../components/button/Button";
-import PurchaseActions from "../purchase-actions/PurchaseActions";
+import DownloadTranscriptButton from "../download-transcript-button/DownloadTranscriptButton";
 import { formatDate } from "../../../../utils/dateUtils";
-import { LOCKED_PREVIEW_PARAGRAPHS } from "../../pages/transcriptDetailConstants";
+import { LOCKED_PREVIEW_PARAGRAPHS } from "../../pages/constants";
 import { COLORS } from "../../../../constants/colors";
 import { purchasedChipSx } from "./PreviewSection.styles";
 import type { Transcript } from "../../types";
@@ -34,7 +34,7 @@ export default function PreviewSection({
   transcript,
 }: PreviewSectionProps) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-main-background p-6">
+    <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-6">
       <h2 className="text-lg font-bold text-text-primary">Preview</h2>
       <p className="mt-3 text-text-secondary">{preview}</p>
 
@@ -60,7 +60,7 @@ export default function PreviewSection({
         </div>
       )}
 
-      <div className="mt-4 flex items-center gap-3.5 border-t border-gray-200 pt-4 text-sm text-text-secondary">
+      <div className="mt-4 flex items-center gap-3.5 border-t border-gray-200 dark:border-gray-800 pt-4 text-sm text-text-secondary">
         <Tooltip title="Published Date" arrow>
           <span className="flex items-center gap-1 cursor-pointer">
             <CalendarTodayIcon fontSize="small" />
@@ -77,7 +77,7 @@ export default function PreviewSection({
       </div>
 
       {isPurchased ? (
-        <div className="mt-4 border-t border-gray-200 pt-4">
+        <div className="mt-4 border-t border-gray-200 dark:border-gray-800 pt-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <h3 className="text-sm font-semibold text-text-primary">
@@ -90,9 +90,9 @@ export default function PreviewSection({
                 sx={purchasedChipSx}
               />
             </div>
-            <PurchaseActions transcript={transcript} />
+            <DownloadTranscriptButton transcript={transcript} />
           </div>
-          <div className="mt-3 max-h-[700px] overflow-y-auto rounded-md border border-gray-200 bg-white p-6 shadow-inner">
+          <div className="mt-3 max-h-[700px] overflow-y-auto rounded-md border border-gray-200 dark:border-gray-800 bg-section-background p-6 shadow-inner">
             <div className="space-y-3">
               {fullText === null ? (
                 <p className="text-text-secondary">Loading full transcript…</p>

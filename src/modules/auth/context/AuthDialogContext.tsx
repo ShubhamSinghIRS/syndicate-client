@@ -4,9 +4,7 @@ import AuthDialog from "../components/auth-dialog";
 import type { AuthDialogMode } from "../types";
 
 type AuthDialogContextValue = {
-  // Opens the sign-in/register dialog on whatever page it's called from —
-  // no navigation involved. `onSuccess` (e.g. "now proceed to checkout with
-  // this buy-now item") runs right after a successful sign-in/register.
+  // Opens the auth dialog in place; `onSuccess` runs after sign-in/register.
   openAuthDialog: (mode?: AuthDialogMode, onSuccess?: () => void) => void;
 };
 

@@ -18,18 +18,18 @@ export default function InvoiceList({ orders }: InvoiceListProps) {
   );
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-main-background p-6">
+    <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-6">
       <h2 className="text-xl font-bold text-text-primary">Invoices</h2>
       <p className="mt-1 text-sm text-text-secondary">
         Billing history for all transcripts purchased
       </p>
 
       {rows.length === 0 ? (
-        <p className="mt-6 border-t border-gray-200 pt-6 text-sm text-text-secondary">
+        <p className="mt-6 border-t border-gray-200 dark:border-gray-800 pt-6 text-sm text-text-secondary">
           No invoices yet.
         </p>
       ) : (
-        <div className="mt-4 overflow-x-auto border-t border-gray-200">
+        <div className="mt-4 overflow-x-auto border-t border-gray-200 dark:border-gray-800">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
@@ -45,7 +45,7 @@ export default function InvoiceList({ orders }: InvoiceListProps) {
               {rows.map(({ order, item }) => (
                 <tr
                   key={`${order.id}-${item.id}`}
-                  className="border-t border-gray-100"
+                  className="border-t border-gray-100 dark:border-gray-800"
                 >
                   <td className="py-3 pr-4 font-medium text-text-primary">
                     {invoiceNumber(order.id)}

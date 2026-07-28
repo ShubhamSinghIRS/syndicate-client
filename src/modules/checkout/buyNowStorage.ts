@@ -2,11 +2,7 @@ import type { CartItem } from "../cart/types";
 
 const BUY_NOW_KEY = "buyNowItem";
 
-// A "Buy Now" purchase must never touch the shared cart, but it also has to
-// survive the auth redirect (RequireAuth -> sign-in -> back to /checkout),
-// which drops React Router's in-memory `location.state`. sessionStorage
-// survives that redirect chain regardless of login state, and clears itself
-// when the tab closes.
+// Bypasses the cart; sessionStorage survives the sign-in redirect back to /checkout.
 export const setBuyNowItem = (item: CartItem): void => {
   sessionStorage.setItem(BUY_NOW_KEY, JSON.stringify(item));
 };

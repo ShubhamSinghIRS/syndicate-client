@@ -1,6 +1,5 @@
 import { API_ENDPOINTS } from "../../../constants/apiEndpoints";
-import { API_BASE_URL } from "../../../constants/config";
-import { getStorageItem } from "../../../utils/storageUtils";
+import { RequestServerBlob } from "../../../utils/services";
 import type { Transcript } from "../types";
 
 const sanitizeFileName = (title: string): string =>
@@ -15,17 +14,14 @@ const downloadBlob = (blob: Blob, fileName: string) => {
   URL.revokeObjectURL(url);
 };
 
-export const usePurchaseActions = (
+export const useDownloadTranscript = (
   transcript: Pick<Transcript, "id" | "title" | "domain" | "preview">,
 ) => {
   const handleDownload = async () => {
-    const token = getStorageItem<string>("token");
-    const url = `${API_BASE_URL}${API_ENDPOINTS.transcriptDownload.replace(":id", transcript.id)}?format=pdf`;
-    const response = await fetch(url, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    });
-    if (!response.ok) throw new Error(`Download failed: ${response.status}`);
-    const blob = await response.blob();
+    const blob = await RequestServerBlob(
+      `${API_ENDPOINTS.transcriptDownload.replace(":id", transcript.id)}?format=pdf`,
+      "Download failed",
+    );
     downloadBlob(blob, `${sanitizeFileName(transcript.title)}.pdf`);
   };
 

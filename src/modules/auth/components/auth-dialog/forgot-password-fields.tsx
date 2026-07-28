@@ -69,7 +69,7 @@ export default function ForgotPasswordFields({
       </Grid>
 
       <Grid item xs={12} className="text-center">
-        <span className="text-sm text-gray-700">
+        <span className="text-sm text-gray-700 dark:text-gray-300">
           Already have an account?{" "}
           <button
             type="button"

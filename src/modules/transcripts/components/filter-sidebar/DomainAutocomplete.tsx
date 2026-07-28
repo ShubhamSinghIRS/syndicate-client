@@ -7,7 +7,7 @@ import { RequestServer } from "../../../../utils/services";
 import {
   domainCheckboxSx,
   domainTextFieldSx,
-} from "./DomainAutocomplete.styles";
+} from "./filter-sidebar.styles";
 
 type DomainOption = { label: string; value: string; count: number };
 

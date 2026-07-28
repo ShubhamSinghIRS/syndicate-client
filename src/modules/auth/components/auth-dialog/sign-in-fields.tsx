@@ -61,7 +61,7 @@ export default function SignInFields({
       </Grid>
 
       <Grid item xs={12} className="text-center">
-        <span className="text-sm text-gray-700">
+        <span className="text-sm text-gray-700 dark:text-gray-300">
           Don't have an account?{" "}
           <button
             type="button"
@@ -77,7 +77,7 @@ export default function SignInFields({
         <button
           type="button"
           onClick={onForgotPassword}
-          className="text-sm font-medium text-gray-700 underline cursor-pointer"
+          className="text-sm font-medium text-gray-700 dark:text-gray-300 underline cursor-pointer"
         >
           Forgot password?
         </button>

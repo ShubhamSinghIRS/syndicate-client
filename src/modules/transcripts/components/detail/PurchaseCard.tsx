@@ -21,7 +21,7 @@ export default function PurchaseCard({
   const [suppressCartTooltip, setSuppressCartTooltip] = useState(false);
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-main-background p-6">
+    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-6">
       <span className="text-2xl font-bold text-text-primary">USD ${price}</span>
 
       <div className="mt-4 flex flex-col gap-3">

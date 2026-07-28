@@ -8,7 +8,7 @@ type OrderDetailsProps = {
 
 export default function OrderDetails({ items }: OrderDetailsProps) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-main-background p-6">
+    <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-6">
       <h2 className="text-lg font-bold text-text-primary">Purchase details</h2>
 
       <div className="mt-4 flex flex-col">
@@ -16,7 +16,7 @@ export default function OrderDetails({ items }: OrderDetailsProps) {
           <div
             key={item.id}
             className={
-              index > 0 ? "mt-4 border-t border-gray-200 pt-4" : undefined
+              index > 0 ? "mt-4 border-t border-gray-200 dark:border-gray-800 pt-4" : undefined
             }
           >
             <div className="flex items-start justify-between gap-4">

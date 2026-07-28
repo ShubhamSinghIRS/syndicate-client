@@ -43,10 +43,8 @@ export const processToken = (
   setStorageItem("token", token);
   setStorageItem("authToken", token);
 
-  // The backend's JWT only carries {id, email} — not a display name — so the
-  // `user` object from the login/register response (when given) takes
-  // priority; JWT claims are just the fallback for the SSO handoff below,
-  // whose tokens carry the older user_id/user_name shape.
+  // `user` from the login/register response takes priority; JWT claims are
+  // the fallback for the SSO handoff below.
   const payload = decodeJWT(token);
   const userId = user?.id ?? payload?.user_id;
   const userName = user?.name ?? payload?.user_name;
@@ -62,8 +60,7 @@ export const isLoggedIn = (): boolean => {
   return !!getStorageItem<string>("token");
 };
 
-// TODO: uncomment once the backend exists (fire-and-forget — don't block the
-// redirect on it), delete this comment once wired up.
+// TODO: uncomment once /api/auth/logout exists (fire-and-forget).
 // import { API_ENDPOINTS } from "../constants/apiEndpoints";
 // import { RequestServer } from "./services";
 export const logout = (): void => {
@@ -72,7 +69,7 @@ export const logout = (): void => {
   window.location.href = APP_ROUTES.home;
 };
 
-// Handles SSO handoff from the main Infollion site, e.g. https://.../transcripts?auth_token=...
+// Handles SSO handoff from the main Infollion site via ?auth_token=.
 export const consumeAuthTokenFromUrl = (): void => {
   const params = new URLSearchParams(window.location.search);
   const authToken = params.get("auth_token");

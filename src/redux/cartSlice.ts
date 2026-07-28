@@ -8,9 +8,7 @@ type CartState = {
   items: CartItem[];
 };
 
-// Hydrate from localStorage on load — this is the guest-cart persistence
-// itself (the client-side equivalent of Amazon's cookie+db combo): items
-// survive refreshes and even days of inactivity until explicitly changed.
+// Hydrate from localStorage so cart items survive refreshes.
 const initialState: CartState = {
   items: getStorageItem<CartItem[]>(CART_STORAGE_KEY) ?? [],
 };
@@ -36,9 +34,7 @@ const cartSlice = createSlice({
       state.items = [];
       persist(state.items);
     },
-    // Replaces the whole cart in one shot — used after a server round trip
-    // (fetchCart on load, or mergeGuestCartIntoAccount after login) once
-    // those endpoints in cartService.ts are wired up.
+    // Replaces the whole cart, used after a server round trip (load/merge).
     setCartItems: (state, action: PayloadAction<CartItem[]>) => {
       state.items = action.payload;
       persist(state.items);

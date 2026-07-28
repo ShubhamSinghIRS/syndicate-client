@@ -16,7 +16,7 @@ export default function DetailHeader({ transcript }: DetailHeaderProps) {
     allTags.map((tag) => (
       <div
         key={`${keyPrefix}-${tag}`}
-        className="inline-flex shrink-0 items-center rounded-full border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-text-primary shadow-2xs whitespace-nowrap mr-1.5"
+        className="inline-flex shrink-0 items-center rounded-full border border-gray-200 dark:border-gray-800 bg-section-background px-2.5 py-1 text-xs font-medium text-text-primary shadow-2xs whitespace-nowrap mr-1.5"
       >
         {tag}
       </div>

@@ -12,12 +12,12 @@ export function getButtonStyle(
     border: isOutlinedAccent
       ? `1px solid ${COLORS.accent2}`
       : variant === "outlined"
-        ? "1px solid #9ca3af"
+        ? "1px solid var(--color-text-secondary)"
         : "none",
     color: isOutlinedAccent
       ? COLORS.accent2
       : variant === "outlined"
-        ? COLORS.textPrimary
+        ? "var(--color-text-primary)"
         : "white",
     fontSize: "13px",
     borderRadius: "9999px",

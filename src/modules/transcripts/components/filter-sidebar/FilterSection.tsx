@@ -12,7 +12,7 @@ export default function FilterSection({ title, children }: FilterSectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
-    <div className="border-b border-gray-200 py-4">
+    <div className="border-b border-gray-200 dark:border-gray-700 py-4">
       <button
         type="button"
         className="flex w-full items-center justify-between text-sm font-semibold text-text-primary"

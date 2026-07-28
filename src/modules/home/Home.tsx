@@ -12,7 +12,6 @@ import WarningDialog from "../../components/form-close-warning/WarningDialog";
 import { useBoolean } from "../../utils/hooks/useBoolean";
 import { APP_ROUTES } from "../../constants/appRoutes";
 import { FEATURE_CARDS } from "./constants/homeConstants";
-import { COLORS } from "../../constants/colors";
 import { heroButtonStyle } from "./Home.styles";
 import styles from "./styles.home.module.css";
 
@@ -94,7 +93,7 @@ export default function Home() {
                 height="56px"
                 submitButtonVariant="orange-circle"
                 borderRadius="9999px"
-                backgroundColor={COLORS.mainBackground}
+                backgroundColor="var(--color-main-background)"
                 boxShadow="0 4px 20px -2px rgba(0, 0, 0, 0.05)"
                 inputFontSize="16px"
                 m={{ xs: "0", sm: "0" }}

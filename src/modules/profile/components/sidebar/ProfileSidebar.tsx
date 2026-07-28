@@ -19,7 +19,7 @@ export default function ProfileSidebar({
   setActiveTab,
 }: ProfileSidebarProps) {
   return (
-    <div className="w-64 shrink-0 rounded-lg border border-gray-200 bg-main-background p-3">
+    <div className="w-64 shrink-0 rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-3">
       <nav className="flex flex-col gap-1">
         {NAV_ITEMS.map((item) => {
           const isActive = item.tab === activeTab;
@@ -31,7 +31,7 @@ export default function ProfileSidebar({
               className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-left text-sm font-medium transition-colors cursor-pointer ${
                 isActive
                   ? "bg-accent-2 text-white"
-                  : "text-text-primary hover:bg-gray-100"
+                  : "text-text-primary hover:bg-gray-100 dark:hover:bg-gray-800"
               }`}
             >
               {item.icon}

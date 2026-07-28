@@ -4,7 +4,6 @@ export const API_ENDPOINTS = {
   logout: "/api/auth/logout",
   forgotPassword: "/api/auth/forgot-password",
   registerOtpSend: "/api/auth/register/otp/send",
-  registerOtpVerify: "/api/auth/register/otp/verify",
   transcripts: "/api/transcripts",
   transcriptDetail: "/api/transcripts/:id",
   transcriptFullText: "/api/transcripts/:id/full-text",

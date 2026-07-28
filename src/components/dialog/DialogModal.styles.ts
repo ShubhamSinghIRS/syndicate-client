@@ -1,13 +1,11 @@
 import type { Theme } from "@mui/material";
 import type { SystemStyleObject } from "@mui/system";
 
-const DIALOG_PAPER_BACKGROUND = "#f5f5f5";
-const DIALOG_SECTION_BACKGROUND = "#fafafa";
-
 export const dialogPaperSx: SystemStyleObject<Theme> = {
   "& .MuiDialog-paper": {
     borderRadius: "10px",
-    backgroundColor: DIALOG_PAPER_BACKGROUND,
+    backgroundColor: (theme: Theme) =>
+      theme.palette.mode === "dark" ? "#1e1e1e" : "#f5f5f5",
   },
 };
 
@@ -15,7 +13,8 @@ export const dialogTitleSx: SystemStyleObject<Theme> = {
   display: "flex",
   justifyContent: "space-between",
   borderBottom: "2px solid rgba(112, 112, 112, 0.2)",
-  backgroundColor: DIALOG_SECTION_BACKGROUND,
+  backgroundColor: (theme: Theme) =>
+    theme.palette.mode === "dark" ? "#252525" : "#fafafa",
   paddingLeft: "16px !important",
   paddingRight: "16px",
   paddingTop: "10px",
@@ -44,6 +43,7 @@ export const dialogCloseGridSx: SystemStyleObject<Theme> = {
 };
 
 export const dialogContentSx: SystemStyleObject<Theme> = {
-  backgroundColor: DIALOG_SECTION_BACKGROUND,
+  backgroundColor: (theme: Theme) =>
+    theme.palette.mode === "dark" ? "#252525" : "#fafafa",
   padding: "0.75rem 1rem",
 };

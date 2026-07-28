@@ -10,8 +10,8 @@ export default function UserDetails({
   companyName,
 }: UserDetailsProps) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-main-background p-6">
-      <h3 className="text-base font-bold text-text-primary border-b border-gray-200 pb-3 mb-4">
+    <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-6">
+      <h3 className="text-base font-bold text-text-primary border-b border-gray-200 dark:border-gray-800 pb-3 mb-4">
         My Profile
       </h3>
 

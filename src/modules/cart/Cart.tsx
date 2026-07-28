@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useCart } from "./hooks/useCart";
-import CartItemRow from "./components/cart-item/CartItemRow";
+import CartItem from "./components/cart-item/CartItem";
 import CartSummary from "./components/cart-summary/CartSummary";
 import EmptyCart from "./components/empty-cart/EmptyCart";
 import Header from "../../components/header/Header";
@@ -38,7 +38,7 @@ export default function Cart() {
             <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-12">
               <div className="flex flex-col gap-4 lg:col-span-8">
                 {items.map((item) => (
-                  <CartItemRow
+                  <CartItem
                     key={item.id}
                     item={item}
                     onRemove={() => removeFromCart(item.id)}

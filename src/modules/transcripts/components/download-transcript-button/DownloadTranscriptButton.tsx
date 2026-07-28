@@ -1,13 +1,15 @@
 import DownloadButton from "../../../../components/download-button/DownloadButton";
-import { usePurchaseActions } from "../../hooks/usePurchaseActions";
+import { useDownloadTranscript } from "../../hooks/useDownloadTranscript";
 import type { Transcript } from "../../types";
 
-type PurchaseActionsProps = {
+type DownloadTranscriptButtonProps = {
   transcript: Pick<Transcript, "id" | "title" | "domain" | "preview">;
 };
 
-export default function PurchaseActions({ transcript }: PurchaseActionsProps) {
-  const { handleDownload } = usePurchaseActions(transcript);
+export default function DownloadTranscriptButton({
+  transcript,
+}: DownloadTranscriptButtonProps) {
+  const { handleDownload } = useDownloadTranscript(transcript);
 
   return (
     <div className="flex items-center">
