@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "../../../../components/tooltip/Tooltip";
-import Chip from "../../../../components/chip/Chip";
 import DeleteIcon from "../../../../icons/Delete/Delete";
 import { APP_ROUTES } from "../../../../constants/appRoutes";
 import type { CartItem } from "../../types";
@@ -15,7 +14,6 @@ export default function CartItem({ item, onRemove }: CartItemRowProps) {
   return (
     <div className="flex items-center justify-between gap-4 rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-4">
       <div>
-        {/* <Chip label={item.domain} variant="outlined" size="small" /> */}
         <Link to={APP_ROUTES.transcriptDetail.replace(":id", item.id)}>
           <h3 className="mt-2 font-semibold text-text-primary hover:underline">
             {item.title}
