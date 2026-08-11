@@ -4,34 +4,19 @@ import Button from "../../../../components/button/Button";
 import { useHookFormContext } from "../../../../utils/hooks/useHookFormContext";
 import { validRegex } from "../../../../utils/isValidType";
 import { commonInputStyles } from "../../../../common/input-styles";
-import type { ForgotPasswordFormValues } from "../../types";
+import type { LoginOtpFormValues } from "../../types";
 
-type ForgotPasswordFieldsProps = {
-  isLinkSent: boolean;
+type LoginOtpFieldsProps = {
   onBackToSignIn: () => void;
 };
 
-export default function ForgotPasswordFields({
-  isLinkSent,
+export default function LoginOtpFields({
   onBackToSignIn,
-}: ForgotPasswordFieldsProps) {
-  const { registerState } = useHookFormContext<ForgotPasswordFormValues>();
+}: LoginOtpFieldsProps) {
+  const { registerState } = useHookFormContext<LoginOtpFormValues>();
 
   return (
     <Grid container spacing={2} mt="1px">
-      {isLinkSent && (
-        <Grid item xs={12}>
-          <div className="flex flex-col items-center py-2 text-center">
-            <p className="text-sm font-semibold text-text-primary">
-              Reset link sent
-            </p>
-            <p className="mt-1 text-sm text-text-secondary">
-              Reset link shared with you on your registered email.
-            </p>
-          </div>
-        </Grid>
-      )}
-
       <HookTextField
         {...registerState("email")}
         rules={{
@@ -53,7 +38,7 @@ export default function ForgotPasswordFields({
       <Grid item xs={12}>
         <Button
           variant="contained"
-          label={isLinkSent ? "Resend reset link" : "Send reset link"}
+          label="Send OTP"
           buttonType="submit"
           className="w-full"
         />
@@ -61,7 +46,7 @@ export default function ForgotPasswordFields({
 
       <Grid item xs={12} className="text-center">
         <span className="text-sm text-gray-700 dark:text-gray-300">
-          Already have an account?{" "}
+          Prefer a password?{" "}
           <button
             type="button"
             onClick={onBackToSignIn}

@@ -33,15 +33,16 @@ export type SidebarFilterPayload = {
   publishedDate: PublishedDateFilterValue;
 };
 
-// Query payload for GET /api/transcripts; list filters use `in___<field>`.
+// Body payload for POST /api/transcripts/filter.
 export type TranscriptsFilterPayload = {
   page: number;
   pageSize: number;
-  sort_by: "-date";
+  domain?: string[];
+  // General text search (topic, preview, domain, geography) - what the main
+  // search bar sends.
   search?: string;
-  in___domain?: string;
-  price?: PriceFilterValue;
-  publishedDate?: PublishedDateFilterValue;
+  minPrice?: number;
+  maxPrice?: number;
 };
 
 export type TranscriptsApiResponse = {

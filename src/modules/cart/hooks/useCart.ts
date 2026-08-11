@@ -1,11 +1,7 @@
+import { useSnackbar } from "notistack";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "../../../redux/store";
-import {
-  addToCart,
-  clearCart,
-  removeFromCart,
-  setCartItems,
-} from "../../../redux/cartSlice";
+import { setCartItems } from "../../../redux/cartSlice";
 import {
   fetchCart,
   mergeGuestCartIntoAccount,
@@ -15,38 +11,49 @@ import {
 } from "../cartService";
 import type { CartItem } from "../types";
 
-// Cart is persisted to localStorage (see cartSlice.ts) and synced to the
-// server via cartService.ts.
+// Cart state always mirrors the last server response (see cartService.ts) -
+// the database is the source of truth, never client storage, so the cart
+// can't be forged by editing local state.
 export const useCart = () => {
   const dispatch = useDispatch<AppDispatch>();
   const items = useSelector((state: RootState) => state.cart.items);
   const total = items.reduce((sum, item) => sum + item.price, 0);
+  const { enqueueSnackbar } = useSnackbar();
 
   return {
     items,
     total,
     addToCart: async (item: CartItem) => {
-      dispatch(addToCart(item));
       try {
-        await syncAddCartItem(item);
+        const updated = await syncAddCartItem(item);
+        dispatch(setCartItems(updated));
       } catch (err) {
         console.error("Failed to sync add-to-cart:", err);
+        enqueueSnackbar("Couldn't add item to your cart. Please try again.", {
+          variant: "error",
+        });
       }
     },
     removeFromCart: async (id: string) => {
-      dispatch(removeFromCart(id));
       try {
-        await syncRemoveCartItem(id);
+        const updated = await syncRemoveCartItem(id);
+        dispatch(setCartItems(updated));
       } catch (err) {
         console.error("Failed to sync remove-from-cart:", err);
+        enqueueSnackbar("Couldn't remove item from your cart. Please try again.", {
+          variant: "error",
+        });
       }
     },
     clearCart: async () => {
-      dispatch(clearCart());
       try {
-        await syncClearCart();
+        const updated = await syncClearCart();
+        dispatch(setCartItems(updated));
       } catch (err) {
         console.error("Failed to sync clear-cart:", err);
+        enqueueSnackbar("Couldn't clear your cart. Please try again.", {
+          variant: "error",
+        });
       }
     },
     // Folds the guest cart into the account cart; call right after sign-in/sign-up.

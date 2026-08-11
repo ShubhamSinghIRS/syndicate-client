@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { fetchTranscripts } from "../transcriptsService";
+import { fetchPurchasedTranscriptsPage, fetchTranscripts } from "../transcriptsService";
 import type { Transcript, TranscriptsFilterPayload } from "../types";
 
 export const useTranscripts = () => {
@@ -22,5 +22,19 @@ export const useTranscripts = () => {
     }
   };
 
-  return { transcripts, total, isLoading, error, loadTranscripts };
+  const loadPurchasedTranscripts = async (page: number, pageSize: number) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const data = await fetchPurchasedTranscriptsPage(page, pageSize);
+      setTranscripts(data.items);
+      setTotal(data.total);
+    } catch {
+      setError("Failed to load purchased transcripts");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { transcripts, total, isLoading, error, loadTranscripts, loadPurchasedTranscripts };
 };

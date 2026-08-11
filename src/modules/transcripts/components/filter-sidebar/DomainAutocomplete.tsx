@@ -9,8 +9,6 @@ import {
   domainTextFieldSx,
 } from "./filter-sidebar.styles";
 
-type DomainOption = { label: string; value: string; count: number };
-
 type DomainAutocompleteProps = {
   selectedDomains: string[];
   setSelectedDomains: (domains: string[]) => void;
@@ -20,22 +18,13 @@ export default function DomainAutocomplete({
   selectedDomains,
   setSelectedDomains,
 }: DomainAutocompleteProps) {
-  const [options, setOptions] = useState<DomainOption[]>([]);
+  const [options, setOptions] = useState<string[]>([]);
 
   useEffect(() => {
-    RequestServer<DomainOption[]>(API_ENDPOINTS.domains, "GET")
+    RequestServer<string[]>(API_ENDPOINTS.domains, "GET")
       .then(setOptions)
       .catch(() => setOptions([]));
   }, []);
-
-  const selectedOptions = selectedDomains.map(
-    (domain) =>
-      options.find((option) => option.value === domain) ?? {
-        label: domain,
-        value: domain,
-        count: 0,
-      },
-  );
 
   return (
     <Autocomplete
@@ -45,22 +34,19 @@ export default function DomainAutocomplete({
       limitTags={2}
       getLimitTagsText={(more) => `+${more} more`}
       options={options}
-      value={selectedOptions}
-      onChange={(_event, value) =>
-        setSelectedDomains(value.map((option) => option.value))
-      }
-      getOptionLabel={(option) => option.label}
-      isOptionEqualToValue={(option, value) => option.value === value.value}
+      value={selectedDomains}
+      onChange={(_event, value) => setSelectedDomains(value)}
+      getOptionLabel={(option) => option}
       filterOptions={(options, { inputValue }) => {
         const inputValueLowercased = inputValue.toLowerCase();
         return options.filter((option) =>
-          option.label.toLowerCase().includes(inputValueLowercased),
+          option.toLowerCase().includes(inputValueLowercased),
         );
       }}
       renderOption={(props, option, { selected }) => (
-        <li {...props} key={option.value}>
+        <li {...props} key={option}>
           <Checkbox checked={selected} sx={domainCheckboxSx} />
-          <span className="flex-1">{option.label}</span>
+          <span className="flex-1">{option}</span>
         </li>
       )}
       renderInput={(params) => (

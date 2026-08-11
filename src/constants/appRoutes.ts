@@ -5,4 +5,5 @@ export const APP_ROUTES = {
   cart: "/cart",
   checkout: "/checkout",
   profile: "/profile",
+  resetPassword: "/reset-password",
 } as const;

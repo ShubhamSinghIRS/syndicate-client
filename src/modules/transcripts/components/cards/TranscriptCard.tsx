@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Tooltip from "../../../../components/tooltip/Tooltip";
 import Typography from "@mui/material/Typography";
 import { APP_ROUTES } from "../../../../constants/appRoutes";
@@ -62,8 +62,14 @@ export default function TranscriptCard({
     ? transcript.preview
     : `${transcript.preview.replace(/\.+$/, "")}...`;
 
+  const goToDetail = () =>
+    navigate(APP_ROUTES.transcriptDetail.replace(":id", transcript.id));
+
   return (
-    <div className="relative rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-4.5">
+    <div
+      onClick={goToDetail}
+      className="relative rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-4.5 cursor-pointer"
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-wrap items-center gap-1.5 min-w-0 flex-1">
           <Typography variant="body2" component="span" sx={domainLabelSx}>
@@ -96,14 +102,12 @@ export default function TranscriptCard({
         </div>
       </div>
 
-      <Link to={APP_ROUTES.transcriptDetail.replace(":id", transcript.id)}>
-        <h2 className="mt-1.5 text-xl font-bold text-text-primary hover:text-accent-2 transition-colors">
-          {transcript.title}
-        </h2>
-        <p className="mt-1 text-text-secondary hover:text-text-primary transition-colors line-clamp-2">
-          {previewText}
-        </p>
-      </Link>
+      <h2 className="mt-1.5 text-xl font-bold text-text-primary hover:text-accent-2 transition-colors">
+        {transcript.title}
+      </h2>
+      <p className="mt-1 text-text-secondary hover:text-text-primary transition-colors line-clamp-2">
+        {previewText}
+      </p>
 
       <div className="mt-2.5 flex items-center justify-between">
         <Tooltip title="Published Date" arrow>
@@ -137,7 +141,8 @@ export default function TranscriptCard({
                   variant="outlined"
                   label={isInCart ? "In Cart" : "Add to Cart"}
                   startIcon={isInCart ? <CheckIcon fontSize="small" /> : undefined}
-                  onClick={() => {
+                  onClick={(event: React.MouseEvent) => {
+                    event.stopPropagation();
                     setSuppressCartTooltip(true);
                     if (isInCart) {
                       removeFromCart(transcript.id);
@@ -151,7 +156,10 @@ export default function TranscriptCard({
             <Button
               variant="contained"
               label="Buy Transcript"
-              onClick={handleBuyTranscript}
+              onClick={(event: React.MouseEvent) => {
+                event.stopPropagation();
+                handleBuyTranscript();
+              }}
             />
           </div>
         )}

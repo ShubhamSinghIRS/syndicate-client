@@ -1,4 +1,8 @@
-export type AuthDialogMode = "signin" | "register" | "forgot-password";
+export type AuthDialogMode =
+  | "signin"
+  | "register"
+  | "forgot-password"
+  | "otp-login";
 
 export type SignInFormValues = {
   workEmail: string;
@@ -16,6 +20,15 @@ export type ForgotPasswordFormValues = {
   email: string;
 };
 
+export type LoginOtpFormValues = {
+  email: string;
+};
+
+export type ResetPasswordFormValues = {
+  password: string;
+  confirmPassword: string;
+};
+
 export type RegisterOtpFormValues = {
   otp: string;
 };
@@ -28,4 +41,8 @@ export type AuthResponse = {
     email: string;
     companyName?: string | null;
   };
+};
+
+export type PendingAuthResponse = {
+  tempToken: string;
 };

@@ -1,5 +1,6 @@
 import { useContext, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { useSnackbar } from "notistack";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { getDefaultFormTheme } from "../../../../common/defaultFormTheme";
 import { useThemeMode } from "../../../../context/ThemeModeContext";
@@ -36,16 +37,21 @@ export default function RequestTopicForm({
     [mode],
   );
   const { setLoading } = useContext(LoadingContext);
+  const { enqueueSnackbar } = useSnackbar();
 
   const onSubmit = async (data: RequestTopicFormValues) => {
     setLoading(true);
     try {
       await RequestServer(API_ENDPOINTS.topicsRequest, "POST", data);
+      enqueueSnackbar("Your topic request has been submitted.", {
+        variant: "success",
+      });
       handleSubmitClose();
     } catch (error) {
-      methods.setError("root", {
-        message: (error as Error).message || "Something went wrong. Please try again.",
-      });
+      const message =
+        (error as Error).message || "Something went wrong. Please try again.";
+      methods.setError("root", { message });
+      enqueueSnackbar(message, { variant: "error" });
     } finally {
       setLoading(false);
     }

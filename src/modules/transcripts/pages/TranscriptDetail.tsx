@@ -34,12 +34,21 @@ export default function TranscriptDetail() {
     setTranscript(null);
     setNotFound(false);
 
-    if (id) {
-      fetchTranscriptById(id)
-        .then(setTranscript)
-        .catch(() => setNotFound(true));
+    if (!id) return;
+
+    // :id matches any path segment, so a made-up route like /transcripts/checkout
+    // would otherwise be sent to the backend and come back as a "not found
+    // transcript" - it isn't a real id at all, so treat it the same as any
+    // other nonexistent route instead of pretending a lookup happened.
+    if (!/^\d+$/.test(id)) {
+      navigate(APP_ROUTES.home, { replace: true });
+      return;
     }
-  }, [id]);
+
+    fetchTranscriptById(id)
+      .then(setTranscript)
+      .catch(() => setNotFound(true));
+  }, [id, navigate]);
 
   useEffect(() => {
     setFullText(null);

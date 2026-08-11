@@ -95,11 +95,13 @@ const SearchBar = React.forwardRef<SearchBarHandle, Props>(
       return null;
     };
     const handleInputBaseChange = (event: any) => {
-      setSearch(event.target.value);
+      // No input field should accept a leading space.
+      const value = event.target.value.replace(/^\s+/, "");
+      setSearch(value);
       if (getOnChange && onChangeFunction) {
-        onChangeFunction(event.target.value);
+        onChangeFunction(value);
       }
-      if (event.target.value === "" && clearTriggersSearch) {
+      if (value === "" && clearTriggersSearch) {
         onSearch("");
       }
     };

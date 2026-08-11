@@ -21,8 +21,7 @@ export default function RelatedTranscripts({
     loadTranscripts({
       page: 1,
       pageSize: RELATED_COUNT + 1,
-      sort_by: "-date",
-      in___domain: domain,
+      domain: [domain],
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [domain]);

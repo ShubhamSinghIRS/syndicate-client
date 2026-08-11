@@ -98,7 +98,14 @@ const Component = <T extends FieldValues>({
               }
             }
           })}
-          onChange={callAll(onChangeI, onChangeRef.current)}
+          onChange={(event) => {
+            // No input field should accept a leading space - strip it before
+            // it reaches react-hook-form/state, not just on blur.
+            if (event.target.value.startsWith(" ")) {
+              event.target.value = event.target.value.replace(/^\s+/, "");
+            }
+            callAll(onChangeI, onChangeRef.current)(event);
+          }}
         />
       )}
     />

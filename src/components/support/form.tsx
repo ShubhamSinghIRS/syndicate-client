@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { useSnackbar } from "notistack";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { getDefaultFormTheme } from "../../common/defaultFormTheme";
 import { useThemeMode } from "../../context/ThemeModeContext";
@@ -28,17 +29,20 @@ export default function SupportForm({ handleSubmitClose }: SupportFormProps) {
   );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   const onSubmit = async (data: SupportFormValues) => {
     setIsSubmitting(true);
     try {
       await RequestServer(API_ENDPOINTS.support, "POST", data);
       methods.reset();
+      enqueueSnackbar("Your message has been sent.", { variant: "success" });
       handleSubmitClose();
     } catch (error) {
-      methods.setError("root", {
-        message: (error as Error).message || "Something went wrong. Please try again.",
-      });
+      const message =
+        (error as Error).message || "Something went wrong. Please try again.";
+      methods.setError("root", { message });
+      enqueueSnackbar(message, { variant: "error" });
     } finally {
       setIsSubmitting(false);
     }

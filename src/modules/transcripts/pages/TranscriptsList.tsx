@@ -25,7 +25,7 @@ import type {
 const SEARCH_DEBOUNCE_MS = 300;
 
 export default function TranscriptsList() {
-  const { transcripts, total, isLoading, error, loadTranscripts } =
+  const { transcripts, total, isLoading, error, loadTranscripts, loadPurchasedTranscripts } =
     useTranscripts();
   const purchasedIds = usePurchasedTranscriptIds();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -115,16 +115,17 @@ export default function TranscriptsList() {
   }, [search, sidebarFilters, page, pageSize, setSearchParams]);
 
   useEffect(() => {
-    loadTranscripts(
-      buildTranscriptsFilterPayload(debouncedSearch, sidebarFilters, page, pageSize),
-    );
+    if (purchasedOnly) {
+      loadPurchasedTranscripts(page, pageSize);
+    } else {
+      loadTranscripts(
+        buildTranscriptsFilterPayload(debouncedSearch, sidebarFilters, page, pageSize),
+      );
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch, sidebarFilters, page, pageSize]);
+  }, [purchasedOnly, debouncedSearch, sidebarFilters, page, pageSize]);
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const visibleTranscripts = purchasedOnly
-    ? transcripts.filter((transcript) => purchasedIds.includes(transcript.id))
-    : transcripts;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -160,7 +161,10 @@ export default function TranscriptsList() {
                 setPage(1);
               }}
               purchasedOnly={purchasedOnly}
-              setPurchasedOnly={setPurchasedOnly}
+              setPurchasedOnly={(value) => {
+                setPurchasedOnly(value);
+                setPage(1);
+              }}
             />
 
             <div className="flex-1">
@@ -176,7 +180,7 @@ export default function TranscriptsList() {
                 </div>
               ) : error ? (
                 <p className="mt-4">{error}</p>
-              ) : visibleTranscripts.length === 0 ? (
+              ) : transcripts.length === 0 ? (
                 <div className="mt-8 flex flex-col items-center justify-center py-16 text-center">
                   <p className="text-lg font-semibold text-text-primary">
                     {purchasedOnly
@@ -186,17 +190,17 @@ export default function TranscriptsList() {
                 </div>
               ) : (
                 <div className="mt-4 flex max-h-[960px] flex-col gap-3 overflow-y-scroll pr-2">
-                  {visibleTranscripts.map((transcript) => (
+                  {transcripts.map((transcript) => (
                     <TranscriptCard
                       key={transcript.id}
                       transcript={transcript}
-                      isPurchased={purchasedIds.includes(transcript.id)}
+                      isPurchased={purchasedOnly || purchasedIds.includes(transcript.id)}
                     />
                   ))}
                 </div>
               )}
 
-              {total > 0 && !purchasedOnly && (
+              {total > 0 && (
                 <div className="mt-8">
                   <PaginationComponent
                     page={page}

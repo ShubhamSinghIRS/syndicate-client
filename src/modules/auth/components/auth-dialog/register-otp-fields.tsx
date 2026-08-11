@@ -10,6 +10,7 @@ type RegisterOtpFieldsProps = {
   email: string;
   onResend: () => void;
   onBack: () => void;
+  submitLabel?: string;
 };
 
 const RESEND_SECONDS = 60;
@@ -18,6 +19,7 @@ export default function RegisterOtpFields({
   email,
   onResend,
   onBack,
+  submitLabel = "Verify",
 }: RegisterOtpFieldsProps) {
   const { registerState } = useHookFormContext<RegisterOtpFormValues>();
   const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
@@ -81,7 +83,7 @@ export default function RegisterOtpFields({
       <Grid item xs={12} className="flex justify-end">
         <Button
           variant="contained"
-          label="Verify & Sign Up"
+          label={submitLabel}
           buttonType="submit"
         />
       </Grid>

@@ -10,11 +10,13 @@ import type { SignInFormValues } from "../../types";
 type SignInFieldsProps = {
   onSwitchToRegister: () => void;
   onForgotPassword: () => void;
+  onLoginWithOtp: () => void;
 };
 
 export default function SignInFields({
   onSwitchToRegister,
   onForgotPassword,
+  onLoginWithOtp,
 }: SignInFieldsProps) {
   const { registerState } = useHookFormContext<SignInFormValues>();
   const passwordVisibility = usePasswordVisibility();
@@ -56,6 +58,15 @@ export default function SignInFields({
           variant="contained"
           label="Login"
           buttonType="submit"
+          className="w-full"
+        />
+      </Grid>
+
+      <Grid item xs={12}>
+        <Button
+          variant="outlined"
+          label="Login with OTP"
+          onClick={onLoginWithOtp}
           className="w-full"
         />
       </Grid>

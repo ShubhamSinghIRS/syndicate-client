@@ -31,6 +31,11 @@ export const decodeJWT = (token: string): JWTPayload | null => {
   }
 };
 
+// Login/signup happen inside a dialog without a page reload, so hooks that
+// already mounted (and cached e.g. isLoggedIn() from before sign-in) need a
+// signal to refetch - this is that signal.
+export const AUTH_CHANGED_EVENT = "auth-changed";
+
 export const processToken = (
   token: string,
   user?: {
@@ -54,6 +59,8 @@ export const processToken = (
   if (userName) setStorageItem("userName", userName);
   if (email) setStorageItem("email", email);
   if (user?.companyName) setStorageItem("companyName", user.companyName);
+
+  window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
 };
 
 export const isLoggedIn = (): boolean => {

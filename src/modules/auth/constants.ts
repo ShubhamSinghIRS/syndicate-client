@@ -17,4 +17,8 @@ export const MODE_COPY: Record<
     subtitle:
       "Enter your registered email to receive a reset link.",
   },
+  "otp-login": {
+    title: "Login with OTP",
+    subtitle: "We'll email you a one-time code to sign in.",
+  },
 };
