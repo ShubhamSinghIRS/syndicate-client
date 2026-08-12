@@ -1,21 +1,21 @@
 import { useEffect, useMemo } from "react";
 import TranscriptCard from "../cards/TranscriptCard";
 import { useTranscripts } from "../../hooks/useTranscripts";
-import { usePurchasedTranscriptIds } from "../../../orders/hooks/usePurchasedTranscriptIds";
 
 const RELATED_COUNT = 3;
 
 type RelatedTranscriptsProps = {
   domain: string;
   excludeId: string;
+  purchasedIds: string[];
 };
 
 export default function RelatedTranscripts({
   domain,
   excludeId,
+  purchasedIds,
 }: RelatedTranscriptsProps) {
   const { transcripts, loadTranscripts } = useTranscripts();
-  const purchasedIds = usePurchasedTranscriptIds();
 
   useEffect(() => {
     loadTranscripts({

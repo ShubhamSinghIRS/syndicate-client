@@ -119,6 +119,7 @@ export default function TranscriptDetail() {
               <RelatedTranscripts
                 domain={transcript.domain}
                 excludeId={transcript.id}
+                purchasedIds={purchasedIds}
               />
             </div>
 

@@ -1,6 +1,5 @@
 import { API_ENDPOINTS } from "../../constants/apiEndpoints";
 import { RequestServer } from "../../utils/services";
-import { DEFAULT_SIDEBAR_FILTERS } from "./components/filter-sidebar/constants";
 import type {
   PriceFilterValue,
   SidebarFilterPayload,
@@ -80,7 +79,7 @@ export const buildTranscriptsFilterPayload = (
   const payload: TranscriptsFilterPayload = { page, pageSize };
   if (search) payload.search = search;
   if (filters.domains.length) payload.domain = filters.domains;
-  if (filters.price !== DEFAULT_SIDEBAR_FILTERS.price) {
+  if (filters.price !== "all") {
     Object.assign(payload, PRICE_RANGES[filters.price]);
   }
   // publishedDate filtering isn't implemented server-side yet.
