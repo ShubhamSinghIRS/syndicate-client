@@ -35,6 +35,7 @@ type AuthFormProps = {
   mode: AuthDialogMode;
   setMode: (mode: AuthDialogMode) => void;
   handleSubmitClose: () => void;
+  onDirtyChange: (isDirty: boolean) => void;
 };
 
 const signInDefaultValues: SignInFormValues = { workEmail: "", password: "" };
@@ -57,6 +58,7 @@ export default function AuthForm({
   mode,
   setMode,
   handleSubmitClose,
+  onDirtyChange,
 }: AuthFormProps) {
   const signInMethods = useForm<SignInFormValues>({
     defaultValues: signInDefaultValues,
@@ -143,6 +145,31 @@ export default function AuthForm({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
+
+  // Only the form currently on screen can hold unsaved input worth warning
+  // about - figure out which one that is, mirroring the render logic below.
+  const activeIsDirty = (() => {
+    if (mode === "signin") {
+      return needsEmailVerification && signInPendingToken
+        ? signInOtpMethods.formState.isDirty
+        : signInMethods.formState.isDirty;
+    }
+    if (mode === "forgot-password") {
+      return forgotPasswordMethods.formState.isDirty;
+    }
+    if (mode === "otp-login") {
+      return loginOtpStep === "otp" && loginOtpPendingToken
+        ? loginOtpOtpMethods.formState.isDirty
+        : loginOtpEmailMethods.formState.isDirty;
+    }
+    return registerStep === "details"
+      ? registerMethods.formState.isDirty
+      : registerOtpMethods.formState.isDirty;
+  })();
+
+  useEffect(() => {
+    onDirtyChange(activeIsDirty);
+  }, [activeIsDirty, onDirtyChange]);
 
   const onSignIn = async (data: SignInFormValues) => {
     setLoading(true);

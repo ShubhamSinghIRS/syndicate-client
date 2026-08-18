@@ -5,6 +5,7 @@ import { useHookFormContext } from "../../../../utils/hooks/useHookFormContext";
 import { validRegex } from "../../../../utils/isValidType";
 import { commonInputStyles } from "../../../../common/input-styles";
 import { usePasswordVisibility } from "./usePasswordVisibility";
+import PasswordRequirements from "./PasswordRequirements";
 import type { RegisterFormValues } from "../../types";
 
 type RegisterFieldsProps = {
@@ -14,8 +15,9 @@ type RegisterFieldsProps = {
 export default function RegisterFields({
   onSwitchToSignIn,
 }: RegisterFieldsProps) {
-  const { registerState } = useHookFormContext<RegisterFormValues>();
+  const { registerState, watch } = useHookFormContext<RegisterFormValues>();
   const passwordVisibility = usePasswordVisibility();
+  const password = watch("password") || "";
 
   return (
     <Grid container spacing={2} mt="1px">
@@ -55,6 +57,11 @@ export default function RegisterFields({
             value: 8,
             message: "Password must be at least 8 characters",
           },
+          pattern: {
+            value: validRegex("password"),
+            message:
+              "Password must include an uppercase letter, a lowercase letter, a number, and a special character",
+          },
         }}
         textFieldProps={{
           ...commonInputStyles,
@@ -65,6 +72,9 @@ export default function RegisterFields({
         }}
         gridProps={{ xs: 12 }}
       />
+      <Grid item xs={12} sx={{ pt: "4px !important" }}>
+        <PasswordRequirements password={password} />
+      </Grid>
       <HookTextField
         {...registerState("companyName")}
         textFieldProps={{

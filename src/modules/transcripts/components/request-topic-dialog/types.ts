@@ -1,8 +1,12 @@
+export type SuggestedExpert = {
+  name: string;
+  linkedin: string;
+};
+
 export type RequestTopicFormValues = {
-  domain: string;
+  domain: string[];
   topic: string;
   email: string;
   remark: string;
-  suggestedExpertName: string;
-  suggestedExpertLinkedin: string;
+  suggestedExperts: SuggestedExpert[];
 };

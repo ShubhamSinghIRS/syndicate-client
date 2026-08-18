@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useState } from "react";
 import type { ReactNode } from "react";
 import AuthDialog from "../components/auth-dialog";
+import WarningDialog from "../../../components/form-close-warning/WarningDialog";
+import { useFormCloseWarning } from "../../../utils/hooks/useFormCloseWarning";
 import type { AuthDialogMode } from "../types";
 
 type AuthDialogContextValue = {
@@ -11,25 +13,32 @@ type AuthDialogContextValue = {
 const AuthDialogContext = createContext<AuthDialogContextValue | null>(null);
 
 export function AuthDialogProvider({ children }: { children: ReactNode }) {
-  const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<AuthDialogMode>("signin");
   const [onSuccessCallback, setOnSuccessCallback] = useState<
     (() => void) | null
   >(null);
+  const {
+    isOpen,
+    open,
+    requestClose,
+    setDirty,
+    isWarningOpen,
+    closeWarning,
+    confirmDiscard,
+    notifySubmitted,
+  } = useFormCloseWarning();
 
   const openAuthDialog = useCallback(
     (newMode: AuthDialogMode = "signin", onSuccess?: () => void) => {
       setMode(newMode);
       setOnSuccessCallback(() => onSuccess ?? null);
-      setIsOpen(true);
+      open();
     },
-    [],
+    [open],
   );
 
-  const handleClose = () => setIsOpen(false);
-
   const handleSuccess = () => {
-    setIsOpen(false);
+    notifySubmitted();
     onSuccessCallback?.();
     setOnSuccessCallback(null);
   };
@@ -39,9 +48,16 @@ export function AuthDialogProvider({ children }: { children: ReactNode }) {
       {children}
       <AuthDialog
         isOpen={isOpen}
-        handleClose={handleClose}
+        handleClose={requestClose}
+        onDirtyChange={setDirty}
         initialMode={mode}
         onSuccess={handleSuccess}
+      />
+      <WarningDialog
+        open={isWarningOpen}
+        handleClose={closeWarning}
+        handleYesClick={confirmDiscard}
+        text="Are you sure you want to close? The information you've entered will be lost."
       />
     </AuthDialogContext.Provider>
   );

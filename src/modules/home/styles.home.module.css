@@ -2,3 +2,35 @@
   background-image: radial-gradient(circle 800px at 50% -100px, rgba(236, 147, 36, 0.12), transparent);
   background-color: var(--color-main-background);
 }
+
+/* Breaks the hero row out of the page's centered max-width so it spans the
+   full viewport, while heroTextCol below keeps the copy aligned with the
+   rest of the page's content edge. */
+.fullBleedRow {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
+.heroTextCol {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .heroTextCol {
+    /* Same left inset as the page's centered max-w-[1440px] sections, so the
+       headline lines up with the header logo and the sections below it. */
+    padding-left: max(1.5rem, calc((100vw - 1440px) / 2 + 1.5rem));
+    padding-right: 2.5rem;
+  }
+}
+
+/* The source PNG has a thin drop-shadow line baked in along its bottom edge
+   and hard photo edges on all sides. A vignette mask fades those edges to
+   transparent so the image dissolves into the page background instead of
+   sitting inside a visible rectangle. */
+.heroImage {
+  -webkit-mask-image: radial-gradient(ellipse 78% 78% at 50% 50%, black 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 78% 78% at 50% 50%, black 55%, transparent 100%);
+}

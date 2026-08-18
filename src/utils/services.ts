@@ -1,3 +1,5 @@
+import axios from "axios";
+import type { AxiosRequestConfig, AxiosResponse } from "axios";
 import { getStorageItem } from "./storageUtils";
 import { logout, processToken } from "./authUtils";
 import { API_ENDPOINTS } from "../constants/apiEndpoints";
@@ -28,25 +30,54 @@ export class ApiError extends Error {
   }
 }
 
+// axios never times out on its own unless told to - a hung backend (cold
+// start, dropped connection, mid-deploy) would otherwise leave a caller's
+// await pending forever with no error and no way to recover.
+const REQUEST_TIMEOUT_MS = 20000;
+
+// Status codes are inspected manually below (401-then-refresh-then-retry,
+// envelope unwrapping) instead of letting axios throw on 4xx/5xx, so every
+// non-network failure stays handled in one place.
+const client = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: REQUEST_TIMEOUT_MS,
+  withCredentials: true,
+  validateStatus: () => true,
+});
+
+const isTimeout = (error: unknown): boolean =>
+  axios.isAxiosError(error) &&
+  (error.code === "ECONNABORTED" || error.code === "ETIMEDOUT");
+
+const request = async (config: AxiosRequestConfig): Promise<AxiosResponse> => {
+  try {
+    return await client.request(config);
+  } catch (error) {
+    if (isTimeout(error)) {
+      throw new Error("The request timed out. Please check your connection and try again.");
+    }
+    throw error;
+  }
+};
+
 // Access tokens are short-lived; the backend hands out a long-lived refresh
-// token via an httpOnly cookie (scoped to /api/auth) instead. `credentials:
-// "include"` on every request is what lets the browser store/send that
-// cookie across the cross-origin frontend/backend split. Deduped so several
-// requests 401ing at once trigger a single refresh instead of racing each
-// other to rotate the refresh token.
+// token via an httpOnly cookie (scoped to /api/auth) instead. `withCredentials`
+// on every request is what lets the browser store/send that cookie across
+// the cross-origin frontend/backend split. Deduped so several requests
+// 401ing at once trigger a single refresh instead of racing each other to
+// rotate the refresh token.
 let refreshPromise: Promise<string | null> | null = null;
 
 const refreshAccessToken = (): Promise<string | null> => {
   if (!refreshPromise) {
-    refreshPromise = fetch(`${API_BASE_URL}${API_ENDPOINTS.refresh}`, {
+    refreshPromise = request({
+      url: API_ENDPOINTS.refresh,
       method: "POST",
-      credentials: "include",
       headers: { "Content-Type": "application/json" },
     })
-      .then(async (response) => {
-        if (!response.ok) return null;
-        const json = await response.json();
-        const data = json?.data as
+      .then((response) => {
+        if (response.status < 200 || response.status >= 300) return null;
+        const data = response.data?.data as
           | { token?: string; user?: Parameters<typeof processToken>[1] }
           | undefined;
         if (!data?.token) return null;
@@ -67,27 +98,27 @@ export const RequestServer = async <T>(
   body?: object,
   extraHeaders?: Record<string, string>,
 ): Promise<T> => {
-  const request = (token: string | null) =>
-    fetch(`${API_BASE_URL}${url}`, {
+  const send = (token: string | null) =>
+    request({
+      url,
       method,
-      credentials: "include",
+      data: body,
       headers: {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...extraHeaders,
       },
-      body: body ? JSON.stringify(body) : undefined,
     });
 
   const token = getStorageItem<string>("token");
-  let response = await request(token);
+  let response = await send(token);
 
   if (response.status === 401 && token) {
     // Access token may have simply expired - try a silent refresh before
     // logging the user out.
     const refreshedToken = await refreshAccessToken();
     if (refreshedToken) {
-      response = await request(refreshedToken);
+      response = await send(refreshedToken);
     }
   }
 
@@ -99,35 +130,42 @@ export const RequestServer = async <T>(
       logout();
       throw new Error("Session expired");
     }
-    throw new ApiError("Not authenticated", 401);
+    // A 401 with no token isn't always "you need to log in" - e.g. the
+    // login/OTP endpoints themselves use 401 for wrong credentials, and
+    // have a specific message worth showing instead of a generic one.
+    throw new ApiError(response.data?.message || "Not authenticated", 401);
   }
 
-  const json = await response.json();
-
-  if (!response.ok) {
-    throw new ApiError(json?.message || `Request failed: ${response.status}`, response.status, json?.data);
+  if (response.status < 200 || response.status >= 300) {
+    throw new ApiError(
+      response.data?.message || `Request failed: ${response.status}`,
+      response.status,
+      response.data?.data,
+    );
   }
 
-  return (json as ApiEnvelope<T>).data;
+  return (response.data as ApiEnvelope<T>).data;
 };
 
 export const RequestServerBlob = async (
   url: string,
   errorMessage: string,
 ): Promise<Blob> => {
-  const request = (token: string | null) =>
-    fetch(`${API_BASE_URL}${url}`, {
-      credentials: "include",
+  const send = (token: string | null) =>
+    request({
+      url,
+      method: "GET",
+      responseType: "blob",
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
 
   const token = getStorageItem<string>("token");
-  let response = await request(token);
+  let response = await send(token);
 
   if (response.status === 401 && token) {
     const refreshedToken = await refreshAccessToken();
     if (refreshedToken) {
-      response = await request(refreshedToken);
+      response = await send(refreshedToken);
     }
   }
 
@@ -139,9 +177,9 @@ export const RequestServerBlob = async (
     throw new Error(`${errorMessage}: 401`);
   }
 
-  if (!response.ok) {
+  if (response.status < 200 || response.status >= 300) {
     throw new Error(`${errorMessage}: ${response.status}`);
   }
 
-  return response.blob();
+  return response.data as Blob;
 };

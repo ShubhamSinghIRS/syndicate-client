@@ -29,18 +29,13 @@ export default function ErrorPage() {
           />
         </defs>
         <g fill="none" fillRule="evenodd">
-          <path
-            fill="#FFF"
-            d="M0 0H1366V800H0z"
-            transform="translate(-448 -157)"
-          />
           <g transform="translate(-448 -157) translate(448 157)">
             <mask id="prefix__b" fill="#fff">
               <use xlinkHref="#prefix__a" />
             </mask>
-            <use fill="#F6F6F7" xlinkHref="#prefix__a" />
+            <use className={styles.sky} xlinkHref="#prefix__a" />
             <path
-              fill="#EDEDF0"
+              className={styles.ground}
               fillRule="nonzero"
               d="M-14.199 211.2H481.36V301.2H-14.199z"
               mask="url(#prefix__b)"

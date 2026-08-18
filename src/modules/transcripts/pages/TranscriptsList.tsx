@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { useTranscripts } from "../hooks/useTranscripts";
+import { useFilterBounds } from "../hooks/useFilterBounds";
 import { usePurchasedTranscriptIds } from "../../orders/hooks/usePurchasedTranscriptIds";
 import { buildTranscriptsFilterPayload } from "../transcriptsService";
 import TranscriptCard from "../components/cards/TranscriptCard";
@@ -13,9 +14,9 @@ import Footer from "../../../components/footer/Footer";
 import PaginationComponent from "../../../components/pagination/Pagination";
 import RequestTopicDialog from "../components/request-topic-dialog";
 import WarningDialog from "../../../components/form-close-warning/WarningDialog";
-import { useBoolean } from "../../../utils/hooks/useBoolean";
+import { useFormCloseWarning } from "../../../utils/hooks/useFormCloseWarning";
 import { DEFAULT_SIDEBAR_FILTERS } from "../components/filter-sidebar/constants";
-import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from "./constants";
+import { PAGE_SIZE } from "./constants";
 import type {
   PriceFilterValue,
   PublishedDateFilterValue,
@@ -28,6 +29,7 @@ export default function TranscriptsList() {
   const { transcripts, total, isLoading, error, loadTranscripts, loadPurchasedTranscripts } =
     useTranscripts();
   const purchasedIds = usePurchasedTranscriptIds();
+  const filterBounds = useFilterBounds();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("q") ?? "");
   const [debouncedSearch, setDebouncedSearch] = useState(search);
@@ -46,48 +48,12 @@ export default function TranscriptsList() {
   );
   const [purchasedOnly, setPurchasedOnly] = useState(false);
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
-  const [pageSize, setPageSize] = useState(
-    Number(searchParams.get("pageSize")) || PAGE_SIZE,
-  );
-  const {
-    value: isRequestTopicOpen,
-    setTrue: openRequestTopic,
-    setFalse: closeRequestTopic,
-  } = useBoolean();
-  const {
-    value: isRequestTopicChanged,
-    setTrue: setRequestTopicChanged,
-    setFalse: resetRequestTopicChanged,
-  } = useBoolean();
-  const {
-    value: isWarningOpen,
-    setTrue: openWarning,
-    setFalse: closeWarning,
-  } = useBoolean();
+  const requestTopicDialog = useFormCloseWarning();
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
     setSidebarFilters(DEFAULT_SIDEBAR_FILTERS);
     setPage(1);
-  };
-
-  const handleRequestTopicClose = () => {
-    if (isRequestTopicChanged) {
-      openWarning();
-    } else {
-      closeRequestTopic();
-    }
-  };
-
-  const handleDiscardChanges = () => {
-    closeWarning();
-    resetRequestTopicChanged();
-    closeRequestTopic();
-  };
-
-  const handleRequestTopicSubmitted = () => {
-    resetRequestTopicChanged();
-    closeRequestTopic();
   };
 
   // Debounced so typing doesn't fire a network request per keystroke now
@@ -110,28 +76,33 @@ export default function TranscriptsList() {
       params.publishedDate = sidebarFilters.publishedDate;
     }
     if (page !== 1) params.page = String(page);
-    if (pageSize !== PAGE_SIZE) params.pageSize = String(pageSize);
     setSearchParams(params, { replace: true });
-  }, [search, sidebarFilters, page, pageSize, setSearchParams]);
+  }, [search, sidebarFilters, page, setSearchParams]);
 
   useEffect(() => {
     if (purchasedOnly) {
-      loadPurchasedTranscripts(page, pageSize);
+      loadPurchasedTranscripts(page, PAGE_SIZE);
     } else {
       loadTranscripts(
-        buildTranscriptsFilterPayload(debouncedSearch, sidebarFilters, page, pageSize),
+        buildTranscriptsFilterPayload(
+          debouncedSearch,
+          sidebarFilters,
+          page,
+          PAGE_SIZE,
+          filterBounds,
+        ),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [purchasedOnly, debouncedSearch, sidebarFilters, page, pageSize]);
+  }, [purchasedOnly, debouncedSearch, sidebarFilters, page, filterBounds]);
 
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <div className="flex min-h-screen flex-col">
       <Header
         isSearch
-        searchPlaceholder="Search topics, domains, or keywords..."
+        searchPlaceholder="Search transcripts..."
         searchValue={search}
         onSearch={handleSearchChange}
         isExtraComponent
@@ -139,7 +110,7 @@ export default function TranscriptsList() {
           <Button
             variant="outlined"
             label="Can't find it ? Request A Topic"
-            onClick={openRequestTopic}
+            onClick={requestTopicDialog.open}
             styles={{
               fontWeight: 500,
               fontSize: "13px",
@@ -165,6 +136,7 @@ export default function TranscriptsList() {
                 setPurchasedOnly(value);
                 setPage(1);
               }}
+              bounds={filterBounds}
             />
 
             <div className="flex-1">
@@ -172,14 +144,12 @@ export default function TranscriptsList() {
                 All transcripts
               </h1>
 
-              {isLoading ? (
+              {isLoading || error ? (
                 <div className="mt-4 flex flex-col gap-3 pr-2">
                   <TranscriptCardSkeleton />
                   <TranscriptCardSkeleton />
                   <TranscriptCardSkeleton />
                 </div>
-              ) : error ? (
-                <p className="mt-4">{error}</p>
               ) : transcripts.length === 0 ? (
                 <div className="mt-8 flex flex-col items-center justify-center py-16 text-center">
                   <p className="text-lg font-semibold text-text-primary">
@@ -205,19 +175,7 @@ export default function TranscriptsList() {
                   <PaginationComponent
                     page={page}
                     totalPages={totalPages}
-                    totalResult={total}
-                    paginationHandler={(_e, value) => setPage(value)}
-                    dropdownFilterProps={{
-                      setFilterPayload: (value) => {
-                        setPageSize(Number(value));
-                        setPage(1);
-                      },
-                      dropDownItems: PAGE_SIZE_OPTIONS.map((size) => ({
-                        label: size,
-                        value: size.toString(),
-                      })),
-                      filterValue: pageSize.toString(),
-                    }}
+                    onPageChange={setPage}
                   />
                 </div>
               )}
@@ -225,15 +183,15 @@ export default function TranscriptsList() {
           </div>
 
           <RequestTopicDialog
-            isOpen={isRequestTopicOpen}
-            handleClose={handleRequestTopicClose}
-            handleFormChange={setRequestTopicChanged}
-            handleSubmitClose={handleRequestTopicSubmitted}
+            isOpen={requestTopicDialog.isOpen}
+            handleClose={requestTopicDialog.requestClose}
+            onDirtyChange={requestTopicDialog.setDirty}
+            handleSubmitClose={requestTopicDialog.notifySubmitted}
           />
           <WarningDialog
-            open={isWarningOpen}
-            handleClose={closeWarning}
-            handleYesClick={handleDiscardChanges}
+            open={requestTopicDialog.isWarningOpen}
+            handleClose={requestTopicDialog.closeWarning}
+            handleYesClick={requestTopicDialog.confirmDiscard}
           />
         </div>
       </div>

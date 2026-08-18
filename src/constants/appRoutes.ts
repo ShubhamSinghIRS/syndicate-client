@@ -6,4 +6,5 @@ export const APP_ROUTES = {
   checkout: "/checkout",
   profile: "/profile",
   resetPassword: "/reset-password",
+  termsOfUse: "/terms-of-use",
 } as const;

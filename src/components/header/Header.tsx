@@ -51,11 +51,11 @@ export default function Header({
   return (
     <header className="sticky top-0 z-50 bg-header-background border-b border-gray-100 dark:border-gray-800">
       <div className="flex items-center justify-between gap-6 px-6 py-3">
-        <Link to={APP_ROUTES.home} className="flex shrink-0 items-center">
+        <Link to={APP_ROUTES.home} className="flex shrink-0 items-center pl-4">
           <img
-            src="/assets/infollion_logo_200x100.png"
+            src="/assets/logo_hd.png"
             alt="Infollion"
-            className="h-12 w-auto"
+            className="h-14 w-auto"
           />
         </Link>
 

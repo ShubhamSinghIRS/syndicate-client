@@ -42,10 +42,10 @@ export default function Fields() {
         rules={{ required: { value: true, message: "This field is required" } }}
         textFieldProps={{
           ...commonInputStyles,
-          label: "What are you trying to find?",
+          label: "How can we help?",
           required: true,
           multiline: true,
-          rows: 5,
+          rows: 4,
         }}
         gridProps={{ xs: 12 }}
       />
@@ -54,7 +54,7 @@ export default function Fields() {
           variant="contained"
           label="Send message"
           buttonType="submit"
-          styles={{ width: "100%", height: "44px", fontSize: "14px" }}
+          styles={{ width: "100%", height: "42px", fontSize: "14px" }}
         />
       </Grid>
     </Grid>

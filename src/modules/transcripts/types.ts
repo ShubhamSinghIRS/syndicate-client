@@ -1,4 +1,4 @@
-export type Author = {
+export type Expert = {
   name: string;
   title: string;
   company: string;
@@ -18,7 +18,7 @@ export type Transcript = {
   date: string;
   geography: string;
   coverageHighlights: string[];
-  author: Author;
+  expert: Expert;
 };
 
 export type PriceFilterValue =
@@ -37,12 +37,13 @@ export type SidebarFilterPayload = {
 export type TranscriptsFilterPayload = {
   page: number;
   pageSize: number;
-  domain?: string[];
+  domains?: string[];
   // General text search (topic, preview, domain, geography) - what the main
   // search bar sends.
   search?: string;
   minPrice?: number;
   maxPrice?: number;
+  publishedAfter?: string;
 };
 
 export type TranscriptsApiResponse = {
@@ -50,4 +51,14 @@ export type TranscriptsApiResponse = {
   total: number;
   page: number;
   pageSize: number;
+};
+
+// GET /api/transcripts/filter-bounds - min/max price and published date
+// across active transcripts, used to size the price/date filter options
+// with real numbers instead of guessed ones.
+export type FilterBounds = {
+  minPrice: number | null;
+  maxPrice: number | null;
+  minPublishedAt: string | null;
+  maxPublishedAt: string | null;
 };

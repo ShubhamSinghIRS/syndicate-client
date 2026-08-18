@@ -5,11 +5,11 @@ import SearchBar from "../../components/searchbar/SearchBar";
 import Header from "../../components/header/Header";
 import Footer from "../../components/footer/Footer";
 import FeatureCard from "./components/feature-card/FeatureCard";
-import ContributorCta from "./components/contributor-cta/ContributorCta";
+import ForExperts from "./components/for-experts/ForExperts";
 import FaqSection from "./components/faq/FaqSection";
 import RequestTopicDialog from "../transcripts/components/request-topic-dialog";
 import WarningDialog from "../../components/form-close-warning/WarningDialog";
-import { useBoolean } from "../../utils/hooks/useBoolean";
+import { useFormCloseWarning } from "../../utils/hooks/useFormCloseWarning";
 import { APP_ROUTES } from "../../constants/appRoutes";
 import { FEATURE_CARDS } from "./constants/homeConstants";
 import { heroButtonStyle } from "./Home.styles";
@@ -18,44 +18,11 @@ import styles from "./styles.home.module.css";
 export default function Home() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const {
-    value: isRequestTopicOpen,
-    setTrue: openRequestTopic,
-    setFalse: closeRequestTopic,
-  } = useBoolean();
-  const {
-    value: isRequestTopicChanged,
-    setTrue: setRequestTopicChanged,
-    setFalse: resetRequestTopicChanged,
-  } = useBoolean();
-  const {
-    value: isWarningOpen,
-    setTrue: openWarning,
-    setFalse: closeWarning,
-  } = useBoolean();
+  const requestTopicDialog = useFormCloseWarning();
 
   const handleSearch = (text: string) => {
     if (!text.trim()) return;
     navigate(`${APP_ROUTES.transcripts}?q=${encodeURIComponent(text)}`);
-  };
-
-  const handleRequestTopicClose = () => {
-    if (isRequestTopicChanged) {
-      openWarning();
-    } else {
-      closeRequestTopic();
-    }
-  };
-
-  const handleDiscardChanges = () => {
-    closeWarning();
-    resetRequestTopicChanged();
-    closeRequestTopic();
-  };
-
-  const handleRequestTopicSubmitted = () => {
-    resetRequestTopicChanged();
-    closeRequestTopic();
   };
 
   return (
@@ -65,25 +32,24 @@ export default function Home() {
       <Header />
 
       <div className="flex-1">
-        <div className="mx-auto max-w-4xl px-6 py-12 md:py-16 flex flex-col gap-6 text-center items-center justify-center relative">
-          {/* Centered hero content */}
-          <div className="w-full flex flex-col gap-6 text-center items-center justify-center">
+        <div className={`${styles.fullBleedRow} flex flex-col md:flex-row items-center gap-10 py-12 md:py-16 relative`}>
+          {/* Hero copy */}
+          <div className={`${styles.heroTextCol} flex-1 flex flex-col gap-6 text-left`}>
             <div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight whitespace-nowrap md:whitespace-normal">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
                 <span className="text-text-primary">Real Expertise. </span>
-                <span className="text-accent-2">Already Recorded</span>
+                <br />
+                <span className="text-accent-2">Verified and Ready.</span>
               </h1>
-              <p className="mt-6 text-lg text-text-secondary leading-relaxed max-w-3xl mx-auto">
-                Every transcript comes from an author recording their view on a
-                topic the market is actively asking about. Search, filter, and
-                get straight to the insight you are looking for.
+              <p className="mt-6 text-lg text-text-secondary leading-relaxed max-w-xl">
+               Every transcript is built from a real expert's view on a topic the market is actively asking about. Written, researched, & shared firsthand. Search, filter, and get straight to the insight you're looking for
               </p>
             </div>
 
             {/* Search bar */}
-            <div className="w-full max-w-3xl mx-auto">
+            <div className="w-full max-w-xl">
               <SearchBar
-                placeholder="Search topics, domains, or keywords..."
+                placeholder="Search transcripts..."
                 searchValue={search}
                 onChangeFunction={setSearch}
                 getOnChange
@@ -101,7 +67,7 @@ export default function Home() {
             </div>
 
             {/* Buttons */}
-            <div className="flex flex-wrap gap-4 justify-center mt-12">
+            <div className="flex flex-wrap space-btw gap-12 mt-2">
               <Link to={APP_ROUTES.transcripts}>
                 <Button
                   variant="contained"
@@ -112,15 +78,25 @@ export default function Home() {
               <Button
                 variant="outlined"
                 label=" Request a Topic"
-                onClick={openRequestTopic}
+                onClick={requestTopicDialog.open}
                 styles={heroButtonStyle}
               />
             </div>
           </div>
+
+          {/* Hero visual - bleeds to the viewport's right edge; no crop, no
+              card border, edges dissolve via the mask in heroImage. */}
+          <div className="hidden md:block flex-[1.15] w-full pr-6 md:pr-0">
+            <img
+              src="/assets/bg_image_side2.png"
+              alt="Expert sharing insights on a video call"
+              className={`${styles.heroImage} w-full h-auto max-h-[480px] object-contain`}
+            />
+          </div>
         </div>
 
         {/* Features section (three separate cards) */}
-        <div className="mx-auto mt-8 max-w-[1100px] px-6">
+        <div className="mx-auto mt-8 max-w-[1440px] px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {FEATURE_CARDS.slice(0, 3).map((card) => (
               <FeatureCard key={card.title} {...card} />
@@ -128,8 +104,8 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mx-auto max-w-[1100px] px-6 pb-32 pt-40 md:pb-40">
-          <ContributorCta />
+        <div className="mx-auto max-w-[1440px] px-6 pb-32 pt-40 md:pb-40">
+          <ForExperts />
         </div>
 
         <FaqSection />
@@ -138,15 +114,15 @@ export default function Home() {
       <Footer style={{ backgroundColor: "transparent", borderTop: "none" }} />
 
       <RequestTopicDialog
-        isOpen={isRequestTopicOpen}
-        handleClose={handleRequestTopicClose}
-        handleFormChange={setRequestTopicChanged}
-        handleSubmitClose={handleRequestTopicSubmitted}
+        isOpen={requestTopicDialog.isOpen}
+        handleClose={requestTopicDialog.requestClose}
+        onDirtyChange={requestTopicDialog.setDirty}
+        handleSubmitClose={requestTopicDialog.notifySubmitted}
       />
       <WarningDialog
-        open={isWarningOpen}
-        handleClose={closeWarning}
-        handleYesClick={handleDiscardChanges}
+        open={requestTopicDialog.isWarningOpen}
+        handleClose={requestTopicDialog.closeWarning}
+        handleYesClick={requestTopicDialog.confirmDiscard}
       />
     </div>
   );

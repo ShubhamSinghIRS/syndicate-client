@@ -6,10 +6,8 @@ import { APP_ROUTES } from "../../../../constants/appRoutes";
 import Button from "../../../../components/button/Button";
 import Chip from "../../../../components/chip/Chip";
 import CalendarTodayIcon from "../../../../icons/CalendarToday/CalendarToday";
-import { setBuyNowItem } from "../../../checkout/buyNowStorage";
+import { useBuyNow } from "../../../checkout/hooks/useBuyNow";
 import { useCart } from "../../../cart/hooks/useCart";
-import { useAuthDialog } from "../../../auth/context/AuthDialogContext";
-import { isLoggedIn } from "../../../../utils/authUtils";
 import { formatDate } from "../../../../utils/dateUtils";
 import CheckIcon from "../../../../icons/Check/Check";
 import CheckCircleIcon from "../../../../icons/CheckCircle/CheckCircle";
@@ -32,7 +30,7 @@ export default function TranscriptCard({
 }: TranscriptCardProps) {
   const navigate = useNavigate();
   const { items: cartItems, addToCart, removeFromCart } = useCart();
-  const { openAuthDialog } = useAuthDialog();
+  const handleBuyNow = useBuyNow();
   const isInCart = cartItems.some((item) => item.id === transcript.id);
   const [suppressCartTooltip, setSuppressCartTooltip] = useState(false);
 
@@ -42,22 +40,6 @@ export default function TranscriptCard({
   const remainingTags = transcript.tags.slice(visibleCount);
   const remainingTagCount = remainingTags.length;
 
-  const goToBuyNowCheckout = () => {
-    // Bypasses the cart; sessionStorage survives navigation.
-    setBuyNowItem(transcript);
-    navigate(APP_ROUTES.checkout);
-  };
-
-  const handleBuyTranscript = () => {
-    if (isLoggedIn()) {
-      goToBuyNowCheckout();
-      return;
-    }
-
-    // Sign in here, then continue straight to checkout.
-    openAuthDialog("signin", goToBuyNowCheckout);
-  };
-
   const previewText = transcript.preview.endsWith("...")
     ? transcript.preview
     : `${transcript.preview.replace(/\.+$/, "")}...`;
@@ -66,10 +48,7 @@ export default function TranscriptCard({
     navigate(APP_ROUTES.transcriptDetail.replace(":id", transcript.id));
 
   return (
-    <div
-      onClick={goToDetail}
-      className="relative rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-4.5 cursor-pointer"
-    >
+    <div className="relative rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-4.5">
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-wrap items-center gap-1.5 min-w-0 flex-1">
           <Typography variant="body2" component="span" sx={domainLabelSx}>
@@ -102,7 +81,10 @@ export default function TranscriptCard({
         </div>
       </div>
 
-      <h2 className="mt-1.5 text-xl font-bold text-text-primary hover:text-accent-2 transition-colors">
+      <h2
+        onClick={goToDetail}
+        className="mt-1.5 text-xl font-bold text-text-primary hover:text-accent-2 transition-colors cursor-pointer"
+      >
         {transcript.title}
       </h2>
       <p className="mt-1 text-text-secondary hover:text-text-primary transition-colors line-clamp-2">
@@ -158,7 +140,7 @@ export default function TranscriptCard({
               label="Buy Transcript"
               onClick={(event: React.MouseEvent) => {
                 event.stopPropagation();
-                handleBuyTranscript();
+                handleBuyNow(transcript);
               }}
             />
           </div>

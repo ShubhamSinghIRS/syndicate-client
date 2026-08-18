@@ -1,38 +1,26 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useState } from "react";
 import TranscriptCard from "../cards/TranscriptCard";
-import { useTranscripts } from "../../hooks/useTranscripts";
+import { fetchSimilarTranscripts } from "../../transcriptsService";
+import type { Transcript } from "../../types";
 
 const RELATED_COUNT = 3;
 
 type RelatedTranscriptsProps = {
-  domain: string;
   excludeId: string;
   purchasedIds: string[];
 };
 
 export default function RelatedTranscripts({
-  domain,
   excludeId,
   purchasedIds,
 }: RelatedTranscriptsProps) {
-  const { transcripts, loadTranscripts } = useTranscripts();
+  const [relatedTranscripts, setRelatedTranscripts] = useState<Transcript[]>([]);
 
   useEffect(() => {
-    loadTranscripts({
-      page: 1,
-      pageSize: RELATED_COUNT + 1,
-      domain: [domain],
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain]);
-
-  const relatedTranscripts = useMemo(
-    () =>
-      transcripts
-        .filter((t) => t.domain === domain && t.id !== excludeId)
-        .slice(0, RELATED_COUNT),
-    [transcripts, domain, excludeId],
-  );
+    fetchSimilarTranscripts(excludeId, RELATED_COUNT)
+      .then(setRelatedTranscripts)
+      .catch(() => setRelatedTranscripts([]));
+  }, [excludeId]);
 
   if (relatedTranscripts.length === 0) return null;
 

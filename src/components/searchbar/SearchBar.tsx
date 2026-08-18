@@ -192,7 +192,7 @@ const SearchBar = React.forwardRef<SearchBarHandle, Props>(
               <SendIcon
                 sx={{
                   fontSize: "18px",
-                  color: "rgba(0,0,0,0.5)",
+                  color: "text.secondary",
                 }}
               />
             </IconButton>

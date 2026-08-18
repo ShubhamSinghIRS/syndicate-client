@@ -2,6 +2,14 @@
   animation: scales 3s alternate infinite;
   transform-origin: center;
 }
+
+.sky {
+  fill: var(--color-layout-background);
+}
+
+.ground {
+  fill: var(--color-section-background);
+}
 .paoBaixo {
   animation: rotatepao 14s cubic-bezier(0.1, 0.49, 0.41, 0.97) infinite;
   transform-origin: center;
