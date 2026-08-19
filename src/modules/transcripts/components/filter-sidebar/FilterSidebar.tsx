@@ -31,7 +31,7 @@ export default function FilterSidebar({
 }: FilterSidebarProps) {
   const priceOptions = buildPriceOptions(bounds);
   return (
-    <div className="w-80 shrink-0 rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-6">
+    <div className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-6 lg:w-80 lg:shrink-0">
       <div className="flex items-center justify-between">
         <h2 className="text-base font-bold text-text-primary">Filters</h2>
         <button

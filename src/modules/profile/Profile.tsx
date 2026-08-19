@@ -36,10 +36,10 @@ export default function Profile() {
       <Header />
       <div className="flex-1">
         <div className="mx-auto max-w-[1800px] px-6 py-10">
-          <div className="flex gap-8">
+          <div className="flex flex-col gap-8 lg:flex-row">
             <ProfileSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               {activeTab === "profile" && (
                 <UserDetails
                   userName={profile?.name ?? userName}

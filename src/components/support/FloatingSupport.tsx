@@ -3,7 +3,7 @@ import { useSnackbar } from "notistack";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import CloseIcon from "@mui/icons-material/Close";
 import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
-import EmailIcon from "@mui/icons-material/Email";
+import MessageIcon from "@mui/icons-material/Message";
 import ExpandMoreIcon from "../../icons/ExpandMore/ExpandMore";
 import HeadsetIcon from "../../icons/Headset/Headset";
 import AccessTimeIcon from "../../icons/AccessTime/AccessTime";
@@ -62,9 +62,6 @@ export default function FloatingSupport() {
                   <h3 className="text-lg font-bold text-text-primary">
                     Need help?
                   </h3>
-                  <p className="mt-1 text-sm text-text-secondary">
-                    We're here to support you.
-                  </p>
                   <p className="mt-1 flex items-center gap-1 text-xs text-text-secondary">
                     <AccessTimeIcon fontSize="inherit" />
                     We'll respond within one business day.
@@ -115,7 +112,7 @@ export default function FloatingSupport() {
                 className="flex w-full items-center gap-3 text-left cursor-pointer"
               >
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent/15">
-                  <EmailIcon sx={{ fontSize: 20, color: COLORS.accent2 }} />
+                  <MessageIcon sx={{ fontSize: 20, color: COLORS.accent2 }} />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium text-text-primary">

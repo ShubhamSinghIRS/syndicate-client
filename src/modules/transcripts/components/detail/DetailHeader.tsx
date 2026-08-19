@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import BackButton from "../../../../components/back-button/BackButton";
 import { APP_ROUTES } from "../../../../constants/appRoutes";
 import type { Transcript } from "../../types";
@@ -8,7 +9,18 @@ type DetailHeaderProps = {
   transcript: Transcript;
 };
 
+// Callers that link here (CartItem, PurchaseHistory, ...) can pass
+// { backTo, backLabel } via router state so "Back" returns to wherever the
+// user actually came from instead of always landing on the transcripts list.
+export type BackNavigationState = {
+  backTo?: string;
+  backLabel?: string;
+};
+
 export default function DetailHeader({ transcript }: DetailHeaderProps) {
+  const location = useLocation();
+  const { backTo, backLabel } = (location.state as BackNavigationState) ?? {};
+
   const allTags = Array.from(
     new Set([transcript.domain, ...transcript.tags]),
   );
@@ -43,7 +55,10 @@ export default function DetailHeader({ transcript }: DetailHeaderProps) {
 
   return (
     <div>
-      <BackButton label="Back To Transcripts" to={APP_ROUTES.transcripts} />
+      <BackButton
+        label={backLabel ?? "Back To Transcripts"}
+        to={backTo ?? APP_ROUTES.transcripts}
+      />
 
       <div ref={containerRef} className="relative mt-2 overflow-hidden pb-1.5 pt-1">
         {/* Invisible single-copy strip used only to detect overflow */}

@@ -45,10 +45,11 @@ const PaginationComponent = ({ page, totalPages, onPageChange }: Props) => {
         type="button"
         disabled={page <= 1}
         onClick={() => onPageChange(page - 1)}
+        aria-label="Previous page"
         className={navButtonClass(page <= 1)}
       >
         <ChevronLeftIcon fontSize="small" />
-        Previous
+        <span className="hidden sm:inline">Previous</span>
       </button>
 
       {showLeadingEllipsis && (
@@ -78,9 +79,10 @@ const PaginationComponent = ({ page, totalPages, onPageChange }: Props) => {
         type="button"
         disabled={page >= totalPages}
         onClick={() => onPageChange(page + 1)}
+        aria-label="Next page"
         className={navButtonClass(page >= totalPages)}
       >
-        Next
+        <span className="hidden sm:inline">Next</span>
         <ChevronRightIcon fontSize="small" />
       </button>
     </div>

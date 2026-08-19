@@ -109,7 +109,7 @@ export default function TranscriptsList() {
         component={
           <Button
             variant="outlined"
-            label="Can't find it ? Request A Topic"
+            label="Can't find it? Request A Topic"
             onClick={requestTopicDialog.open}
             styles={{
               fontWeight: 500,
@@ -124,7 +124,7 @@ export default function TranscriptsList() {
 
       <div className="flex-1">
         <div className="mx-auto max-w-[1400px] px-6 py-10">
-          <div className="flex gap-8">
+          <div className="flex flex-col gap-8 lg:flex-row">
             <FilterSidebar
               filters={sidebarFilters}
               setFilters={(filters) => {
@@ -139,7 +139,7 @@ export default function TranscriptsList() {
               bounds={filterBounds}
             />
 
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               <h1 className="text-3xl font-bold text-text-primary">
                 All transcripts
               </h1>

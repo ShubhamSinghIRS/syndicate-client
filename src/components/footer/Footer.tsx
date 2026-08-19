@@ -117,7 +117,7 @@ export default function Footer({ style }: FooterProps) {
                   to={`${APP_ROUTES.home}#faq`}
                   className="text-base text-text-secondary hover:text-accent-2 transition-colors duration-200 block"
                 >
-                  Help FAQs
+                  FAQs
                 </Link>
               </li>
               <li>
@@ -126,7 +126,7 @@ export default function Footer({ style }: FooterProps) {
                   onClick={handleCopyEmail}
                   className="text-base text-text-secondary hover:text-accent-2 transition-colors duration-200 block"
                 >
-                  Customer Support
+                  Support
                 </a>
               </li>
             </ul>

@@ -42,7 +42,7 @@ export default function Home() {
                 <span className="text-accent-2">Verified and Ready.</span>
               </h1>
               <p className="mt-6 text-lg text-text-secondary leading-relaxed max-w-xl">
-               Every transcript is built from a real expert's view on a topic the market is actively asking about. Written, researched, & shared firsthand. Search, filter, and get straight to the insight you're looking for
+               Every transcript comes from a real expert sharing their expertise on a topic the market is actively asking about. Search, filter, and get straight to the insight you need.
               </p>
             </div>
 

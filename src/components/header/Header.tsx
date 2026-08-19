@@ -50,18 +50,18 @@ export default function Header({
 
   return (
     <header className="sticky top-0 z-50 bg-header-background border-b border-gray-100 dark:border-gray-800">
-      <div className="flex items-center justify-between gap-6 px-6 py-3">
-        <Link to={APP_ROUTES.home} className="flex shrink-0 items-center pl-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 lg:flex-nowrap lg:gap-6 lg:px-6">
+        <Link to={APP_ROUTES.home} className="flex shrink-0 items-center lg:pl-4">
           <img
             src="/assets/logo_hd.png"
             alt="Infollion"
-            className="h-14 w-auto"
+            className="h-10 w-auto md:h-14"
           />
         </Link>
 
         {isSearch && (
-          <div className="flex flex-1 items-center gap-3 max-w-3xl">
-            <div className="flex-1">
+          <div className="order-last flex w-full flex-wrap items-center gap-3 lg:order-none lg:w-auto lg:max-w-3xl lg:flex-1 lg:flex-nowrap">
+            <div className="min-w-0 flex-1">
               <SearchBar
                 placeholder={searchPlaceholder}
                 searchValue={searchValue}
@@ -70,11 +70,13 @@ export default function Header({
                 height="40px"
               />
             </div>
-            {isExtraComponent && component}
+            {isExtraComponent && (
+              <div className="w-full sm:w-auto">{component}</div>
+            )}
           </div>
         )}
 
-        <nav className="flex shrink-0 items-center gap-4 text-sm text-text-primary">
+        <nav className="flex shrink-0 items-center gap-2 text-sm text-text-primary sm:gap-4">
           {!isSearch && isExtraComponent && component}
 
           <ThemeToggle />
@@ -122,7 +124,7 @@ export default function Header({
           {loggedIn ? (
             <AccountMenu userName={userName} />
           ) : (
-            <div className="flex items-center gap-2 rounded-full bg-accent/15 px-4 py-2 text-sm">
+            <div className="flex items-center gap-2 rounded-full bg-accent/15 px-3 py-1.5 text-sm sm:px-4 sm:py-2">
               <button
                 type="button"
                 onClick={() => openAuthDialog("signin")}

@@ -187,14 +187,15 @@ export const fetchSimilarTranscripts = async (
 // Entitlement-backed, not order-backed - includes admin-granted access, not
 // just paid purchases. Loops to completion rather than reading one page,
 // since a truncated result would wrongly treat an owned item past the first
-// page as not-yet-purchased. Completion is checked against the accumulated
-// count, not `page * requestedLimit` - the backend caps page size server-side
-// (currently 20) regardless of what's requested, so a page can come back
-// smaller than asked for.
+// page as not-yet-purchased. The requested limit here is just a hint - the
+// backend is the real enforcement (a client-side cap would be pointless,
+// anyone can call the API directly with any value) - so completion is
+// checked against the accumulated count, not `page * requestedLimit`,
+// which stays correct no matter what the server actually enforces.
 const fetchAllPurchasedPages = async <T>(
   mapItem: (raw: RawTranscript) => T,
 ): Promise<T[]> => {
-  const limit = 100;
+  const limit = 20;
   let page = 1;
   const items: T[] = [];
 

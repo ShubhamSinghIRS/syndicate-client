@@ -91,7 +91,7 @@ export default function TranscriptCard({
         {previewText}
       </p>
 
-      <div className="mt-2.5 flex items-center justify-between">
+      <div className="mt-2.5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <Tooltip title="Published Date" arrow>
           <span className="flex items-center gap-1 text-sm text-text-secondary cursor-pointer">
             <CalendarTodayIcon fontSize="inherit" />
@@ -104,8 +104,8 @@ export default function TranscriptCard({
             Purchased
           </p>
         ) : (
-          <div className="flex items-center gap-3">
-            <span className="text-base font-bold text-text-primary">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <span className="shrink-0 text-base font-bold text-text-primary">
               USD ${transcript.price}
             </span>
             <Tooltip
@@ -118,11 +118,12 @@ export default function TranscriptCard({
                 },
               }}
             >
-              <span onMouseLeave={() => setSuppressCartTooltip(false)}>
+              <span onMouseLeave={() => setSuppressCartTooltip(false)} className="shrink-0">
                 <Button
                   variant="outlined"
                   label={isInCart ? "In Cart" : "Add to Cart"}
                   startIcon={isInCart ? <CheckIcon fontSize="small" /> : undefined}
+                  className="whitespace-nowrap"
                   onClick={(event: React.MouseEvent) => {
                     event.stopPropagation();
                     setSuppressCartTooltip(true);
@@ -138,6 +139,7 @@ export default function TranscriptCard({
             <Button
               variant="contained"
               label="Buy Transcript"
+              className="shrink-0 whitespace-nowrap"
               onClick={(event: React.MouseEvent) => {
                 event.stopPropagation();
                 handleBuyNow(transcript);

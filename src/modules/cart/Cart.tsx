@@ -33,6 +33,7 @@ export default function Cart() {
                     key={item.id}
                     item={item}
                     onRemove={() => removeFromCart(item.id)}
+                    linkState={{ backTo: APP_ROUTES.cart, backLabel: "Back To Cart" }}
                   />
                 ))}
               </div>

@@ -1,6 +1,3 @@
-import CheckCircleIcon from "../../../../icons/CheckCircle/CheckCircle";
-import { COLORS } from "../../../../constants/colors";
-
 type Requirement = {
   label: string;
   test: (value: string) => boolean;
@@ -8,10 +5,10 @@ type Requirement = {
 
 const REQUIREMENTS: Requirement[] = [
   { label: "8+ characters", test: (value) => value.length >= 8 },
-  { label: "Uppercase letter", test: (value) => /[A-Z]/.test(value) },
-  { label: "Lowercase letter", test: (value) => /[a-z]/.test(value) },
-  { label: "Number", test: (value) => /\d/.test(value) },
-  { label: "Special character", test: (value) => /[^A-Za-z0-9]/.test(value) },
+  { label: "uppercase letter", test: (value) => /[A-Z]/.test(value) },
+  { label: "lowercase letter", test: (value) => /[a-z]/.test(value) },
+  { label: "number", test: (value) => /\d/.test(value) },
+  { label: "special character", test: (value) => /[^A-Za-z0-9]/.test(value) },
 ];
 
 type PasswordRequirementsProps = {
@@ -19,27 +16,31 @@ type PasswordRequirementsProps = {
 };
 
 export default function PasswordRequirements({ password }: PasswordRequirementsProps) {
+  if (!password) return null;
+
+  const metCount = REQUIREMENTS.filter((requirement) => requirement.test(password)).length;
+  const missing = REQUIREMENTS.filter((requirement) => !requirement.test(password)).map(
+    (requirement) => requirement.label,
+  );
   return (
-    <ul className="mt-1.5 grid grid-cols-2 gap-x-3 gap-y-1">
-      {REQUIREMENTS.map((requirement) => {
-        const met = requirement.test(password);
-        return (
-          <li
+    <div className="mt-1.5">
+      <div className="flex gap-1.5">
+        {REQUIREMENTS.map((requirement, index) => (
+          <span
             key={requirement.label}
-            className={`flex items-center gap-1.5 text-xs transition-colors ${
-              met ? "font-medium" : "text-text-secondary"
+            className={`h-1.5 flex-1 rounded-full transition-colors ${
+              index < metCount ? "bg-accent-2" : "bg-gray-200 dark:bg-gray-700"
             }`}
-            style={met ? { color: COLORS.accent2 } : undefined}
-          >
-            {met ? (
-              <CheckCircleIcon sx={{ fontSize: 14, color: COLORS.accent2 }} />
-            ) : (
-              <span className="inline-block h-3.5 w-3.5 shrink-0 rounded-full border border-current" />
-            )}
-            {requirement.label}
-          </li>
-        );
-      })}
-    </ul>
+          />
+        ))}
+      </div>
+      <p
+        className={`mt-1.5 text-xs ${
+          missing.length > 0 ? "text-text-secondary" : "font-medium text-accent-2"
+        }`}
+      >
+        {missing.length > 0 ? `Add: ${missing.join(", ")}.` : "Strong password."}
+      </p>
+    </div>
   );
 }
