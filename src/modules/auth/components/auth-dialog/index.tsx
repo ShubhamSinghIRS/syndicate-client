@@ -14,11 +14,18 @@ import type { AuthDialogMode } from "../../types";
 type AuthDialogProps = {
   isOpen: boolean;
   handleClose: () => void;
+  onDirtyChange: (isDirty: boolean) => void;
   initialMode?: AuthDialogMode;
   onSuccess: () => void;
 };
 
-export default function AuthDialog({ isOpen, handleClose, initialMode = "signin", onSuccess }: AuthDialogProps) {
+export default function AuthDialog({
+  isOpen,
+  handleClose,
+  onDirtyChange,
+  initialMode = "signin",
+  onSuccess,
+}: AuthDialogProps) {
   const [mode, setMode] = useState<AuthDialogMode>(initialMode);
   const isMobile = useIsMobile();
   const { value: loading, setValue: setLoading } = useBoolean();
@@ -31,7 +38,6 @@ export default function AuthDialog({ isOpen, handleClose, initialMode = "signin"
   const handleSubmitClose = () => {
     setMode(initialMode);
     onSuccess();
-    handleClose();
   };
 
   const { title, subtitle } = MODE_COPY[mode];
@@ -76,7 +82,12 @@ export default function AuthDialog({ isOpen, handleClose, initialMode = "signin"
             </div>
 
             <div className="mt-4">
-              <AuthForm mode={mode} setMode={setMode} handleSubmitClose={handleSubmitClose} />
+              <AuthForm
+                mode={mode}
+                setMode={setMode}
+                handleSubmitClose={handleSubmitClose}
+                onDirtyChange={onDirtyChange}
+              />
             </div>
           </LoadingContext.Provider>
         </div>

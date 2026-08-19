@@ -28,7 +28,7 @@ export default function ProfileSidebar({
   setActiveTab,
 }: ProfileSidebarProps) {
   return (
-    <div className="w-64 shrink-0 rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-3">
+    <div className="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-3 lg:w-64 lg:shrink-0">
       <nav className="flex flex-col gap-1">
         {LINK_ITEMS.map((item) => (
           <Link

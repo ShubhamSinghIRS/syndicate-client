@@ -17,12 +17,15 @@ import Loading from "../../../components/loading/Loading";
 import { useBoolean } from "../../../utils/hooks/useBoolean";
 import { HookTextField } from "../../../components/form-fields/SLFieldTextField";
 import Button from "../../../components/button/Button";
+import WarningDialog from "../../../components/form-close-warning/WarningDialog";
 import { useHookFormContext } from "../../../utils/hooks/useHookFormContext";
+import { validRegex } from "../../../utils/isValidType";
 import { commonInputStyles } from "../../../common/input-styles";
 import { COLORS } from "../../../constants/colors";
 import { APP_ROUTES } from "../../../constants/appRoutes";
 import { resetPassword } from "../authService";
 import { usePasswordVisibility } from "../components/auth-dialog/usePasswordVisibility";
+import PasswordRequirements from "../components/auth-dialog/PasswordRequirements";
 import { useAuthDialog } from "../context/AuthDialogContext";
 import { authDialogPaperSx } from "../components/auth-dialog/AuthDialog.styles";
 import type { ResetPasswordFormValues } from "../types";
@@ -48,6 +51,11 @@ function ResetPasswordFields() {
             value: 8,
             message: "Password must be at least 8 characters",
           },
+          pattern: {
+            value: validRegex("password"),
+            message:
+              "Password must include an uppercase letter, a lowercase letter, a number, and a special character",
+          },
         }}
         textFieldProps={{
           ...commonInputStyles,
@@ -58,6 +66,9 @@ function ResetPasswordFields() {
         }}
         gridProps={{ xs: 12 }}
       />
+      <Grid item xs={12} sx={{ pt: "4px !important" }}>
+        <PasswordRequirements password={watch("password") || ""} />
+      </Grid>
       <HookTextField
         {...registerState("confirmPassword")}
         rules={{
@@ -102,6 +113,11 @@ export default function ResetPassword() {
   const [isDone, setIsDone] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const { enqueueSnackbar } = useSnackbar();
+  const {
+    value: isWarningOpen,
+    setTrue: openWarning,
+    setFalse: closeWarning,
+  } = useBoolean();
 
   const methods = useForm<ResetPasswordFormValues>({ defaultValues });
 
@@ -130,6 +146,14 @@ export default function ResetPassword() {
 
   const goHome = () => navigate(APP_ROUTES.home);
 
+  const requestClose = () => {
+    if (methods.formState.isDirty) {
+      openWarning();
+    } else {
+      goHome();
+    }
+  };
+
   const subtitle = !token
     ? "This password reset link is missing or malformed."
     : "Enter your new password below.";
@@ -138,7 +162,7 @@ export default function ResetPassword() {
     <ThemeProvider theme={defaultTheme}>
       <Dialog
         open
-        onClose={goHome}
+        onClose={requestClose}
         maxWidth="md"
         fullWidth
         sx={authDialogPaperSx}
@@ -159,7 +183,7 @@ export default function ResetPassword() {
               <Loading loading={loading} />
 
               <IconButton
-                onClick={goHome}
+                onClick={requestClose}
                 aria-label="Close"
                 className="absolute! right-3! top-3!"
               >
@@ -250,6 +274,14 @@ export default function ResetPassword() {
           </div>
         </div>
       </Dialog>
+      <WarningDialog
+        open={isWarningOpen}
+        handleClose={closeWarning}
+        handleYesClick={() => {
+          closeWarning();
+          goHome();
+        }}
+      />
     </ThemeProvider>
   );
 }

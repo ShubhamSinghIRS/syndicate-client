@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Tooltip from "../../../../components/tooltip/Tooltip";
 import Typography from "@mui/material/Typography";
@@ -6,10 +6,8 @@ import { APP_ROUTES } from "../../../../constants/appRoutes";
 import Button from "../../../../components/button/Button";
 import Chip from "../../../../components/chip/Chip";
 import CalendarTodayIcon from "../../../../icons/CalendarToday/CalendarToday";
-import { setBuyNowItem } from "../../../checkout/buyNowStorage";
+import { useBuyNow } from "../../../checkout/hooks/useBuyNow";
 import { useCart } from "../../../cart/hooks/useCart";
-import { useAuthDialog } from "../../../auth/context/AuthDialogContext";
-import { isLoggedIn } from "../../../../utils/authUtils";
 import { formatDate } from "../../../../utils/dateUtils";
 import CheckIcon from "../../../../icons/Check/Check";
 import CheckCircleIcon from "../../../../icons/CheckCircle/CheckCircle";
@@ -26,13 +24,39 @@ type TranscriptCardProps = {
   isPurchased?: boolean;
 };
 
+// The chip's label is CSS-truncated (domainChipSx: maxWidth + ellipsis), so
+// whether it's actually cut off depends on rendered text width, not
+// character count. Measure the label's scrollWidth vs clientWidth so the
+// tooltip only appears when the domain name is genuinely truncated.
+function DomainChip({ label }: { label: string }) {
+  const chipRef = useRef<HTMLDivElement>(null);
+  const [isTruncated, setIsTruncated] = useState(false);
+
+  useEffect(() => {
+    const labelEl = chipRef.current?.querySelector<HTMLElement>(".MuiChip-label");
+    setIsTruncated(!!labelEl && labelEl.scrollWidth > labelEl.clientWidth);
+  }, [label]);
+
+  return (
+    <Tooltip title={label} arrow disableHoverListener={!isTruncated}>
+      <Chip
+        ref={chipRef}
+        label={label}
+        variant="outlined"
+        size="small"
+        sx={domainChipSx}
+      />
+    </Tooltip>
+  );
+}
+
 export default function TranscriptCard({
   transcript,
   isPurchased = false,
 }: TranscriptCardProps) {
   const navigate = useNavigate();
   const { items: cartItems, addToCart, removeFromCart } = useCart();
-  const { openAuthDialog } = useAuthDialog();
+  const handleBuyNow = useBuyNow();
   const isInCart = cartItems.some((item) => item.id === transcript.id);
   const [suppressCartTooltip, setSuppressCartTooltip] = useState(false);
 
@@ -42,22 +66,6 @@ export default function TranscriptCard({
   const remainingTags = transcript.tags.slice(visibleCount);
   const remainingTagCount = remainingTags.length;
 
-  const goToBuyNowCheckout = () => {
-    // Bypasses the cart; sessionStorage survives navigation.
-    setBuyNowItem(transcript);
-    navigate(APP_ROUTES.checkout);
-  };
-
-  const handleBuyTranscript = () => {
-    if (isLoggedIn()) {
-      goToBuyNowCheckout();
-      return;
-    }
-
-    // Sign in here, then continue straight to checkout.
-    openAuthDialog("signin", goToBuyNowCheckout);
-  };
-
   const previewText = transcript.preview.endsWith("...")
     ? transcript.preview
     : `${transcript.preview.replace(/\.+$/, "")}...`;
@@ -66,29 +74,15 @@ export default function TranscriptCard({
     navigate(APP_ROUTES.transcriptDetail.replace(":id", transcript.id));
 
   return (
-    <div
-      onClick={goToDetail}
-      className="relative rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-4.5 cursor-pointer"
-    >
+    <div className="relative rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-4.5">
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-wrap items-center gap-1.5 min-w-0 flex-1">
           <Typography variant="body2" component="span" sx={domainLabelSx}>
             Domain:
           </Typography>
-          {visibleTags.map((tag) => {
-            const isLong = tag.length > 40;
-            const displayLabel = isLong ? `${tag.slice(0, 40)}...` : tag;
-            return (
-              <Tooltip key={tag} title={tag} arrow disableHoverListener={!isLong}>
-                <Chip
-                  label={displayLabel}
-                  variant="outlined"
-                  size="small"
-                  sx={domainChipSx}
-                />
-              </Tooltip>
-            );
-          })}
+          {visibleTags.map((tag) => (
+            <DomainChip key={tag} label={tag} />
+          ))}
           {remainingTagCount > 0 && (
             <Tooltip title={remainingTags.join(", ")} arrow>
               <Chip
@@ -102,14 +96,20 @@ export default function TranscriptCard({
         </div>
       </div>
 
-      <h2 className="mt-1.5 text-xl font-bold text-text-primary hover:text-accent-2 transition-colors">
+      <h2
+        onClick={goToDetail}
+        className="mt-1.5 text-xl font-bold text-text-primary hover:text-accent-2 transition-colors cursor-pointer"
+      >
         {transcript.title}
       </h2>
-      <p className="mt-1 text-text-secondary hover:text-text-primary transition-colors line-clamp-2">
+      <p
+        onClick={goToDetail}
+        className="mt-1 text-text-secondary hover:text-text-primary transition-colors line-clamp-2 cursor-pointer"
+      >
         {previewText}
       </p>
 
-      <div className="mt-2.5 flex items-center justify-between">
+      <div className="mt-2.5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <Tooltip title="Published Date" arrow>
           <span className="flex items-center gap-1 text-sm text-text-secondary cursor-pointer">
             <CalendarTodayIcon fontSize="inherit" />
@@ -122,8 +122,8 @@ export default function TranscriptCard({
             Purchased
           </p>
         ) : (
-          <div className="flex items-center gap-3">
-            <span className="text-base font-bold text-text-primary">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <span className="shrink-0 text-base font-bold text-text-primary">
               USD ${transcript.price}
             </span>
             <Tooltip
@@ -136,11 +136,12 @@ export default function TranscriptCard({
                 },
               }}
             >
-              <span onMouseLeave={() => setSuppressCartTooltip(false)}>
+              <span onMouseLeave={() => setSuppressCartTooltip(false)} className="shrink-0">
                 <Button
                   variant="outlined"
                   label={isInCart ? "In Cart" : "Add to Cart"}
                   startIcon={isInCart ? <CheckIcon fontSize="small" /> : undefined}
+                  className="whitespace-nowrap"
                   onClick={(event: React.MouseEvent) => {
                     event.stopPropagation();
                     setSuppressCartTooltip(true);
@@ -156,9 +157,10 @@ export default function TranscriptCard({
             <Button
               variant="contained"
               label="Buy Transcript"
+              className="shrink-0 whitespace-nowrap"
               onClick={(event: React.MouseEvent) => {
                 event.stopPropagation();
-                handleBuyTranscript();
+                handleBuyNow(transcript);
               }}
             />
           </div>

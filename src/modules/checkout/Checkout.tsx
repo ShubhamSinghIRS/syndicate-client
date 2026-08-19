@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSnackbar } from "notistack";
+import BackButton from "../../components/back-button/BackButton";
 import { useCart } from "../cart/hooks/useCart";
 import { useOrders } from "../orders/hooks/useOrders";
 import { usePurchasedTranscriptIds } from "../orders/hooks/usePurchasedTranscriptIds";
@@ -13,6 +14,7 @@ import { getCheckoutIdempotencyKey, clearCheckoutIdempotencyKey } from "./checko
 import OrderDetails from "./components/order-summary/OrderDetails";
 import OrderSummary from "./components/order-summary/OrderSummary";
 import OrderConfirmation from "./components/order-confirmation/OrderConfirmation";
+import PaymentProcessing from "./components/payment-processing/PaymentProcessing";
 import Button from "../../components/button/Button";
 import Header from "../../components/header/Header";
 import Footer from "../../components/footer/Footer";
@@ -104,7 +106,11 @@ export default function Checkout() {
         <Header />
         <div className="flex-1">
           <div className="mx-auto max-w-[1400px] px-6 py-10 text-center">
-            <p className="text-text-secondary">Your cart is empty.</p>
+            <p className="text-text-secondary">
+              {buyNowItem
+                ? "You already own this transcript."
+                : "Your cart is empty."}
+            </p>
             <Link to={APP_ROUTES.transcripts}>
               <Button
                 variant="contained"
@@ -193,33 +199,21 @@ export default function Checkout() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <PaymentProcessing active={isSubmitting} />
       <Header />
       <div className="flex-1">
         <div className="mx-auto max-w-[1400px] px-6 py-10">
-          <div className="flex items-center gap-2 text-sm text-text-secondary">
-            <Link
-              to={APP_ROUTES.transcripts}
-              className="underline hover:no-underline text-text-primary font-medium"
-            >
-              All transcripts
-            </Link>
-            <span>/</span>
-            <Link
-              to={APP_ROUTES.cart}
-              className="underline hover:no-underline text-text-primary font-medium"
-            >
-              Cart
-            </Link>
-            <span>/</span>
-            <span>Checkout</span>
-          </div>
+          <BackButton
+            label={buyNowItem ? "Back To Transcripts" : "Back To Cart"}
+            to={buyNowItem ? APP_ROUTES.transcripts : APP_ROUTES.cart}
+          />
 
           <h1 className="mt-4 text-3xl font-bold text-text-primary">
             Checkout
           </h1>
 
           <div className="mt-6 flex flex-col gap-8 lg:flex-row">
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               <OrderDetails items={items} />
             </div>
             <div className="lg:w-100 lg:shrink-0">

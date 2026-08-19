@@ -1,7 +1,7 @@
-import type { Author } from "../../types";
+import type { Expert } from "../../types";
 
-type AuthorCardProps = {
-  author: Author;
+type ExpertCardProps = {
+  expert: Expert;
 };
 
 const getInitials = (name: string): string =>
@@ -12,21 +12,21 @@ const getInitials = (name: string): string =>
     .slice(0, 2)
     .toUpperCase();
 
-export default function AuthorCard({ author }: AuthorCardProps) {
+export default function ExpertCard({ expert }: ExpertCardProps) {
   return (
     <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-6">
       <p className="text-sm font-semibold text-text-primary">
-        About the Author
+        About the Expert
       </p>
 
       <div className="mt-3 flex items-center gap-3">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent text-base font-semibold text-white">
-          {getInitials(author.name)}
+          {getInitials(expert.name)}
         </div>
         <div>
-          <p className="font-semibold text-text-primary">{author.name}</p>
+          <p className="font-semibold text-text-primary">{expert.name}</p>
           <p className="text-sm text-text-secondary">
-            {author.title} at {author.company}
+            {expert.title} at {expert.company}
           </p>
         </div>
       </div>

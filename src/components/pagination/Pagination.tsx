@@ -1,70 +1,91 @@
-import Pagination from "@mui/material/Pagination";
-import { useIsMobile } from "../../utils/hooks/useIsMobile";
-import BoxCenter from "../box-center/BoxCenter";
-import DropDownFilter from "../drop-down-filter/DropDownFilter";
-import type { ChangeEvent, ReactNode } from "react";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+
+const MAX_VISIBLE_PAGES = 5;
 
 type Props = {
   page: number;
   totalPages: number;
-  totalResult: number;
-  paginationHandler: (event: ChangeEvent<unknown>, page: number) => void;
-  dropdownFilterProps?: {
-    link?: string;
-    setFilterPayload: (value: string) => void;
-    dropDownItems: { label: ReactNode; value: string }[];
-    filterValue: string;
-  };
-  hideRowsPerPage?: boolean;
+  onPageChange: (page: number) => void;
 };
 
-const PaginationComponent = ({
-  page,
-  totalPages,
-  paginationHandler,
-  dropdownFilterProps,
-  totalResult,
-  hideRowsPerPage = false,
-}: Props) => {
-  const isMobile = useIsMobile();
+function getVisiblePages(page: number, totalPages: number) {
+  if (totalPages <= MAX_VISIBLE_PAGES) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+
+  let start = Math.max(1, page - Math.floor(MAX_VISIBLE_PAGES / 2));
+  let end = start + MAX_VISIBLE_PAGES - 1;
+
+  if (end > totalPages) {
+    end = totalPages;
+    start = end - MAX_VISIBLE_PAGES + 1;
+  }
+
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+}
+
+const PaginationComponent = ({ page, totalPages, onPageChange }: Props) => {
+  if (totalPages <= 1) return null;
+
+  const visiblePages = getVisiblePages(page, totalPages);
+  const showLeadingEllipsis = visiblePages[0] > 1;
+  const showTrailingEllipsis = visiblePages[visiblePages.length - 1] < totalPages;
+
+  const navButtonClass = (disabled: boolean) =>
+    `flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+      disabled
+        ? "text-gray-300 dark:text-gray-700 cursor-not-allowed"
+        : "text-text-secondary hover:bg-[#FAF7F2] dark:hover:bg-gray-800 cursor-pointer"
+    }`;
 
   return (
-    <>
-      <Pagination
-        size={isMobile ? "small" : "medium"}
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "10px 0",
-          "& .MuiPagination-ul": {
-            "& button": { fontSize: isMobile ? "12.5px" : "13px" },
-          },
-        }}
-        page={page}
-        count={totalPages}
-        onChange={paginationHandler}
-      />
-      <BoxCenter sx={{ flexWrap: "wrap", "& p": { fontSize: "14px" } }}>
-        {!hideRowsPerPage && dropdownFilterProps && (
-          <BoxCenter>
-            <p>Items per page:</p>
-            <DropDownFilter
-              link={dropdownFilterProps.link}
-              setFilterPayload={dropdownFilterProps.setFilterPayload}
-              dropDownItems={dropdownFilterProps.dropDownItems}
-              filterValue={dropdownFilterProps.filterValue}
-              noMinWidth
-            />
-          </BoxCenter>
-        )}
-        <BoxCenter>
-          <p>
-            Total Results : <span>{totalResult || 0}</span>
-          </p>
-        </BoxCenter>
-      </BoxCenter>
-    </>
+    <div className="mx-auto flex w-fit items-center gap-1 rounded-xl border border-[#ECE8DF] dark:border-gray-800 bg-white dark:bg-main-background p-1.5">
+      <button
+        type="button"
+        disabled={page <= 1}
+        onClick={() => onPageChange(page - 1)}
+        aria-label="Previous page"
+        className={navButtonClass(page <= 1)}
+      >
+        <ChevronLeftIcon fontSize="small" />
+        <span className="hidden sm:inline">Previous</span>
+      </button>
+
+      {showLeadingEllipsis && (
+        <span className="px-2 text-sm text-text-secondary">...</span>
+      )}
+
+      {visiblePages.map((p) => (
+        <button
+          key={p}
+          type="button"
+          onClick={() => onPageChange(p)}
+          className={
+            p === page
+              ? "flex h-8 w-8 items-center justify-center rounded-lg border-2 border-text-primary text-sm font-semibold text-text-primary"
+              : "flex h-8 w-8 items-center justify-center rounded-lg text-sm text-text-secondary hover:bg-[#FAF7F2] dark:hover:bg-gray-800 cursor-pointer"
+          }
+        >
+          {p}
+        </button>
+      ))}
+
+      {showTrailingEllipsis && (
+        <span className="px-2 text-sm text-text-secondary">...</span>
+      )}
+
+      <button
+        type="button"
+        disabled={page >= totalPages}
+        onClick={() => onPageChange(page + 1)}
+        aria-label="Next page"
+        className={navButtonClass(page >= totalPages)}
+      >
+        <span className="hidden sm:inline">Next</span>
+        <ChevronRightIcon fontSize="small" />
+      </button>
+    </div>
   );
 };
 

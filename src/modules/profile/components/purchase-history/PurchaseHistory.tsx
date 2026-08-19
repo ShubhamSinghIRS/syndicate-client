@@ -41,6 +41,10 @@ export default function PurchaseHistory({ orders }: PurchaseHistoryProps) {
               <div>
                 <Link
                   to={APP_ROUTES.transcriptDetail.replace(":id", item.id)}
+                  state={{
+                    backTo: `${APP_ROUTES.profile}?section=purchases`,
+                    backLabel: "Back To Purchases",
+                  }}
                   className="text-sm font-medium text-text-primary hover:underline"
                 >
                   {item.title}

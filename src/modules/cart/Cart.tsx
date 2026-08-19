@@ -1,10 +1,10 @@
-import { Link } from "react-router-dom";
 import { useCart } from "./hooks/useCart";
 import CartItem from "./components/cart-item/CartItem";
 import CartSummary from "./components/cart-summary/CartSummary";
 import EmptyCart from "./components/empty-cart/EmptyCart";
 import Header from "../../components/header/Header";
 import Footer from "../../components/footer/Footer";
+import BackButton from "../../components/back-button/BackButton";
 import { APP_ROUTES } from "../../constants/appRoutes";
 
 export default function Cart() {
@@ -15,16 +15,7 @@ export default function Cart() {
       <Header />
       <div className="flex-1">
         <div className="mx-auto max-w-[1400px] px-6 py-10">
-          <div className="flex items-center gap-2 text-sm text-text-secondary">
-            <Link
-              to={APP_ROUTES.transcripts}
-              className="underline hover:no-underline text-text-primary font-medium"
-            >
-              All transcripts
-            </Link>
-            <span>/</span>
-            <span>Cart</span>
-          </div>
+          <BackButton label="Back To Transcripts" to={APP_ROUTES.transcripts} />
 
           <h1 className="mt-4 text-3xl font-bold text-text-primary">
             Transcript Cart
@@ -42,6 +33,7 @@ export default function Cart() {
                     key={item.id}
                     item={item}
                     onRemove={() => removeFromCart(item.id)}
+                    linkState={{ backTo: APP_ROUTES.cart, backLabel: "Back To Cart" }}
                   />
                 ))}
               </div>

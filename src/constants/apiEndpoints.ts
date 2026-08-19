@@ -12,9 +12,11 @@ export const API_ENDPOINTS = {
   transcripts: "/api/transcripts",
   transcriptsFilter: "/api/transcripts/filter",
   transcriptDetail: "/api/transcripts/:id",
+  transcriptSimilar: "/api/transcripts/:id/similar",
   transcriptFullText: "/api/transcripts/:id/full-text",
   transcriptDownload: "/api/transcripts/:id/download",
   domains: "/api/transcripts/domains",
+  filterBounds: "/api/transcripts/filter-bounds",
   myPurchased: "/api/transcripts/me/purchased",
   saved: "/api/saved",
   cart: "/api/cart",
@@ -26,5 +28,6 @@ export const API_ENDPOINTS = {
   orderReceipt: "/api/orders/:id/receipt",
   profile: "/api/users/me",
   topicsRequest: "/api/topics/request",
+  myTopicRequests: "/api/topics/my-requests",
   support: "/api/support",
 } as const;

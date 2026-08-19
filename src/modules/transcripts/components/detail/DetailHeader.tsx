@@ -1,4 +1,6 @@
-import { Link } from "react-router-dom";
+import { useLayoutEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
+import BackButton from "../../../../components/back-button/BackButton";
 import { APP_ROUTES } from "../../../../constants/appRoutes";
 import type { Transcript } from "../../types";
 import styles from "./DetailHeader.module.css";
@@ -7,10 +9,39 @@ type DetailHeaderProps = {
   transcript: Transcript;
 };
 
+// Callers that link here (CartItem, PurchaseHistory, ...) can pass
+// { backTo, backLabel } via router state so "Back" returns to wherever the
+// user actually came from instead of always landing on the transcripts list.
+export type BackNavigationState = {
+  backTo?: string;
+  backLabel?: string;
+};
+
 export default function DetailHeader({ transcript }: DetailHeaderProps) {
+  const location = useLocation();
+  const { backTo, backLabel } = (location.state as BackNavigationState) ?? {};
+
   const allTags = Array.from(
     new Set([transcript.domain, ...transcript.tags]),
   );
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLDivElement>(null);
+  const [needsMarquee, setNeedsMarquee] = useState(false);
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    const measure = measureRef.current;
+    if (!container || !measure) return;
+
+    const checkOverflow = () => {
+      setNeedsMarquee(measure.scrollWidth > container.clientWidth);
+    };
+
+    checkOverflow();
+    window.addEventListener("resize", checkOverflow);
+    return () => window.removeEventListener("resize", checkOverflow);
+  }, [allTags.length]);
 
   const renderTags = (keyPrefix: string) =>
     allTags.map((tag) => (
@@ -24,26 +55,24 @@ export default function DetailHeader({ transcript }: DetailHeaderProps) {
 
   return (
     <div>
-      <div className="flex items-center gap-2 text-sm text-text-secondary min-w-0">
-        <Link
-          to={APP_ROUTES.transcripts}
-          className="underline hover:no-underline text-text-primary font-medium shrink-0"
-        >
-          All transcripts
-        </Link>
-        <span className="shrink-0">/</span>
-        <span
-          title={transcript.domain}
-          className="text-text-primary font-medium truncate max-w-xl"
-        >
-          {transcript.domain}
-        </span>
-      </div>
+      <BackButton
+        label={backLabel ?? "Back To Transcripts"}
+        to={backTo ?? APP_ROUTES.transcripts}
+      />
 
-      <div className="mt-2 overflow-hidden pb-1.5 pt-1">
-        <div className={styles.marqueeTrack}>
+      <div ref={containerRef} className="relative mt-2 overflow-hidden pb-1.5 pt-1">
+        {/* Invisible single-copy strip used only to detect overflow */}
+        <div
+          ref={measureRef}
+          className="absolute invisible pointer-events-none flex"
+          aria-hidden="true"
+        >
+          {renderTags("measure")}
+        </div>
+
+        <div className={needsMarquee ? styles.marqueeTrack : "flex"}>
           {renderTags("a")}
-          {renderTags("b")}
+          {needsMarquee && renderTags("b")}
         </div>
       </div>
 

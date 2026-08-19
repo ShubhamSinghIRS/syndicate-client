@@ -19,6 +19,7 @@ export default function DomainAutocomplete({
   setSelectedDomains,
 }: DomainAutocompleteProps) {
   const [options, setOptions] = useState<string[]>([]);
+  const [showAllTags, setShowAllTags] = useState(false);
 
   useEffect(() => {
     RequestServer<string[]>(API_ENDPOINTS.domains, "GET")
@@ -31,8 +32,20 @@ export default function DomainAutocomplete({
       multiple
       disableCloseOnSelect
       size="small"
-      limitTags={2}
-      getLimitTagsText={(more) => `+${more} more`}
+      limitTags={showAllTags ? -1 : 2}
+      getLimitTagsText={(more) => (
+        <span
+          onMouseDown={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.stopPropagation();
+            setShowAllTags(true);
+          }}
+          className="cursor-pointer hover:underline"
+        >
+          +{more} more
+        </span>
+      )}
+      sx={{ "& .MuiAutocomplete-tag": { maxWidth: "none" } }}
       options={options}
       value={selectedDomains}
       onChange={(_event, value) => setSelectedDomains(value)}

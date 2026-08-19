@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import Button from "../../../../components/button/Button";
+import LockOutlinedIcon from "../../../../icons/LockOutlined/LockOutlined";
 import { APP_ROUTES } from "../../../../constants/appRoutes";
 import { clearBuyNowItem } from "../../../checkout/buyNowStorage";
 import { useAuthDialog } from "../../../auth/context/AuthDialogContext";
@@ -35,7 +37,7 @@ export default function CartSummary({ itemCount, total }: CartSummaryProps) {
 
       <div className="mt-4 flex items-center justify-between text-sm text-text-secondary">
         <span>
-          {itemCount} {itemCount === 1 ? "item" : "items"}
+          {itemCount} {itemCount === 1 ? "transcript" : "transcripts"}
         </span>
         <span>${total}</span>
       </div>
@@ -51,9 +53,14 @@ export default function CartSummary({ itemCount, total }: CartSummaryProps) {
         <Button
           variant="contained"
           label="Proceed to Checkout"
+          endIcon={<ArrowForwardIcon fontSize="small" />}
           styles={{ width: "100%", height: "42px" }}
           onClick={handleCheckoutClick}
         />
+      </div>
+      <div className="mt-3 flex items-center justify-center gap-1.5 text-xs text-text-secondary">
+        <LockOutlinedIcon fontSize="inherit" />
+        Secure checkout
       </div>
     </div>
   );

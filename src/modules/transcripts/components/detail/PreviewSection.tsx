@@ -41,7 +41,7 @@ export default function PreviewSection({
       {coverageHighlights.length > 0 && (
         <div className="mt-4">
           <p className="text-sm font-semibold text-text-primary">
-            What this topic covers:
+            Key Insights:
           </p>
           <ul className="mt-3 flex flex-col gap-2">
             {coverageHighlights.map((highlight, index) => (

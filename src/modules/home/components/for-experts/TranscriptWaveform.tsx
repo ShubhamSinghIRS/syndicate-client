@@ -1,5 +1,10 @@
 import { useEffect, useRef } from "react";
 
+interface BarSeed {
+  phase: number;
+  noise: number;
+}
+
 export function TranscriptWaveform({ className = "" }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef<{ x: number; y: number; active: boolean }>({
@@ -19,9 +24,9 @@ export function TranscriptWaveform({ className = "" }: { className?: string }) {
     const dpr = window.devicePixelRatio || 1;
     let w = 0;
     let h = 0;
-    const seeds: number[] = [];
-    const BAR_W = 5;
-    const GAP = 5;
+    const seeds: BarSeed[] = [];
+    const BAR_W = 2.5;
+    const GAP = 3.5;
     let count = 0;
 
     const resize = () => {
@@ -33,7 +38,12 @@ export function TranscriptWaveform({ className = "" }: { className?: string }) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       count = Math.ceil(w / (BAR_W + GAP));
       seeds.length = 0;
-      for (let i = 0; i < count; i++) seeds.push(Math.random() * Math.PI * 2);
+      for (let i = 0; i < count; i++) {
+        seeds.push({
+          phase: Math.random() * Math.PI * 2,
+          noise: 0.55 + Math.random() * 0.45,
+        });
+      }
     };
     resize();
     const onResize = () => resize();
@@ -53,7 +63,7 @@ export function TranscriptWaveform({ className = "" }: { className?: string }) {
     canvas.addEventListener("pointerleave", onLeave);
 
     const start = performance.now();
-    const RADIUS = 200;
+    const RADIUS = 180;
 
     const draw = (now: number) => {
       const t = (now - start) / 1000;
@@ -63,11 +73,23 @@ export function TranscriptWaveform({ className = "" }: { className?: string }) {
 
       for (let i = 0; i < count; i++) {
         const x = i * (BAR_W + GAP) + GAP / 2;
-        const phase = seeds[i];
-        const osc = reduced ? 0.5 : Math.sin(t * 1.2 + phase) * 0.5 + 0.5;
-        const baseH = h * 0.18 + osc * h * 0.62;
+        const seed = seeds[i];
+        if (!seed) continue;
 
-        // proximity influence
+        // Normalized coordinate across the waveform (0 to 1)
+        const tNorm = count > 1 ? i / (count - 1) : 0.5;
+
+        // Multi-peak envelope matching the reference image: peaks at 15%, 50%, and 85%
+        const peak1 = 0.48 * Math.exp(-Math.pow((tNorm - 0.15) / 0.10, 2));
+        const peak2 = 0.95 * Math.exp(-Math.pow((tNorm - 0.50) / 0.14, 2));
+        const peak3 = 0.48 * Math.exp(-Math.pow((tNorm - 0.85) / 0.10, 2));
+        const envelope = peak1 + peak2 + peak3;
+
+        // Dynamic animation: faster, more pronounced rippling/breathing effect
+        const osc = reduced ? 1.0 : 0.70 + 0.30 * Math.sin(t * 2.8 + seed.phase);
+        const baseH = h * 1.25 * envelope * seed.noise * osc;
+
+        // Proximity influence (interactive hover effect)
         let glow = 0;
         if (active) {
           const dx = x + BAR_W / 2 - mx;
@@ -76,27 +98,15 @@ export function TranscriptWaveform({ className = "" }: { className?: string }) {
             glow = Math.pow(1 - d / RADIUS, 2);
           }
         }
-        const barH = baseH * (1 + glow * 0.7);
-        const alpha = 0.3 + glow * 0.3;
+        const barH = Math.max(3, baseH * (1 + glow * 0.7));
+        const alpha = 0.22 + glow * 0.38;
 
-        ctx.fillStyle = `rgba(232,148,26,${alpha})`;
+        // Warm orange matching COLORS.accent2 (#ec9324)
+        ctx.fillStyle = `rgba(236, 147, 36, ${alpha})`;
         const y = midY - barH / 2;
-        const r = BAR_W / 2;
-        // rounded rect
-        ctx.beginPath();
-        ctx.moveTo(x + r, y);
-        ctx.lineTo(x + BAR_W - r, y);
-        ctx.quadraticCurveTo(x + BAR_W, y, x + BAR_W, y + r);
-        ctx.lineTo(x + BAR_W, y + barH - r);
-        ctx.quadraticCurveTo(x + BAR_W, y + barH, x + BAR_W - r, y + barH);
-        ctx.lineTo(x + r, y + barH);
-        ctx.quadraticCurveTo(x, y + barH, x, y + barH - r);
-        ctx.lineTo(x, y + r);
-        ctx.quadraticCurveTo(x, y, x + r, y);
-        ctx.fill();
+        
+        ctx.fillRect(x, y, BAR_W, barH);
       }
-
-
 
       raf = requestAnimationFrame(draw);
     };

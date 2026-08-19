@@ -1,41 +1,41 @@
-import { useEffect } from "react";
+import { useState } from "react";
+import { useFieldArray } from "react-hook-form";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
+import AddIcon from "@mui/icons-material/Add";
 import Tooltip from "../../../../components/tooltip/Tooltip";
 import { HookTextField } from "../../../../components/form-fields/SLFieldTextField";
-import { HookSelect } from "../../../../components/form-fields/SLFieldSelect";
 import FormCancelSubmitBtns from "../../../../components/form-cancel-submit-btns/FormCancelSubmitBtns";
 import { useHookFormContext } from "../../../../utils/hooks/useHookFormContext";
 import { validRegex } from "../../../../utils/isValidType";
 import { commonInputStyles } from "../../../../common/input-styles";
 import InfoOutlined from "../../../../icons/InfoOutlined/InfoOutlined";
+import ExpandMoreIcon from "../../../../icons/ExpandMore/ExpandMore";
+import DeleteIcon from "../../../../icons/Delete/Delete";
+import DomainField from "./DomainField";
 import type { RequestTopicFormValues } from "./types";
-
-const DOMAIN_OPTIONS = [
-  { label: "Enterprise SaaS", value: "Enterprise SaaS" },
-  { label: "Robotics", value: "Robotics" },
-  { label: "Retail", value: "Retail" },
-  { label: "Other", value: "Other" },
-];
 
 type FieldsProps = {
   handleClose: () => void;
-  handleFormChange: () => void;
+  showEmail: boolean;
 };
 
-export default function Fields({ handleClose, handleFormChange }: FieldsProps) {
-  const { registerState, watch } = useHookFormContext<RequestTopicFormValues>();
+export default function Fields({ handleClose, showEmail }: FieldsProps) {
+  const { registerState, control } =
+    useHookFormContext<RequestTopicFormValues>();
+  const [showExpertFields, setShowExpertFields] = useState(false);
+  const {
+    fields: expertFields,
+    append: appendExpert,
+    remove: removeExpert,
+  } = useFieldArray({ control, name: "suggestedExperts" });
 
-  useEffect(() => {
-    const subscription = watch((_value, { type }) => {
-      if (type === "change") {
-        handleFormChange();
-      }
-    });
-
-    return () => subscription.unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watch]);
+  const handleToggleExpertFields = () => {
+    if (!showExpertFields && expertFields.length === 0) {
+      appendExpert({ name: "", linkedin: "" });
+    }
+    setShowExpertFields((prev) => !prev);
+  };
 
   return (
     <Grid container spacing={2} mt="1px">
@@ -50,30 +50,26 @@ export default function Fields({ handleClose, handleFormChange }: FieldsProps) {
         }}
         gridProps={{ xs: 12 }}
       />
-      <HookSelect
-        {...registerState("domain")}
-        rules={{ required: { value: true, message: "This field is required" } }}
-        label="Domain"
-        items={DOMAIN_OPTIONS}
-        gridProps={{ xs: 12 }}
-        formControlProps={{ margin: "none" }}
-        selectProps={{ size: "small" }}
-      />
-      <HookTextField
-        {...registerState("email")}
-        rules={{
-          pattern: {
-            value: validRegex("email"),
-            message: "Please enter a correct email",
-          },
-        }}
-        textFieldProps={{
-          ...commonInputStyles,
-          label: "Email",
-          placeholder: "So we can notify you when it's ready",
-        }}
-        gridProps={{ xs: 12 }}
-      />
+      <Grid item xs={12}>
+        <DomainField control={control} />
+      </Grid>
+      {showEmail && (
+        <HookTextField
+          {...registerState("email")}
+          rules={{
+            pattern: {
+              value: validRegex("email"),
+              message: "Please enter a correct email",
+            },
+          }}
+          textFieldProps={{
+            ...commonInputStyles,
+            label: "Email",
+            placeholder: "So we can notify you when it's ready",
+          }}
+          gridProps={{ xs: 12 }}
+        />
+      )}
       <HookTextField
         {...registerState("remark")}
         textFieldProps={{
@@ -87,25 +83,79 @@ export default function Fields({ handleClose, handleFormChange }: FieldsProps) {
       />
 
       <Grid item xs={12} sx={{ pt: "8px !important", pb: "0px !important" }}>
-        <p className="flex items-center gap-1 text-sm font-medium text-text-primary">
-          Recommend an expert
-          <Tooltip title="Share a name or LinkedIn if there's someone specific you'd like us to approach to get the transcript">
-            <IconButton size="small" sx={{ color: "inherit", p: 0.5 }}>
-              <InfoOutlined fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </p>
+        <button
+          type="button"
+          onClick={handleToggleExpertFields}
+          aria-expanded={showExpertFields}
+          className="flex w-full items-center justify-between gap-1 text-left cursor-pointer"
+        >
+          <span className="flex items-center gap-1 text-sm font-medium text-text-primary">
+            Recommend an expert
+            <Tooltip title="Share a name or LinkedIn if there's someone specific you'd like us to approach to get the transcript">
+              <IconButton
+                size="small"
+                sx={{ color: "inherit", p: 0.5 }}
+                onClick={(event) => event.stopPropagation()}
+              >
+                <InfoOutlined fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </span>
+          <ExpandMoreIcon
+            fontSize="small"
+            className={`text-text-secondary transition-transform duration-200 ${
+              showExpertFields ? "rotate-180" : ""
+            }`}
+          />
+        </button>
       </Grid>
-      <HookTextField
-        {...registerState("suggestedExpertName")}
-        textFieldProps={{ ...commonInputStyles, label: "Name" }}
-        gridProps={{ xs: 12, sx: { pt: "8px !important" } }}
-      />
-      <HookTextField
-        {...registerState("suggestedExpertLinkedin")}
-        textFieldProps={{ ...commonInputStyles, label: "LinkedIn" }}
-        gridProps={{ xs: 12 }}
-      />
+      {showExpertFields && (
+        <Grid
+          item
+          xs={12}
+          sx={{ pt: "8px !important", display: "flex", flexDirection: "column", gap: "12px" }}
+        >
+          {expertFields.map((expertField, index) => (
+            <div key={expertField.id} className="flex flex-col gap-1.5">
+              <p className="text-sm font-semibold text-text-primary">
+                Expert {index + 1}
+              </p>
+              <div className="flex items-start gap-2">
+                <HookTextField
+                  {...registerState(`suggestedExperts.${index}.name`)}
+                  textFieldProps={{
+                    ...commonInputStyles,
+                    placeholder: "Expert name",
+                  }}
+                />
+                <HookTextField
+                  {...registerState(`suggestedExperts.${index}.linkedin`)}
+                  textFieldProps={{
+                    ...commonInputStyles,
+                    placeholder: "LinkedIn profile URL",
+                  }}
+                />
+                <IconButton
+                  size="small"
+                  aria-label="Remove expert"
+                  onClick={() => removeExpert(index)}
+                  sx={{ mt: "4px" }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </div>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() => appendExpert({ name: "", linkedin: "" })}
+            className="flex items-center justify-center gap-1 rounded-lg border border-dashed border-gray-300 dark:border-gray-700 py-2 text-sm font-medium text-text-primary hover:bg-section-background cursor-pointer"
+          >
+            <AddIcon fontSize="small" />
+            Add another expert
+          </button>
+        </Grid>
+      )}
 
       <FormCancelSubmitBtns handleClose={handleClose} submitLabel="Request" />
     </Grid>

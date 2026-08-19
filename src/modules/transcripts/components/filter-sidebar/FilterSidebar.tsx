@@ -4,13 +4,11 @@ import CustomRadio from "../../../../components/radio/CustomRadio";
 import FilterSection from "./FilterSection";
 import DomainAutocomplete from "./DomainAutocomplete";
 import { isLoggedIn } from "../../../../utils/authUtils";
-import {
-  DEFAULT_SIDEBAR_FILTERS,
-  PRICE_OPTIONS,
-  PUBLISHED_DATE_OPTIONS,
-} from "./constants";
+import { DEFAULT_SIDEBAR_FILTERS, PUBLISHED_DATE_OPTIONS } from "./constants";
+import { buildPriceOptions } from "../../transcriptsService";
 import { purchasedOnlySwitchSx } from "./filter-sidebar.styles";
 import type {
+  FilterBounds,
   PriceFilterValue,
   PublishedDateFilterValue,
   SidebarFilterPayload,
@@ -21,6 +19,7 @@ type FilterSidebarProps = {
   setFilters: (filters: SidebarFilterPayload) => void;
   purchasedOnly: boolean;
   setPurchasedOnly: (purchasedOnly: boolean) => void;
+  bounds: FilterBounds | null;
 };
 
 export default function FilterSidebar({
@@ -28,9 +27,11 @@ export default function FilterSidebar({
   setFilters,
   purchasedOnly,
   setPurchasedOnly,
+  bounds,
 }: FilterSidebarProps) {
+  const priceOptions = buildPriceOptions(bounds);
   return (
-    <div className="w-80 shrink-0 rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-6">
+    <div className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-6 lg:w-80 lg:shrink-0">
       <div className="flex items-center justify-between">
         <h2 className="text-base font-bold text-text-primary">Filters</h2>
         <button
@@ -72,7 +73,7 @@ export default function FilterSidebar({
             })
           }
         >
-          {PRICE_OPTIONS.map((option) => (
+          {priceOptions.map((option) => (
             <CustomRadio
               key={option.value}
               label={option.label}

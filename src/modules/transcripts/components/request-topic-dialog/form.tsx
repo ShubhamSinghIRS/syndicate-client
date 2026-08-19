@@ -1,4 +1,4 @@
-import { useContext, useMemo } from "react";
+import { useContext, useEffect, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useSnackbar } from "notistack";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -9,28 +9,30 @@ import Fields from "./fields";
 import type { RequestTopicFormValues } from "./types";
 import { API_ENDPOINTS } from "../../../../constants/apiEndpoints";
 import { RequestServer } from "../../../../utils/services";
+import { isLoggedIn } from "../../../../utils/authUtils";
+import { useCurrentUser } from "../../../profile/hooks/useCurrentUser";
 
 type RequestTopicFormProps = {
   handleClose: () => void;
-  handleFormChange: () => void;
+  onDirtyChange: (isDirty: boolean) => void;
   handleSubmitClose: () => void;
 };
 
 const defaultValues: RequestTopicFormValues = {
-  domain: "",
+  domain: [],
   topic: "",
   email: "",
   remark: "",
-  suggestedExpertName: "",
-  suggestedExpertLinkedin: "",
+  suggestedExperts: [],
 };
 
 export default function RequestTopicForm({
   handleClose,
-  handleFormChange,
+  onDirtyChange,
   handleSubmitClose,
 }: RequestTopicFormProps) {
   const methods = useForm<RequestTopicFormValues>({ defaultValues });
+  const { isDirty } = methods.formState;
   const { mode } = useThemeMode();
   const defaultTheme = useMemo(
     () => createTheme(getDefaultFormTheme(mode)),
@@ -38,11 +40,34 @@ export default function RequestTopicForm({
   );
   const { setLoading } = useContext(LoadingContext);
   const { enqueueSnackbar } = useSnackbar();
+  const { userId, email: currentUserEmail } = useCurrentUser();
+  const loggedIn = isLoggedIn();
+
+  useEffect(() => {
+    onDirtyChange(isDirty);
+  }, [isDirty, onDirtyChange]);
 
   const onSubmit = async (data: RequestTopicFormValues) => {
     setLoading(true);
     try {
-      await RequestServer(API_ENDPOINTS.topicsRequest, "POST", data);
+      // Backend's topic_requests table only has one domain string column
+      // and one suggestedExpertName/suggestedExpertLinkedin pair, so
+      // multiple selections are joined before submission.
+      const experts = data.suggestedExperts.filter(
+        (expert) => expert.name || expert.linkedin,
+      );
+      await RequestServer(API_ENDPOINTS.topicsRequest, "POST", {
+        ...data,
+        // Logged-in users don't see the email field at all - use their
+        // account email instead of whatever's left in the form default.
+        email: loggedIn ? (currentUserEmail ?? data.email) : data.email,
+        domain: data.domain.join(", "),
+        suggestedExpertName: experts.map((expert) => expert.name).join("; "),
+        suggestedExpertLinkedin: experts
+          .map((expert) => expert.linkedin)
+          .join("; "),
+        ...(loggedIn && userId ? { user_id: userId } : {}),
+      });
       enqueueSnackbar("Your topic request has been submitted.", {
         variant: "success",
       });
@@ -66,10 +91,7 @@ export default function RequestTopicForm({
               {methods.formState.errors.root.message}
             </p>
           )}
-          <Fields
-            handleClose={handleClose}
-            handleFormChange={handleFormChange}
-          />
+          <Fields handleClose={handleClose} showEmail={!loggedIn} />
         </form>
       </ThemeProvider>
     </FormProvider>

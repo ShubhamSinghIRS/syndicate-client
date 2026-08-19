@@ -4,26 +4,29 @@ import { fetchTranscriptById } from "../transcriptsService";
 import type { Transcript } from "../types";
 import { useCart } from "../../cart/hooks/useCart";
 import { usePurchasedTranscriptIds } from "../../orders/hooks/usePurchasedTranscriptIds";
-import { setBuyNowItem } from "../../checkout/buyNowStorage";
-import { useAuthDialog } from "../../auth/context/AuthDialogContext";
-import { isLoggedIn } from "../../../utils/authUtils";
+import { useBuyNow } from "../../checkout/hooks/useBuyNow";
 import { RequestServer } from "../../../utils/services";
 import { API_ENDPOINTS } from "../../../constants/apiEndpoints";
 import { APP_ROUTES } from "../../../constants/appRoutes";
 import Header from "../../../components/header/Header";
 import Footer from "../../../components/footer/Footer";
+import Button from "../../../components/button/Button";
 import DetailHeader from "../components/detail/DetailHeader";
 import PreviewSection from "../components/detail/PreviewSection";
 import PurchaseCard from "../components/detail/PurchaseCard";
-import AuthorCard from "../components/detail/AuthorCard";
+import ExpertCard from "../components/detail/ExpertCard";
 import RelatedTranscripts from "../components/detail/RelatedTranscripts";
 import TranscriptDetailSkeleton from "../components/detail/TranscriptDetailSkeleton";
+
+// Ids are either the legacy plain-number form or the backend's UUID form.
+const TRANSCRIPT_ID_PATTERN =
+  /^(\d+|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
 
 export default function TranscriptDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { items: cartItems, addToCart, removeFromCart } = useCart();
-  const { openAuthDialog } = useAuthDialog();
+  const buyNow = useBuyNow();
   const [transcript, setTranscript] = useState<Transcript | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [fullText, setFullText] = useState<string | null>(null);
@@ -40,7 +43,7 @@ export default function TranscriptDetail() {
     // would otherwise be sent to the backend and come back as a "not found
     // transcript" - it isn't a real id at all, so treat it the same as any
     // other nonexistent route instead of pretending a lookup happened.
-    if (!/^\d+$/.test(id)) {
+    if (!TRANSCRIPT_ID_PATTERN.test(id)) {
       navigate(APP_ROUTES.home, { replace: true });
       return;
     }
@@ -68,8 +71,27 @@ export default function TranscriptDetail() {
       <div className="flex min-h-screen flex-col">
         <Header />
         <div className="flex-1">
-          <div className="mx-auto max-w-[1400px] px-6 py-10 text-center text-text-secondary">
-            We couldn't find that transcript.
+          <div className="mx-auto flex max-w-[1400px] flex-col items-center px-6 py-24 text-center">
+            <p className="text-6xl font-extrabold text-accent-2">404</p>
+            <h1 className="mt-4 text-2xl font-bold text-text-primary">
+              Transcript Not Found
+            </h1>
+            <p className="mt-2 max-w-md text-text-secondary">
+              The transcript you're looking for isn't available or may have
+              been removed.
+            </p>
+            <div className="mt-6 flex gap-3">
+              <Button
+                variant="outlined"
+                label="Go to Homepage"
+                onClick={() => navigate(APP_ROUTES.home)}
+              />
+              <Button
+                variant="contained"
+                label="Search Transcripts"
+                onClick={() => navigate(APP_ROUTES.transcripts)}
+              />
+            </div>
           </div>
         </div>
         <Footer />
@@ -81,21 +103,7 @@ export default function TranscriptDetail() {
     return <TranscriptDetailSkeleton />;
   }
 
-  const goToBuyNowCheckout = () => {
-    // Bypasses the cart; sessionStorage survives navigation.
-    setBuyNowItem(transcript);
-    navigate(APP_ROUTES.checkout);
-  };
-
-  const handleBuyNow = () => {
-    if (isLoggedIn()) {
-      goToBuyNowCheckout();
-      return;
-    }
-
-    // Sign in here, then continue straight to checkout.
-    openAuthDialog("signin", goToBuyNowCheckout);
-  };
+  const handleBuyNow = () => buyNow(transcript);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -117,8 +125,8 @@ export default function TranscriptDetail() {
                 transcript={transcript}
               />
               <RelatedTranscripts
-                domain={transcript.domain}
                 excludeId={transcript.id}
+                purchasedIds={purchasedIds}
               />
             </div>
 
@@ -132,7 +140,7 @@ export default function TranscriptDetail() {
                   onBuyNow={handleBuyNow}
                 />
               )}
-              <AuthorCard author={transcript.author} />
+              <ExpertCard expert={transcript.expert} />
             </div>
           </div>
         </div>
