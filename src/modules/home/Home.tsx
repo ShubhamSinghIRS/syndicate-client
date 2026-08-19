@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useThemeMode } from "../../context/ThemeModeContext";
 import Button from "../../components/button/Button";
 import SearchBar from "../../components/searchbar/SearchBar";
 import Header from "../../components/header/Header";
@@ -19,6 +20,11 @@ export default function Home() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const requestTopicDialog = useFormCloseWarning();
+  const { mode } = useThemeMode();
+  const heroImageSrc =
+    mode === "dark"
+      ? "/assets/bg_image_side_dark_mod.png"
+      : "/assets/bg_image_side_light_mod.png";
 
   const handleSearch = (text: string) => {
     if (!text.trim()) return;
@@ -88,7 +94,7 @@ export default function Home() {
               card border, edges dissolve via the mask in heroImage. */}
           <div className="hidden md:block flex-[1.15] w-full pr-6 md:pr-0">
             <img
-              src="/assets/bg_image_side2.png"
+              src={heroImageSrc}
               alt="Expert sharing insights on a video call"
               className={`${styles.heroImage} w-full h-auto max-h-[480px] object-contain`}
             />

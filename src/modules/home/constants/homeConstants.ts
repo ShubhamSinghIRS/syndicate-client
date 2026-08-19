@@ -39,7 +39,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: "What is a session transcript?",
     answer:
-      "A full written record of an expert's insights on a specific topic, captured either through a recorded conversation or a submitted report, then reviewed internally and formatted so it's ready to read and reference.",
+      "A full written record of an expert's insights on a specific topic, captured either through a recorded conversation or a submitted report, then reviewed internally and formatted so it's ready to read and publish.",
   },
   {
     question: "Who creates these transcripts, and can I trust the content?",

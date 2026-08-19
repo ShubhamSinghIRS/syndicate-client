@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import IconButton from "@mui/material/IconButton";
+import Tooltip from "../../../../components/tooltip/Tooltip";
 import DeleteIcon from "../../../../icons/Delete/Delete";
 import DescriptionIcon from "../../../../icons/Description/Description";
 import CalendarTodayIcon from "../../../../icons/CalendarToday/CalendarToday";
@@ -57,9 +58,9 @@ export default function CartItem({ item, onRemove, linkState }: CartItemRowProps
           ${item.price}
         </span>
         {onRemove && (
-          <div className="flex flex-col items-center gap-0.5">
+          <Tooltip title="Remove from Cart" arrow>
             <IconButton
-              aria-label="Remove"
+              aria-label="Remove from Cart"
               onClick={onRemove}
               sx={{
                 border: "1px solid",
@@ -70,8 +71,7 @@ export default function CartItem({ item, onRemove, linkState }: CartItemRowProps
             >
               <DeleteIcon fontSize="small" />
             </IconButton>
-            <span className="text-[11px] text-text-secondary">Remove</span>
-          </div>
+          </Tooltip>
         )}
       </div>
     </div>

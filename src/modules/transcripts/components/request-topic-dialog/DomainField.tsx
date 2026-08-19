@@ -41,6 +41,7 @@ export default function DomainField({ control }: DomainFieldProps) {
         <Autocomplete
           multiple
           freeSolo
+          disableCloseOnSelect
           size="small"
           options={options}
           value={value}

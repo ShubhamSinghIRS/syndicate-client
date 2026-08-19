@@ -108,7 +108,7 @@ export const fetchFilterBounds = async (): Promise<FilterBounds> =>
 
 // published-date bucket -> number of days back from now to filter from.
 const PUBLISHED_DATE_DAYS: Record<
-  Exclude<PublishedDateFilterValue, "anytime">,
+  Exclude<PublishedDateFilterValue, "any time">,
   number
 > = {
   "last-week": 7,
@@ -131,7 +131,7 @@ export const buildTranscriptsFilterPayload = (
   if (filters.price !== "all") {
     Object.assign(payload, buildPriceRanges(bounds)[filters.price]);
   }
-  if (filters.publishedDate !== "anytime") {
+  if (filters.publishedDate !== "any time") {
     const days = PUBLISHED_DATE_DAYS[filters.publishedDate];
     const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
     payload.publishedAfter = cutoff.toISOString();

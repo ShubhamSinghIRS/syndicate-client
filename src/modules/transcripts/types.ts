@@ -25,7 +25,7 @@ export type PriceFilterValue =
   "all" | "free" | "under-100" | "100-250" | "over-250";
 
 export type PublishedDateFilterValue =
-  "anytime" | "last-week" | "last-month" | "last-3-months" | "last-year";
+  "any time" | "last-week" | "last-month" | "last-3-months" | "last-year";
 
 export type SidebarFilterPayload = {
   domains: string[];

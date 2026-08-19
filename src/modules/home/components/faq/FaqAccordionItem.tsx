@@ -6,6 +6,22 @@ type FaqAccordionItemProps = FaqItem & {
   onToggle: () => void;
 };
 
+const EMAIL_PATTERN = /([\w.-]+@[\w.-]+\.\w+)/g;
+
+function highlightEmails(text: string) {
+  return text
+    .split(EMAIL_PATTERN)
+    .map((part, index) =>
+      index % 2 === 1 ? (
+        <span key={index} className="text-accent-2 font-medium">
+          {part}
+        </span>
+      ) : (
+        part
+      ),
+    );
+}
+
 export default function FaqAccordionItem({
   question,
   answer,
@@ -41,7 +57,7 @@ export default function FaqAccordionItem({
               isExpanded ? "opacity-100 delay-100" : "opacity-0"
             }`}
           >
-            {answer}
+            {highlightEmails(answer)}
           </p>
         </div>
       </div>

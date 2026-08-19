@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Tooltip from "../../../../components/tooltip/Tooltip";
 import Typography from "@mui/material/Typography";
@@ -23,6 +23,32 @@ type TranscriptCardProps = {
   transcript: Transcript;
   isPurchased?: boolean;
 };
+
+// The chip's label is CSS-truncated (domainChipSx: maxWidth + ellipsis), so
+// whether it's actually cut off depends on rendered text width, not
+// character count. Measure the label's scrollWidth vs clientWidth so the
+// tooltip only appears when the domain name is genuinely truncated.
+function DomainChip({ label }: { label: string }) {
+  const chipRef = useRef<HTMLDivElement>(null);
+  const [isTruncated, setIsTruncated] = useState(false);
+
+  useEffect(() => {
+    const labelEl = chipRef.current?.querySelector<HTMLElement>(".MuiChip-label");
+    setIsTruncated(!!labelEl && labelEl.scrollWidth > labelEl.clientWidth);
+  }, [label]);
+
+  return (
+    <Tooltip title={label} arrow disableHoverListener={!isTruncated}>
+      <Chip
+        ref={chipRef}
+        label={label}
+        variant="outlined"
+        size="small"
+        sx={domainChipSx}
+      />
+    </Tooltip>
+  );
+}
 
 export default function TranscriptCard({
   transcript,
@@ -54,20 +80,9 @@ export default function TranscriptCard({
           <Typography variant="body2" component="span" sx={domainLabelSx}>
             Domain:
           </Typography>
-          {visibleTags.map((tag) => {
-            const isLong = tag.length > 40;
-            const displayLabel = isLong ? `${tag.slice(0, 40)}...` : tag;
-            return (
-              <Tooltip key={tag} title={tag} arrow disableHoverListener={!isLong}>
-                <Chip
-                  label={displayLabel}
-                  variant="outlined"
-                  size="small"
-                  sx={domainChipSx}
-                />
-              </Tooltip>
-            );
-          })}
+          {visibleTags.map((tag) => (
+            <DomainChip key={tag} label={tag} />
+          ))}
           {remainingTagCount > 0 && (
             <Tooltip title={remainingTags.join(", ")} arrow>
               <Chip
@@ -87,7 +102,10 @@ export default function TranscriptCard({
       >
         {transcript.title}
       </h2>
-      <p className="mt-1 text-text-secondary hover:text-text-primary transition-colors line-clamp-2">
+      <p
+        onClick={goToDetail}
+        className="mt-1 text-text-secondary hover:text-text-primary transition-colors line-clamp-2 cursor-pointer"
+      >
         {previewText}
       </p>
 

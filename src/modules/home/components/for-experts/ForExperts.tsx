@@ -50,7 +50,7 @@ export default function ForExperts() {
         </h2>
         <p className="mt-4 max-w-2xl text-lg text-text-secondary leading-relaxed">
           Share a recorded session or upload a document. Once reviewed, your
-          expertise goes live on the Infollion marketplace and earns every
+          expertise goes live on the Syndicate marketplace and earns every
           time it's accessed.
         </p>
         <div className="mt-6 flex flex-wrap items-start gap-6">

@@ -7,7 +7,7 @@ export const PUBLISHED_DATE_OPTIONS: {
   label: string;
   value: PublishedDateFilterValue;
 }[] = [
-  { label: "Anytime", value: "anytime" },
+  { label: "Any time", value: "any time" },
   { label: "Past week", value: "last-week" },
   { label: "Past month", value: "last-month" },
   { label: "Past 3 months", value: "last-3-months" },
@@ -17,5 +17,5 @@ export const PUBLISHED_DATE_OPTIONS: {
 export const DEFAULT_SIDEBAR_FILTERS: SidebarFilterPayload = {
   domains: [],
   price: "all",
-  publishedDate: "anytime",
+  publishedDate: "any time",
 };

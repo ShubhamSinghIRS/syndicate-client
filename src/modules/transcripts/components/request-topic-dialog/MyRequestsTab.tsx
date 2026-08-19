@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CircularProgress from "@mui/material/CircularProgress";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
@@ -152,10 +151,6 @@ export default function MyRequestsTab({
                   >
                     {statusDisplay.label}
                   </span>
-                  <ChevronRightIcon
-                    fontSize="small"
-                    className="text-text-secondary"
-                  />
                 </div>
               </div>
               <p className="mt-1 text-sm text-text-secondary">{item.domain}</p>
