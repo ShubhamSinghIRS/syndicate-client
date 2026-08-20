@@ -13,7 +13,7 @@ export const API_ENDPOINTS = {
   transcriptsFilter: "/api/transcripts/filter",
   transcriptDetail: "/api/transcripts/:id",
   transcriptSimilar: "/api/transcripts/:id/similar",
-  transcriptFullText: "/api/transcripts/:id/full-text",
+  transcriptView: "/api/transcripts/:id/view",
   transcriptDownload: "/api/transcripts/:id/download",
   domains: "/api/transcripts/domains",
   filterBounds: "/api/transcripts/filter-bounds",
