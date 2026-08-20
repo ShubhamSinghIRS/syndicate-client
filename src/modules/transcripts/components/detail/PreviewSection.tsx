@@ -10,6 +10,7 @@ import { formatDate } from "../../../../utils/dateUtils";
 import { LOCKED_PREVIEW_PARAGRAPHS } from "../../pages/constants";
 import { COLORS } from "../../../../constants/colors";
 import { purchasedChipSx } from "./PreviewSection.styles";
+import type { PdfStatus } from "../../hooks/useTranscriptPdf";
 import type { Transcript } from "../../types";
 
 type PreviewSectionProps = {
@@ -19,7 +20,8 @@ type PreviewSectionProps = {
   coverageHighlights: string[];
   onBuyClick: () => void;
   isPurchased: boolean;
-  fullText: string | null;
+  pdfUrl: string | null;
+  pdfStatus: PdfStatus;
   transcript: Pick<Transcript, "id" | "title" | "domain" | "preview">;
 };
 
@@ -30,7 +32,8 @@ export default function PreviewSection({
   coverageHighlights,
   onBuyClick,
   isPurchased,
-  fullText,
+  pdfUrl,
+  pdfStatus,
   transcript,
 }: PreviewSectionProps) {
   return (
@@ -92,21 +95,22 @@ export default function PreviewSection({
             </div>
             <DownloadTranscriptButton transcript={transcript} />
           </div>
-          <div className="mt-3 max-h-[700px] overflow-y-auto rounded-md border border-gray-200 dark:border-gray-800 bg-section-background p-6 shadow-inner">
-            <div className="space-y-3">
-              {fullText === null ? (
-                <p className="text-text-secondary">Loading full transcript…</p>
-              ) : (
-                fullText
-                  .split("\n")
-                  .filter((line) => line.trim().length > 0)
-                  .map((line, index) => (
-                    <p key={index} className="text-text-secondary">
-                      {line}
-                    </p>
-                  ))
-              )}
-            </div>
+          <div className="mt-3 h-[700px] overflow-hidden rounded-md border border-gray-200 dark:border-gray-800 bg-section-background shadow-inner">
+            {pdfStatus === "ready" && pdfUrl ? (
+              <iframe
+                src={pdfUrl}
+                title="Full transcript"
+                className="h-full w-full border-0"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center p-6 text-center">
+                <p className="text-text-secondary">
+                  {pdfStatus === "error"
+                    ? "We couldn't load this transcript. Please try again."
+                    : "Loading full transcript…"}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       ) : (

@@ -5,8 +5,7 @@ import type { Transcript } from "../types";
 import { useCart } from "../../cart/hooks/useCart";
 import { usePurchasedTranscriptIds } from "../../orders/hooks/usePurchasedTranscriptIds";
 import { useBuyNow } from "../../checkout/hooks/useBuyNow";
-import { RequestServer } from "../../../utils/services";
-import { API_ENDPOINTS } from "../../../constants/apiEndpoints";
+import { useTranscriptPdf } from "../hooks/useTranscriptPdf";
 import { APP_ROUTES } from "../../../constants/appRoutes";
 import Header from "../../../components/header/Header";
 import Footer from "../../../components/footer/Footer";
@@ -29,9 +28,9 @@ export default function TranscriptDetail() {
   const buyNow = useBuyNow();
   const [transcript, setTranscript] = useState<Transcript | null>(null);
   const [notFound, setNotFound] = useState(false);
-  const [fullText, setFullText] = useState<string | null>(null);
   const purchasedIds = usePurchasedTranscriptIds();
   const isPurchased = !!id && purchasedIds.includes(id);
+  const { url: pdfUrl, status: pdfStatus } = useTranscriptPdf(id, isPurchased);
 
   useEffect(() => {
     setTranscript(null);
@@ -52,19 +51,6 @@ export default function TranscriptDetail() {
       .then(setTranscript)
       .catch(() => setNotFound(true));
   }, [id, navigate]);
-
-  useEffect(() => {
-    setFullText(null);
-
-    if (!id || !isPurchased) return;
-
-    RequestServer<{ fullText: string }>(
-      API_ENDPOINTS.transcriptFullText.replace(":id", id),
-      "GET",
-    )
-      .then((result) => setFullText(result.fullText))
-      .catch(() => setFullText(null));
-  }, [id, isPurchased]);
 
   if (notFound) {
     return (
@@ -121,7 +107,8 @@ export default function TranscriptDetail() {
                 coverageHighlights={transcript.coverageHighlights}
                 onBuyClick={handleBuyNow}
                 isPurchased={isPurchased}
-                fullText={fullText}
+                pdfUrl={pdfUrl}
+                pdfStatus={pdfStatus}
                 transcript={transcript}
               />
               <RelatedTranscripts
