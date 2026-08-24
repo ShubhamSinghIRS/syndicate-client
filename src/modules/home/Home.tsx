@@ -73,7 +73,7 @@ export default function Home() {
             </div>
 
             {/* Buttons */}
-            <div className="flex flex-wrap space-btw gap-12 mt-2">
+            <div className="flex flex-wrap justify-start gap-4 mt-2">
               <Link to={APP_ROUTES.transcripts}>
                 <Button
                   variant="contained"

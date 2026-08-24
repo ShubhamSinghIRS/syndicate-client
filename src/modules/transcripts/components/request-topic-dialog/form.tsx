@@ -19,7 +19,7 @@ type RequestTopicFormProps = {
 };
 
 const defaultValues: RequestTopicFormValues = {
-  domain: [],
+  domains: [],
   topic: "",
   email: "",
   remark: "",
@@ -50,9 +50,9 @@ export default function RequestTopicForm({
   const onSubmit = async (data: RequestTopicFormValues) => {
     setLoading(true);
     try {
-      // Backend's topic_requests table only has one domain string column
-      // and one suggestedExpertName/suggestedExpertLinkedin pair, so
-      // multiple selections are joined before submission.
+      // Backend's topic_requests table only has one
+      // suggestedExpertName/suggestedExpertLinkedin pair, so multiple
+      // experts are joined before submission (domain is a real array column).
       const experts = data.suggestedExperts.filter(
         (expert) => expert.name || expert.linkedin,
       );
@@ -61,7 +61,6 @@ export default function RequestTopicForm({
         // Logged-in users don't see the email field at all - use their
         // account email instead of whatever's left in the form default.
         email: loggedIn ? (currentUserEmail ?? data.email) : data.email,
-        domain: data.domain.join(", "),
         suggestedExpertName: experts.map((expert) => expert.name).join("; "),
         suggestedExpertLinkedin: experts
           .map((expert) => expert.linkedin)

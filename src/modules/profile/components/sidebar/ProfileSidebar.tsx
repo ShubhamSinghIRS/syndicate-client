@@ -29,12 +29,13 @@ export default function ProfileSidebar({
 }: ProfileSidebarProps) {
   return (
     <div className="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-3 lg:w-64 lg:shrink-0">
-      <nav className="flex flex-col gap-1">
+      {/* On mobile, nav items are horizontally scrollable */}
+      <nav className="flex flex-row gap-1 overflow-x-auto pb-1 lg:flex-col lg:pb-0">
         {LINK_ITEMS.map((item) => (
           <Link
             key={item.to}
             to={item.to}
-            className="flex items-center gap-3 rounded-lg px-4 py-2.5 text-left text-sm font-medium text-text-primary transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="flex shrink-0 items-center gap-3 rounded-lg px-4 py-2.5 text-left text-sm font-medium text-text-primary transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
           >
             {item.icon}
             {item.label}
@@ -44,7 +45,7 @@ export default function ProfileSidebar({
 
       <div className="my-2 border-t border-gray-200 dark:border-gray-800" />
 
-      <nav className="flex flex-col gap-1">
+      <nav className="flex flex-row gap-1 overflow-x-auto pb-1 lg:flex-col lg:pb-0">
         {NAV_ITEMS.map((item) => {
           const isActive = item.tab === activeTab;
           return (
@@ -52,7 +53,7 @@ export default function ProfileSidebar({
               key={item.tab}
               type="button"
               onClick={() => setActiveTab(item.tab)}
-              className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-left text-sm font-medium transition-colors cursor-pointer ${
+              className={`flex shrink-0 items-center gap-3 rounded-lg px-4 py-2.5 text-left text-sm font-medium transition-colors cursor-pointer ${
                 isActive
                   ? "bg-accent-2 text-white"
                   : "text-text-primary hover:bg-gray-100 dark:hover:bg-gray-800"

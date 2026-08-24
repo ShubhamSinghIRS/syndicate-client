@@ -22,15 +22,15 @@ export type Transcript = {
 };
 
 export type PriceFilterValue =
-  "all" | "free" | "under-100" | "100-250" | "over-250";
+  "free" | "under-100" | "100-250" | "over-250";
 
 export type PublishedDateFilterValue =
-  "any time" | "last-week" | "last-month" | "last-3-months" | "last-year";
+  "last-week" | "last-month" | "last-3-months" | "last-year";
 
 export type SidebarFilterPayload = {
   domains: string[];
-  price: PriceFilterValue;
-  publishedDate: PublishedDateFilterValue;
+  price: PriceFilterValue[];
+  publishedDate: PublishedDateFilterValue[];
 };
 
 // Body payload for POST /api/transcripts/filter.

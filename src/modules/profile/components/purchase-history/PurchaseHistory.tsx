@@ -36,7 +36,7 @@ export default function PurchaseHistory({ orders }: PurchaseHistoryProps) {
           {rows.map(({ order, item }) => (
             <div
               key={`${order.id}-${item.id}`}
-              className="flex items-center justify-between gap-4 border-b border-gray-100 dark:border-gray-800 py-4"
+              className="flex flex-col gap-3 border-b border-gray-100 dark:border-gray-800 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
             >
               <div>
                 <Link

@@ -1,6 +1,5 @@
-import RadioGroup from "@mui/material/RadioGroup";
 import Switch from "@mui/material/Switch";
-import CustomRadio from "../../../../components/radio/CustomRadio";
+import CustomCheckbox from "../../../../components/checkbox/CustomCheckbox";
 import FilterSection from "./FilterSection";
 import DomainAutocomplete from "./DomainAutocomplete";
 import { isLoggedIn } from "../../../../utils/authUtils";
@@ -13,6 +12,12 @@ import type {
   PublishedDateFilterValue,
   SidebarFilterPayload,
 } from "../../types";
+
+// Toggles a value in/out of an array-valued filter (price, published date).
+const toggleValue = <T,>(values: T[], value: T): T[] =>
+  values.includes(value)
+    ? values.filter((v) => v !== value)
+    : [...values, value];
 
 type FilterSidebarProps = {
   filters: SidebarFilterPayload;
@@ -64,43 +69,45 @@ export default function FilterSidebar({
       </FilterSection>
 
       <FilterSection title="Price">
-        <RadioGroup
-          value={filters.price}
-          onChange={(e) =>
-            setFilters({
-              ...filters,
-              price: e.target.value as PriceFilterValue,
-            })
-          }
-        >
+        <div className="flex flex-col">
           {priceOptions.map((option) => (
-            <CustomRadio
+            <CustomCheckbox
               key={option.value}
               label={option.label}
-              value={option.value}
+              checked={filters.price.includes(option.value)}
+              onChange={() =>
+                setFilters({
+                  ...filters,
+                  price: toggleValue<PriceFilterValue>(
+                    filters.price,
+                    option.value,
+                  ),
+                })
+              }
             />
           ))}
-        </RadioGroup>
+        </div>
       </FilterSection>
 
       <FilterSection title="Published date">
-        <RadioGroup
-          value={filters.publishedDate}
-          onChange={(e) =>
-            setFilters({
-              ...filters,
-              publishedDate: e.target.value as PublishedDateFilterValue,
-            })
-          }
-        >
+        <div className="flex flex-col">
           {PUBLISHED_DATE_OPTIONS.map((option) => (
-            <CustomRadio
+            <CustomCheckbox
               key={option.value}
               label={option.label}
-              value={option.value}
+              checked={filters.publishedDate.includes(option.value)}
+              onChange={() =>
+                setFilters({
+                  ...filters,
+                  publishedDate: toggleValue<PublishedDateFilterValue>(
+                    filters.publishedDate,
+                    option.value,
+                  ),
+                })
+              }
             />
           ))}
-        </RadioGroup>
+        </div>
       </FilterSection>
     </div>
   );

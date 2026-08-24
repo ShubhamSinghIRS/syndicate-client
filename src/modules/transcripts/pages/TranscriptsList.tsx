@@ -14,7 +14,10 @@ import Footer from "../../../components/footer/Footer";
 import PaginationComponent from "../../../components/pagination/Pagination";
 import RequestTopicDialog from "../components/request-topic-dialog";
 import WarningDialog from "../../../components/form-close-warning/WarningDialog";
+import DialogModal from "../../../components/dialog/DialogModal";
+import FilterAltIcon from "../../../icons/FilterAlt/FilterAlt";
 import { useFormCloseWarning } from "../../../utils/hooks/useFormCloseWarning";
+import { useBoolean } from "../../../utils/hooks/useBoolean";
 import { DEFAULT_SIDEBAR_FILTERS } from "../components/filter-sidebar/constants";
 import { PAGE_SIZE } from "./constants";
 import type {
@@ -39,16 +42,23 @@ export default function TranscriptsList() {
         searchParams.get("domains")?.split(",").filter(Boolean) ??
         DEFAULT_SIDEBAR_FILTERS.domains,
       price:
-        (searchParams.get("price") as PriceFilterValue | null) ??
+        (searchParams
+          .get("price")
+          ?.split(",")
+          .filter(Boolean) as PriceFilterValue[] | undefined) ??
         DEFAULT_SIDEBAR_FILTERS.price,
       publishedDate:
-        (searchParams.get("publishedDate") as PublishedDateFilterValue | null) ??
+        (searchParams
+          .get("publishedDate")
+          ?.split(",")
+          .filter(Boolean) as PublishedDateFilterValue[] | undefined) ??
         DEFAULT_SIDEBAR_FILTERS.publishedDate,
     }),
   );
   const [purchasedOnly, setPurchasedOnly] = useState(false);
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   const requestTopicDialog = useFormCloseWarning();
+  const mobileFilters = useBoolean();
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
@@ -69,15 +79,20 @@ export default function TranscriptsList() {
     if (sidebarFilters.domains.length) {
       params.domains = sidebarFilters.domains.join(",");
     }
-    if (sidebarFilters.price !== DEFAULT_SIDEBAR_FILTERS.price) {
-      params.price = sidebarFilters.price;
+    if (sidebarFilters.price.length) {
+      params.price = sidebarFilters.price.join(",");
     }
-    if (sidebarFilters.publishedDate !== DEFAULT_SIDEBAR_FILTERS.publishedDate) {
-      params.publishedDate = sidebarFilters.publishedDate;
+    if (sidebarFilters.publishedDate.length) {
+      params.publishedDate = sidebarFilters.publishedDate.join(",");
     }
     if (page !== 1) params.page = String(page);
     setSearchParams(params, { replace: true });
   }, [search, sidebarFilters, page, setSearchParams]);
+
+  // filterBounds only affects the payload when a price bucket is selected
+  // (see unionPriceRange) - ignoring it otherwise stops the async bounds
+  // fetch resolving from re-triggering an identical transcripts request.
+  const priceRelevantBounds = sidebarFilters.price.length ? filterBounds : null;
 
   useEffect(() => {
     if (purchasedOnly) {
@@ -89,12 +104,12 @@ export default function TranscriptsList() {
           sidebarFilters,
           page,
           PAGE_SIZE,
-          filterBounds,
+          priceRelevantBounds,
         ),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [purchasedOnly, debouncedSearch, sidebarFilters, page, filterBounds]);
+  }, [purchasedOnly, debouncedSearch, sidebarFilters, page, priceRelevantBounds]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
@@ -125,24 +140,37 @@ export default function TranscriptsList() {
       <div className="flex-1">
         <div className="mx-auto max-w-[1400px] px-6 py-10">
           <div className="flex flex-col gap-8 lg:flex-row">
-            <FilterSidebar
-              filters={sidebarFilters}
-              setFilters={(filters) => {
-                setSidebarFilters(filters);
-                setPage(1);
-              }}
-              purchasedOnly={purchasedOnly}
-              setPurchasedOnly={(value) => {
-                setPurchasedOnly(value);
-                setPage(1);
-              }}
-              bounds={filterBounds}
-            />
+            <div className="hidden lg:block">
+              <FilterSidebar
+                filters={sidebarFilters}
+                setFilters={(filters) => {
+                  setSidebarFilters(filters);
+                  setPage(1);
+                }}
+                purchasedOnly={purchasedOnly}
+                setPurchasedOnly={(value) => {
+                  setPurchasedOnly(value);
+                  setPage(1);
+                }}
+                bounds={filterBounds}
+              />
+            </div>
 
             <div className="min-w-0 flex-1">
-              <h1 className="text-3xl font-bold text-text-primary">
-                All transcripts
-              </h1>
+              <div className="flex items-center justify-between">
+                <h1 className="text-3xl font-bold text-text-primary">
+                  All transcripts
+                </h1>
+                <button
+                  type="button"
+                  aria-label="Open filters"
+                  onClick={mobileFilters.setTrue}
+                  className="flex items-center gap-1 rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm font-medium text-text-primary lg:hidden"
+                >
+                  <FilterAltIcon fontSize="small" />
+                  Filters
+                </button>
+              </div>
 
               {isLoading || error ? (
                 <div className="mt-4 flex flex-col gap-3 pr-2">
@@ -181,6 +209,33 @@ export default function TranscriptsList() {
               )}
             </div>
           </div>
+
+          <DialogModal
+            isOpen={mobileFilters.value}
+            handleClose={mobileFilters.setFalse}
+            title="Filters"
+            isFullScreen
+          >
+            <FilterSidebar
+              filters={sidebarFilters}
+              setFilters={(filters) => {
+                setSidebarFilters(filters);
+                setPage(1);
+              }}
+              purchasedOnly={purchasedOnly}
+              setPurchasedOnly={(value) => {
+                setPurchasedOnly(value);
+                setPage(1);
+              }}
+              bounds={filterBounds}
+            />
+            <Button
+              variant="contained"
+              label={`Show ${total} result${total === 1 ? "" : "s"}`}
+              onClick={mobileFilters.setFalse}
+              className="mt-6 w-full"
+            />
+          </DialogModal>
 
           <RequestTopicDialog
             isOpen={requestTopicDialog.isOpen}

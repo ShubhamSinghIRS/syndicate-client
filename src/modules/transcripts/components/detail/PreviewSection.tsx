@@ -63,7 +63,7 @@ export default function PreviewSection({
         </div>
       )}
 
-      <div className="mt-4 flex items-center gap-3.5 border-t border-gray-200 dark:border-gray-800 pt-4 text-sm text-text-secondary">
+      <div className="mt-4 flex flex-wrap items-center gap-3.5 border-t border-gray-200 dark:border-gray-800 pt-4 text-sm text-text-secondary">
         <Tooltip title="Published Date" arrow>
           <span className="flex items-center gap-1 cursor-pointer">
             <CalendarTodayIcon fontSize="small" />
@@ -81,7 +81,7 @@ export default function PreviewSection({
 
       {isPurchased ? (
         <div className="mt-4 border-t border-gray-200 dark:border-gray-800 pt-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <h3 className="text-sm font-semibold text-text-primary">
                 Full transcript

@@ -16,21 +16,21 @@ export default function UserDetails({
       </h3>
 
       <div className="grid grid-cols-1 gap-y-3 text-sm">
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 items-center">
+        <div className="flex flex-col gap-0.5 sm:grid sm:grid-cols-4 sm:items-center md:grid-cols-6">
           <span className="font-semibold text-text-primary">Full Name</span>
-          <span className="col-span-2 sm:col-span-3 md:col-span-5 text-text-secondary">
+          <span className="sm:col-span-3 md:col-span-5 text-text-secondary">
             {userName || "N/A"}
           </span>
         </div>
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 items-center">
+        <div className="flex flex-col gap-0.5 sm:grid sm:grid-cols-4 sm:items-center md:grid-cols-6">
           <span className="font-semibold text-text-primary">Work Email</span>
-          <span className="col-span-2 sm:col-span-3 md:col-span-5 text-text-secondary">
+          <span className="sm:col-span-3 md:col-span-5 text-text-secondary break-all">
             {email || "N/A"}
           </span>
         </div>
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 items-center">
+        <div className="flex flex-col gap-0.5 sm:grid sm:grid-cols-4 sm:items-center md:grid-cols-6">
           <span className="font-semibold text-text-primary">Company Name</span>
-          <span className="col-span-2 sm:col-span-3 md:col-span-5 text-text-secondary">
+          <span className="sm:col-span-3 md:col-span-5 text-text-secondary">
             {companyName || "N/A"}
           </span>
         </div>

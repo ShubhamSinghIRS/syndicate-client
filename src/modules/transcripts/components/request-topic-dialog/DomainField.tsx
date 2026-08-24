@@ -35,7 +35,7 @@ export default function DomainField({ control }: DomainFieldProps) {
 
   return (
     <Controller
-      name="domain"
+      name="domains"
       control={control}
       render={({ field: { onChange, value, ref } }) => (
         <Autocomplete
