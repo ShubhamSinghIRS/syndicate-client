@@ -1,14 +1,17 @@
 import axios from "axios";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
-import { getStorageItem } from "./storageUtils";
-import { logout, processToken } from "./authUtils";
+import { isLoggedIn, logout, processToken } from "./authUtils";
 import { API_ENDPOINTS } from "../constants/apiEndpoints";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ??
-  (import.meta.env.DEV
-    ? "http://localhost:8000"
-    : "https://syndicate-transcript-backend-ac3k.onrender.com");
+// TODO: add a separate branch here once a dev/staging domain exists.
+const getApiBaseUrl = (): string => {
+  if (window.location.href.includes("localhost")) {
+    return "http://localhost:8000";
+  }
+  return "https://syndicate-transcript-backend-ac3k.onrender.com";
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 type RequestMethod = "GET" | "POST" | "PUT" | "DELETE";
 
@@ -30,14 +33,10 @@ export class ApiError extends Error {
   }
 }
 
-// axios never times out on its own unless told to - a hung backend (cold
-// start, dropped connection, mid-deploy) would otherwise leave a caller's
-// await pending forever with no error and no way to recover.
+// axios doesn't time out on its own - a hung backend would leave callers awaiting forever.
 const REQUEST_TIMEOUT_MS = 20000;
 
-// Status codes are inspected manually below (401-then-refresh-then-retry,
-// envelope unwrapping) instead of letting axios throw on 4xx/5xx, so every
-// non-network failure stays handled in one place.
+// validateStatus lets 4xx/5xx through so status handling stays manual below, in one place.
 const client = axios.create({
   baseURL: API_BASE_URL,
   timeout: REQUEST_TIMEOUT_MS,
@@ -49,10 +48,18 @@ const isTimeout = (error: unknown): boolean =>
   axios.isAxiosError(error) &&
   (error.code === "ECONNABORTED" || error.code === "ETIMEDOUT");
 
+// No response at all (backend down, DNS/CORS failure, offline) as opposed to
+// a response that simply carries an error status.
+const isNetworkError = (error: unknown): boolean =>
+  axios.isAxiosError(error) && !error.response;
+
 const request = async (config: AxiosRequestConfig): Promise<AxiosResponse> => {
   try {
     return await client.request(config);
   } catch (error) {
+    if (isTimeout(error) || isNetworkError(error)) {
+      window.enqueueSnackbar?.("Server connection failed", { variant: "error" });
+    }
     if (isTimeout(error)) {
       throw new Error("The request timed out. Please check your connection and try again.");
     }
@@ -60,15 +67,11 @@ const request = async (config: AxiosRequestConfig): Promise<AxiosResponse> => {
   }
 };
 
-// Access tokens are short-lived; the backend hands out a long-lived refresh
-// token via an httpOnly cookie (scoped to /api/auth) instead. `withCredentials`
-// on every request is what lets the browser store/send that cookie across
-// the cross-origin frontend/backend split. Deduped so several requests
-// 401ing at once trigger a single refresh instead of racing each other to
-// rotate the refresh token.
-let refreshPromise: Promise<string | null> | null = null;
+// Tokens live in httpOnly cookies, sent automatically via withCredentials.
+// Deduped so several requests 401ing at once share one refresh.
+let refreshPromise: Promise<boolean> | null = null;
 
-const refreshAccessToken = (): Promise<string | null> => {
+export const refreshAccessToken = (): Promise<boolean> => {
   if (!refreshPromise) {
     refreshPromise = request({
       url: API_ENDPOINTS.refresh,
@@ -76,15 +79,14 @@ const refreshAccessToken = (): Promise<string | null> => {
       headers: { "Content-Type": "application/json" },
     })
       .then((response) => {
-        if (response.status < 200 || response.status >= 300) return null;
+        if (response.status < 200 || response.status >= 300) return false;
         const data = response.data?.data as
-          | { token?: string; user?: Parameters<typeof processToken>[1] }
+          | Parameters<typeof processToken>[0]
           | undefined;
-        if (!data?.token) return null;
-        processToken(data.token, data.user);
-        return data.token;
+        processToken(data);
+        return true;
       })
-      .catch(() => null)
+      .catch(() => false)
       .finally(() => {
         refreshPromise = null;
       });
@@ -98,41 +100,35 @@ export const RequestServer = async <T>(
   body?: object,
   extraHeaders?: Record<string, string>,
 ): Promise<T> => {
-  const send = (token: string | null) =>
+  const send = () =>
     request({
       url,
       method,
       data: body,
       headers: {
         "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...extraHeaders,
       },
     });
 
-  const token = getStorageItem<string>("token");
-  let response = await send(token);
+  const wasLoggedIn = isLoggedIn();
+  let response = await send();
 
-  if (response.status === 401 && token) {
-    // Access token may have simply expired - try a silent refresh before
-    // logging the user out.
-    const refreshedToken = await refreshAccessToken();
-    if (refreshedToken) {
-      response = await send(refreshedToken);
+  if (response.status === 401 && wasLoggedIn) {
+    // Token may have just expired - try a silent refresh before logging out.
+    const refreshed = await refreshAccessToken();
+    if (refreshed) {
+      response = await send();
     }
   }
 
   if (response.status === 401) {
-    // Only a real session teardown if we were actually logged in - a
-    // request made with no token (anonymous browsing hitting a protected
-    // or misconfigured endpoint) shouldn't wipe storage or hard-redirect.
-    if (token) {
+    if (wasLoggedIn) {
       logout();
       throw new Error("Session expired");
     }
-    // A 401 with no token isn't always "you need to log in" - e.g. the
-    // login/OTP endpoints themselves use 401 for wrong credentials, and
-    // have a specific message worth showing instead of a generic one.
+    // Anonymous 401s aren't always "please log in" - login/OTP endpoints
+    // also use 401 for wrong credentials, with their own message.
     throw new ApiError(response.data?.message || "Not authenticated", 401);
   }
 
@@ -151,26 +147,25 @@ export const RequestServerBlob = async (
   url: string,
   errorMessage: string,
 ): Promise<Blob> => {
-  const send = (token: string | null) =>
+  const send = () =>
     request({
       url,
       method: "GET",
       responseType: "blob",
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
 
-  const token = getStorageItem<string>("token");
-  let response = await send(token);
+  const wasLoggedIn = isLoggedIn();
+  let response = await send();
 
-  if (response.status === 401 && token) {
-    const refreshedToken = await refreshAccessToken();
-    if (refreshedToken) {
-      response = await send(refreshedToken);
+  if (response.status === 401 && wasLoggedIn) {
+    const refreshed = await refreshAccessToken();
+    if (refreshed) {
+      response = await send();
     }
   }
 
   if (response.status === 401) {
-    if (token) {
+    if (wasLoggedIn) {
       logout();
       throw new Error("Session expired");
     }

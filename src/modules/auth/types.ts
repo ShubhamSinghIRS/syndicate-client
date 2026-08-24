@@ -34,7 +34,6 @@ export type RegisterOtpFormValues = {
 };
 
 export type AuthResponse = {
-  token: string;
   user: {
     id: string;
     name: string;

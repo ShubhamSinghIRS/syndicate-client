@@ -117,7 +117,7 @@ export default function TranscriptDetail() {
               />
             </div>
 
-            <div className="sticky top-6 flex flex-col gap-6 self-start lg:col-span-4">
+            <div className="flex flex-col gap-6 self-start lg:sticky lg:top-6 lg:col-span-4">
               {!isPurchased && (
                 <PurchaseCard
                   price={transcript.price}

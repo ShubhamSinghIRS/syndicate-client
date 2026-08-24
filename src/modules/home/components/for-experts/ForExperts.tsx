@@ -29,8 +29,8 @@ const STEPS: { icon: SvgIconComponent; title: string; subtitle: string }[] = [
 
 export default function ForExperts() {
   return (
-    <div className="flex items-stretch gap-8 py-10">
-      <div className="flex-1">
+    <div className="flex flex-col gap-8 py-10 md:flex-row md:items-stretch">
+      <div className="w-full flex-1">
         <div className="mb-4 flex items-center gap-2">
           <span
             className="h-4 w-1 rounded-full"

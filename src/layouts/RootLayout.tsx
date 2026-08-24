@@ -1,17 +1,37 @@
 import { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import { consumeAuthTokenFromUrl } from "../utils/authUtils";
 import FloatingSupport from "../components/support/FloatingSupport";
 import { AuthDialogProvider } from "../modules/auth/context/AuthDialogContext";
+import { processToken, setLoggedIn } from "../utils/authUtils";
+import { fetchProfile } from "../modules/profile/profileService";
+import { refreshAccessToken } from "../utils/services";
 
 export default function RootLayout() {
   const location = useLocation();
-  const [authCheckCompleted, setAuthCheckCompleted] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
+  // Ask the server who we are on load; retry once via refresh before giving up.
   useEffect(() => {
-    consumeAuthTokenFromUrl();
-    setAuthCheckCompleted(true);
-  }, [location.pathname, location.search]);
+    let cancelled = false;
+    const restoreSession = async () => {
+      try {
+        const profile = await fetchProfile();
+        if (!cancelled) processToken(profile);
+      } catch {
+        // refreshAccessToken is deduped across concurrent callers (see
+        // services.ts) so StrictMode's double-mount in dev doesn't fire two
+        // separate refresh requests here.
+        const refreshed = await refreshAccessToken();
+        if (!cancelled && !refreshed) setLoggedIn(false);
+      } finally {
+        if (!cancelled) setAuthChecked(true);
+      }
+    };
+    void restoreSession();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (location.hash) {
@@ -24,7 +44,7 @@ export default function RootLayout() {
     window.scrollTo(0, 0);
   }, [location.pathname, location.hash]);
 
-  if (!authCheckCompleted) {
+  if (!authChecked) {
     return null;
   }
 

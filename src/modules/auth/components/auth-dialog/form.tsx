@@ -175,7 +175,7 @@ export default function AuthForm({
     setLoading(true);
     try {
       const response = await signIn(data);
-      processToken(response.token, response.user);
+      processToken(response.user);
       await mergeGuestCartAfterAuth();
       enqueueSnackbar("Signed in successfully.", { variant: "success" });
       handleSubmitClose();
@@ -207,7 +207,7 @@ export default function AuthForm({
     setLoading(true);
     try {
       const response = await verifyRegistrationOtp(signInPendingToken, otp);
-      processToken(response.token, response.user);
+      processToken(response.user);
       await mergeGuestCartAfterAuth();
       enqueueSnackbar("Signed in successfully.", { variant: "success" });
       handleSubmitClose();
@@ -243,7 +243,7 @@ export default function AuthForm({
     setLoading(true);
     try {
       const response = await verifyRegistrationOtp(registerPendingToken, otp);
-      processToken(response.token, response.user);
+      processToken(response.user);
       await mergeGuestCartAfterAuth();
       enqueueSnackbar("Registration successful.", { variant: "success" });
       handleSubmitClose();
@@ -296,7 +296,7 @@ export default function AuthForm({
     setLoading(true);
     try {
       const response = await verifyLoginOtp(loginOtpPendingToken, otp);
-      processToken(response.token, response.user);
+      processToken(response.user);
       await mergeGuestCartAfterAuth();
       enqueueSnackbar("Signed in successfully.", { variant: "success" });
       handleSubmitClose();

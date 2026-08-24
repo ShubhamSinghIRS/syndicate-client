@@ -18,15 +18,24 @@ type MyRequestsTabProps = {
   onSwitchToRequestTab: () => void;
 };
 
+const SEARCH_DEBOUNCE_MS = 300;
+
 export default function MyRequestsTab({
   onSwitchToRequestTab,
 }: MyRequestsTabProps) {
   const { openAuthDialog } = useAuthDialog();
   const [loggedIn, setLoggedIn] = useState(isLoggedIn());
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
   const [items, setItems] = useState<TopicRequestItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Debounced so typing doesn't fire a network request per keystroke.
+  useEffect(() => {
+    const timeout = setTimeout(() => setDebouncedSearch(search), SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timeout);
+  }, [search]);
 
   useEffect(() => {
     if (!loggedIn) return;
@@ -35,7 +44,7 @@ export default function MyRequestsTab({
     setIsLoading(true);
     setError(null);
 
-    fetchMyTopicRequests(1, 20, search)
+    fetchMyTopicRequests(1, 20, debouncedSearch)
       .then((page) => {
         if (isActive) setItems(page.items);
       })
@@ -49,7 +58,7 @@ export default function MyRequestsTab({
     return () => {
       isActive = false;
     };
-  }, [loggedIn, search]);
+  }, [loggedIn, debouncedSearch]);
 
   if (!loggedIn) {
     return (
@@ -128,7 +137,7 @@ export default function MyRequestsTab({
 
       {!isLoading && !error && items.length === 0 && (
         <p className="py-6 text-center text-sm text-text-secondary">
-          {search ? "No matching requests." : "You haven't requested any topics yet."}
+          {debouncedSearch ? "No matching requests." : "You haven't requested any topics yet."}
         </p>
       )}
 
@@ -139,7 +148,7 @@ export default function MyRequestsTab({
           return (
             <div
               key={item.id}
-              className="rounded-xl border border-gray-100 dark:border-gray-800 p-4"
+              className="rounded-xl border border-gray-200 dark:border-gray-800 bg-section-background p-4"
             >
               <div className="flex items-center justify-between gap-3">
                 <h4 className="font-semibold text-text-primary">
@@ -153,7 +162,7 @@ export default function MyRequestsTab({
                   </span>
                 </div>
               </div>
-              <p className="mt-1 text-sm text-text-secondary">{item.domain}</p>
+              <p className="mt-1 text-sm text-text-secondary">{item.domains.join(", ")}</p>
               <p className="mt-2 text-xs text-text-secondary">
                 Requested on {formatDate(item.createdAt)}
               </p>

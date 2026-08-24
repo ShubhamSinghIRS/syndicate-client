@@ -135,14 +135,16 @@ export default function Fields({ handleClose, showEmail }: FieldsProps) {
                     placeholder: "LinkedIn profile URL",
                   }}
                 />
-                <IconButton
-                  size="small"
-                  aria-label="Remove expert"
-                  onClick={() => removeExpert(index)}
-                  sx={{ mt: "4px" }}
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
+                <Tooltip title="Remove expert">
+                  <IconButton
+                    size="small"
+                    aria-label="Remove expert"
+                    onClick={() => removeExpert(index)}
+                    sx={{ mt: "4px" }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
               </div>
             </div>
           ))}

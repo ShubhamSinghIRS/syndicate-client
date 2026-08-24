@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Provider } from "react-redux";
 import { ThemeProvider } from "@mui/material/styles";
 import { RouterProvider } from "react-router-dom";
@@ -25,6 +25,19 @@ function SnackbarCloseButton({ snackbarKey }: { snackbarKey: SnackbarKey }) {
   );
 }
 
+// Exposes enqueueSnackbar on window so non-React modules (e.g. the axios
+// client in services.ts) can surface a toast for connection failures.
+function SnackbarUtilsConfigurator() {
+  const { enqueueSnackbar } = useSnackbar();
+  useEffect(() => {
+    window.enqueueSnackbar = enqueueSnackbar;
+    return () => {
+      delete window.enqueueSnackbar;
+    };
+  }, [enqueueSnackbar]);
+  return null;
+}
+
 const ThemedApp = () => {
   const { mode } = useThemeMode();
   const appTheme = useMemo(() => getAppTheme(mode), [mode]);
@@ -36,6 +49,7 @@ const ThemedApp = () => {
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         action={(snackbarKey) => <SnackbarCloseButton snackbarKey={snackbarKey} />}
       >
+        <SnackbarUtilsConfigurator />
         <CartSync />
         <RouterProvider router={router} />
       </SnackbarProvider>

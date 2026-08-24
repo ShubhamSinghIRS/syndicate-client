@@ -83,7 +83,7 @@ export default function OrderConfirmation({ order }: OrderConfirmationProps) {
                   </p>
                 </div>
 
-                <div className="mt-4 flex justify-center gap-3 border-t border-gray-200 dark:border-gray-800 pt-4">
+                <div className="mt-4 flex flex-wrap justify-center gap-3 border-t border-gray-200 dark:border-gray-800 pt-4">
                   <DownloadButton
                     label="View Receipt"
                     styles={smallActionButtonStyle}

@@ -6,7 +6,7 @@ export type TopicRequestStatus = "open" | "in_progress" | "resolved" | "rejected
 export type RawTopicRequestItem = {
   id: number;
   topic: string | null;
-  domain: string;
+  domains: string[];
   status: TopicRequestStatus;
   createdAt: string | null;
 };
@@ -14,7 +14,7 @@ export type RawTopicRequestItem = {
 export type TopicRequestItem = {
   id: number;
   topic: string;
-  domain: string;
+  domains: string[];
   status: TopicRequestStatus;
   createdAt: string | null;
 };
@@ -32,7 +32,7 @@ export type TopicRequestsPage = {
 };
 
 // Backend only tracks open/in_progress/resolved/rejected - "Live" here means
-// the requested topic was fulfilled, "In review" covers both open states.
+// the requested topic was fulfilled.
 export const TOPIC_REQUEST_STATUS_DISPLAY: Record<
   TopicRequestStatus,
   { label: string; className: string }
@@ -43,7 +43,7 @@ export const TOPIC_REQUEST_STATUS_DISPLAY: Record<
       "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400",
   },
   in_progress: {
-    label: "In review",
+    label: "In progress",
     className:
       "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400",
   },

@@ -77,7 +77,7 @@ const priceBreakpoints = (bounds: FilterBounds | null): { low: number; high: num
 // price bucket -> TranscriptFilterRequest's minPrice/maxPrice range.
 const buildPriceRanges = (
   bounds: FilterBounds | null,
-): Record<Exclude<PriceFilterValue, "all">, { minPrice?: number; maxPrice?: number }> => {
+): Record<PriceFilterValue, { minPrice?: number; maxPrice?: number }> => {
   const { low, high } = priceBreakpoints(bounds);
   return {
     free: { minPrice: 0, maxPrice: 0 },
@@ -87,7 +87,7 @@ const buildPriceRanges = (
   };
 };
 
-// Labels for the price RadioGroup - the bucket identifiers (e.g. "under-100")
+// Labels for the price checkboxes - the bucket identifiers (e.g. "under-100")
 // are just internal ids (also used in the URL's ?price= param) and don't need
 // to match the displayed number, which comes from priceBreakpoints instead.
 export const buildPriceOptions = (
@@ -95,7 +95,6 @@ export const buildPriceOptions = (
 ): { label: string; value: PriceFilterValue }[] => {
   const { low, high } = priceBreakpoints(bounds);
   return [
-    { label: "All prices", value: "all" },
     { label: "Free", value: "free" },
     { label: `Under $${low}`, value: "under-100" },
     { label: `$${low} - $${high}`, value: "100-250" },
@@ -107,14 +106,30 @@ export const fetchFilterBounds = async (): Promise<FilterBounds> =>
   RequestServer<FilterBounds>(API_ENDPOINTS.filterBounds, "GET");
 
 // published-date bucket -> number of days back from now to filter from.
-const PUBLISHED_DATE_DAYS: Record<
-  Exclude<PublishedDateFilterValue, "any time">,
-  number
-> = {
+const PUBLISHED_DATE_DAYS: Record<PublishedDateFilterValue, number> = {
   "last-week": 7,
   "last-month": 30,
   "last-3-months": 90,
   "last-year": 365,
+};
+
+// The backend only takes a single minPrice/maxPrice pair, but the price
+// filter now allows picking several buckets at once, so multiple selections
+// are unioned into one range spanning the lowest min to the highest max.
+// Non-adjacent picks (e.g. "Free" + "Over $250") will also pull in the
+// buckets between them - an accepted approximation given the single-range
+// backend contract.
+const unionPriceRange = (
+  selected: PriceFilterValue[],
+  bounds: FilterBounds | null,
+): { minPrice?: number; maxPrice?: number } => {
+  const ranges = selected.map((value) => buildPriceRanges(bounds)[value]);
+  const minPrice = Math.min(...ranges.map((range) => range.minPrice ?? 0));
+  const maxes = ranges.map((range) => range.maxPrice);
+  const maxPrice = maxes.every((max) => max !== undefined)
+    ? Math.max(...(maxes as number[]))
+    : undefined;
+  return maxPrice === undefined ? { minPrice } : { minPrice, maxPrice };
 };
 
 // Builds the body for POST /api/transcripts/filter, omitting default filters.
@@ -128,11 +143,15 @@ export const buildTranscriptsFilterPayload = (
   const payload: TranscriptsFilterPayload = { page, pageSize };
   if (search) payload.search = search;
   if (filters.domains.length) payload.domains = filters.domains;
-  if (filters.price !== "all") {
-    Object.assign(payload, buildPriceRanges(bounds)[filters.price]);
+  if (filters.price.length) {
+    Object.assign(payload, unionPriceRange(filters.price, bounds));
   }
-  if (filters.publishedDate !== "any time") {
-    const days = PUBLISHED_DATE_DAYS[filters.publishedDate];
+  if (filters.publishedDate.length) {
+    // Published-date buckets are nested (last-week ⊂ last-year), so the
+    // widest selected bucket alone covers the union of all selected ones.
+    const days = Math.max(
+      ...filters.publishedDate.map((value) => PUBLISHED_DATE_DAYS[value]),
+    );
     const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
     payload.publishedAfter = cutoff.toISOString();
   }

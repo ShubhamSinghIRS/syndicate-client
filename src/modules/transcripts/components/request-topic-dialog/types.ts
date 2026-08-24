@@ -4,7 +4,7 @@ export type SuggestedExpert = {
 };
 
 export type RequestTopicFormValues = {
-  domain: string[];
+  domains: string[];
   topic: string;
   email: string;
   remark: string;
