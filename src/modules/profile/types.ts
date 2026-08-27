@@ -1,1 +1,1 @@
-export type ProfileTab = "profile" | "invoice" | "purchases";
+export type ProfileTab = "profile" | "invoice" | "purchases" | "requestedTopics";

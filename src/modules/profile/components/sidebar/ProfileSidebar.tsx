@@ -3,6 +3,7 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
+import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
 import { Link } from "react-router-dom";
 import { APP_ROUTES } from "../../../../constants/appRoutes";
 import type { ProfileTab } from "../../types";
@@ -21,6 +22,7 @@ const NAV_ITEMS: { tab: ProfileTab; label: string; icon: React.ReactNode }[] = [
   { tab: "profile", label: "My Profile", icon: <PersonOutlineIcon fontSize="small" /> },
   { tab: "purchases", label: "Purchases", icon: <ShoppingBagOutlinedIcon fontSize="small" /> },
   { tab: "invoice", label: "Invoice", icon: <ReceiptLongIcon fontSize="small" /> },
+  { tab: "requestedTopics", label: "Requested Topics", icon: <LightbulbOutlinedIcon fontSize="small" /> },
 ];
 
 export default function ProfileSidebar({

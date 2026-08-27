@@ -82,6 +82,7 @@ const Component = <T extends FieldValues>({
           helperText={error?.message}
           inputRef={ref}
           value={value ?? ""}
+          inputProps={inputProps}
           {...rest}
           onBlur={callAll(onBlurI, onBlurRef.current, async () => {
             if (trimWhitespaceOnBlur) {

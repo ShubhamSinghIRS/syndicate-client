@@ -26,7 +26,7 @@ export default function ExpertCard({ expert }: ExpertCardProps) {
         <div>
           <p className="font-semibold text-text-primary">{expert.name}</p>
           <p className="text-sm text-text-secondary">
-            {expert.title} at {expert.company}
+            {expert.title} 
           </p>
         </div>
       </div>

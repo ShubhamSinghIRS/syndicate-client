@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useFieldArray } from "react-hook-form";
+import { useFieldArray, useWatch } from "react-hook-form";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
@@ -15,14 +15,19 @@ import DeleteIcon from "../../../../icons/Delete/Delete";
 import DomainField from "./DomainField";
 import type { RequestTopicFormValues } from "./types";
 
+const TOPIC_MAX_LENGTH = 300;
+const REMARK_MAX_LENGTH = 2000;
+
 type FieldsProps = {
   handleClose: () => void;
   showEmail: boolean;
 };
 
 export default function Fields({ handleClose, showEmail }: FieldsProps) {
-  const { registerState, control } =
+  const { registerState, control, formState } =
     useHookFormContext<RequestTopicFormValues>();
+  const topicValue = useWatch({ control, name: "topic" }) ?? "";
+  const remarkValue = useWatch({ control, name: "remark" }) ?? "";
   const [showExpertFields, setShowExpertFields] = useState(false);
   const {
     fields: expertFields,
@@ -41,12 +46,31 @@ export default function Fields({ handleClose, showEmail }: FieldsProps) {
     <Grid container spacing={2} mt="1px">
       <HookTextField
         {...registerState("topic")}
-        rules={{ required: { value: true, message: "This field is required" } }}
+        rules={{
+          required: { value: true, message: "This field is required" },
+          maxLength: {
+            value: TOPIC_MAX_LENGTH,
+            message: `Topic must be at most ${TOPIC_MAX_LENGTH} characters`,
+          },
+        }}
         textFieldProps={{
           ...commonInputStyles,
           label: "Topic",
           placeholder: "What insight are you looking for?",
           required: true,
+          inputProps: {
+            maxLength: TOPIC_MAX_LENGTH,
+            style: { paddingRight: 56 },
+          },
+          InputProps: {
+            endAdornment: (
+              <span className="pointer-events-none absolute bottom-0.5 right-3 text-[10px] text-text-secondary">
+                {topicValue.length}/{TOPIC_MAX_LENGTH}
+              </span>
+            ),
+          },
+          sx: { "& .MuiOutlinedInput-root": { position: "relative" } },
+          helperText: formState.errors.topic?.message ?? "",
         }}
         gridProps={{ xs: 12 }}
       />
@@ -72,12 +96,31 @@ export default function Fields({ handleClose, showEmail }: FieldsProps) {
       )}
       <HookTextField
         {...registerState("remark")}
+        rules={{
+          maxLength: {
+            value: REMARK_MAX_LENGTH,
+            message: `Remark must be at most ${REMARK_MAX_LENGTH} characters`,
+          },
+        }}
         textFieldProps={{
           ...commonInputStyles,
           label: "Remark",
           placeholder: "Any additional notes",
           multiline: true,
           minRows: 2,
+          inputProps: {
+            maxLength: REMARK_MAX_LENGTH,
+            style: { paddingBottom: 14 },
+          },
+          InputProps: {
+            endAdornment: (
+              <span className="pointer-events-none absolute bottom-3 right-3 text-[10px] text-text-secondary">
+                {remarkValue.length}/{REMARK_MAX_LENGTH}
+              </span>
+            ),
+          },
+          sx: { "& .MuiOutlinedInput-root": { position: "relative" } },
+          helperText: formState.errors.remark?.message ?? "",
         }}
         gridProps={{ xs: 12 }}
       />

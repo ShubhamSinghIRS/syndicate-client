@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
-import SearchIcon from "@mui/icons-material/Search";
 import CircularProgress from "@mui/material/CircularProgress";
-import InputAdornment from "@mui/material/InputAdornment";
-import TextField from "@mui/material/TextField";
 import Button from "../../../../components/button/Button";
+import SearchBar from "../../../../components/searchbar/SearchBar";
 import EmailOutlinedIcon from "../../../../icons/EmailOutlined/EmailOutlined";
 import { isLoggedIn } from "../../../../utils/authUtils";
 import { formatDate } from "../../../../utils/dateUtils";
@@ -18,24 +16,15 @@ type MyRequestsTabProps = {
   onSwitchToRequestTab: () => void;
 };
 
-const SEARCH_DEBOUNCE_MS = 300;
-
 export default function MyRequestsTab({
   onSwitchToRequestTab,
 }: MyRequestsTabProps) {
   const { openAuthDialog } = useAuthDialog();
   const [loggedIn, setLoggedIn] = useState(isLoggedIn());
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState(search);
   const [items, setItems] = useState<TopicRequestItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Debounced so typing doesn't fire a network request per keystroke.
-  useEffect(() => {
-    const timeout = setTimeout(() => setDebouncedSearch(search), SEARCH_DEBOUNCE_MS);
-    return () => clearTimeout(timeout);
-  }, [search]);
 
   useEffect(() => {
     if (!loggedIn) return;
@@ -44,7 +33,7 @@ export default function MyRequestsTab({
     setIsLoading(true);
     setError(null);
 
-    fetchMyTopicRequests(1, 20, debouncedSearch)
+    fetchMyTopicRequests(1, 20, search)
       .then((page) => {
         if (isActive) setItems(page.items);
       })
@@ -58,7 +47,7 @@ export default function MyRequestsTab({
     return () => {
       isActive = false;
     };
-  }, [loggedIn, debouncedSearch]);
+  }, [loggedIn, search]);
 
   if (!loggedIn) {
     return (
@@ -108,19 +97,12 @@ export default function MyRequestsTab({
 
   return (
     <div className="flex flex-col gap-3">
-      <TextField
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
+      <SearchBar
         placeholder="Search your requests"
-        size="small"
-        fullWidth
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon fontSize="small" />
-            </InputAdornment>
-          ),
-        }}
+        searchValue={search}
+        onSearch={setSearch}
+        maxWidth="100%"
+        height="40px"
       />
 
       {isLoading && (
@@ -137,7 +119,7 @@ export default function MyRequestsTab({
 
       {!isLoading && !error && items.length === 0 && (
         <p className="py-6 text-center text-sm text-text-secondary">
-          {debouncedSearch ? "No matching requests." : "You haven't requested any topics yet."}
+          {search ? "No matching requests." : "You haven't requested any topics yet."}
         </p>
       )}
 
@@ -150,8 +132,11 @@ export default function MyRequestsTab({
               key={item.id}
               className="rounded-xl border border-gray-200 dark:border-gray-800 bg-section-background p-4"
             >
-              <div className="flex items-center justify-between gap-3">
-                <h4 className="font-semibold text-text-primary">
+              <div className="flex items-start justify-between gap-3">
+                <h4
+                  className="line-clamp-2 min-w-0 break-words font-semibold text-text-primary"
+                  title={item.topic}
+                >
                   {item.topic}
                 </h4>
                 <div className="flex items-center gap-2 shrink-0">
@@ -162,7 +147,9 @@ export default function MyRequestsTab({
                   </span>
                 </div>
               </div>
-              <p className="mt-1 text-sm text-text-secondary">{item.domains.join(", ")}</p>
+              <p className="mt-1 line-clamp-1 break-words text-sm text-text-secondary">
+                {item.domains.join(", ")}
+              </p>
               <p className="mt-2 text-xs text-text-secondary">
                 Requested on {formatDate(item.createdAt)}
               </p>
