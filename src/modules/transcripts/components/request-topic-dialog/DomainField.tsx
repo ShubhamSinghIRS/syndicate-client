@@ -9,27 +9,20 @@ import { RequestServer } from "../../../../utils/services";
 import { commonInputStyles } from "../../../../common/input-styles";
 import type { RequestTopicFormValues } from "./types";
 
-// Shown immediately while the live list loads, and kept as a fallback if
-// the request fails - freeSolo still lets people type anything else.
-const FALLBACK_DOMAIN_OPTIONS = [
-  "Enterprise SaaS",
-  "Robotics",
-  "Retail",
-  "Other",
-];
+const MIN_DOMAINS = 2;
+const MAX_DOMAINS = 200;
+const DOMAIN_MAX_LENGTH = 100;
 
 type DomainFieldProps = {
   control: Control<RequestTopicFormValues>;
 };
 
 export default function DomainField({ control }: DomainFieldProps) {
-  const [options, setOptions] = useState<string[]>(FALLBACK_DOMAIN_OPTIONS);
+  const [options, setOptions] = useState<string[]>([]);
 
   useEffect(() => {
     RequestServer<string[]>(API_ENDPOINTS.domains, "GET")
-      .then((domains) => {
-        setOptions((prev) => Array.from(new Set([...prev, ...domains])));
-      })
+      .then(setOptions)
       .catch(() => {});
   }, []);
 
@@ -37,7 +30,18 @@ export default function DomainField({ control }: DomainFieldProps) {
     <Controller
       name="domains"
       control={control}
-      render={({ field: { onChange, value, ref } }) => (
+      rules={{
+        validate: (value) => {
+          if (value.length < MIN_DOMAINS) {
+            return `Please add at least ${MIN_DOMAINS} domains`;
+          }
+          if (value.length > MAX_DOMAINS) {
+            return `You can add at most ${MAX_DOMAINS} domains`;
+          }
+          return true;
+        },
+      }}
+      render={({ field: { onChange, value, ref }, fieldState: { error } }) => (
         <Autocomplete
           multiple
           freeSolo
@@ -45,7 +49,7 @@ export default function DomainField({ control }: DomainFieldProps) {
           size="small"
           options={options}
           value={value}
-          onChange={(_event, newValue) => onChange(newValue)}
+          onChange={(_event, newValue) => onChange(newValue.slice(0, MAX_DOMAINS))}
           renderTags={(tagValue, getTagProps) =>
             tagValue.map((option, index) => (
               <Chip
@@ -63,6 +67,9 @@ export default function DomainField({ control }: DomainFieldProps) {
               inputRef={ref}
               label="Domain"
               placeholder={value.length ? undefined : "Search or add a domain"}
+              error={!!error}
+              helperText={error?.message}
+              inputProps={{ ...params.inputProps, maxLength: DOMAIN_MAX_LENGTH }}
             />
           )}
         />
