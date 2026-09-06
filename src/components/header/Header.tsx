@@ -94,7 +94,7 @@ export default function Header({
               fill="none"
               stroke="currentColor"
               strokeWidth={1.5}
-              className="h-6 w-6"
+              className="h-7 w-7"
             >
               <path
                 strokeLinecap="round"
@@ -117,7 +117,7 @@ export default function Header({
               />
             </svg>
             {cartItems.length > 0 && (
-              <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-accent-2 text-[10px] font-semibold text-white">
+              <span className="absolute right-0 top-0 flex h-5 w-5 items-center justify-center rounded-full bg-accent-2 text-[11px] font-semibold text-white">
                 {cartItems.length}
               </span>
             )}
