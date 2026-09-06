@@ -6,6 +6,7 @@ export type Profile = {
   name: string;
   email: string;
   companyName?: string | null;
+  accessTokenExpiresIn: number;
 };
 
 export const fetchProfile = async (): Promise<Profile> =>

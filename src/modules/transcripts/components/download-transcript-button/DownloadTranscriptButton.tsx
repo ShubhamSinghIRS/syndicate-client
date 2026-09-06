@@ -3,7 +3,7 @@ import { useDownloadTranscript } from "../../hooks/useDownloadTranscript";
 import type { Transcript } from "../../types";
 
 type DownloadTranscriptButtonProps = {
-  transcript: Pick<Transcript, "id" | "title" | "domain" | "preview">;
+  transcript: Pick<Transcript, "id" | "title" | "domains" | "preview">;
 };
 
 export default function DownloadTranscriptButton({

@@ -7,7 +7,7 @@ import CheckCircleIcon from "../../../../icons/CheckCircle/CheckCircle";
 import Button from "../../../../components/button/Button";
 import DownloadTranscriptButton from "../download-transcript-button/DownloadTranscriptButton";
 import { formatDate } from "../../../../utils/dateUtils";
-import { LOCKED_PREVIEW_PARAGRAPHS } from "../../pages/constants";
+import { LOCKED_PREVIEW_PARAGRAPHS } from "../../constants";
 import { COLORS } from "../../../../constants/colors";
 import { purchasedChipSx } from "./PreviewSection.styles";
 import type { PdfStatus } from "../../hooks/useTranscriptPdf";
@@ -17,19 +17,19 @@ type PreviewSectionProps = {
   preview: string;
   date: string;
   geography: string;
-  coverageHighlights: string[];
+  keyInsights: string[];
   onBuyClick: () => void;
   isPurchased: boolean;
   pdfUrl: string | null;
   pdfStatus: PdfStatus;
-  transcript: Pick<Transcript, "id" | "title" | "domain" | "preview">;
+  transcript: Pick<Transcript, "id" | "title" | "domains" | "preview">;
 };
 
 export default function PreviewSection({
   preview,
   date,
   geography,
-  coverageHighlights,
+  keyInsights,
   onBuyClick,
   isPurchased,
   pdfUrl,
@@ -41,13 +41,13 @@ export default function PreviewSection({
       <h2 className="text-lg font-bold text-text-primary">Preview</h2>
       <p className="mt-3 text-text-secondary">{preview}</p>
 
-      {coverageHighlights.length > 0 && (
+      {keyInsights.length > 0 && (
         <div className="mt-4">
           <p className="text-sm font-semibold text-text-primary">
             Key Insights:
           </p>
           <ul className="mt-3 flex flex-col gap-2">
-            {coverageHighlights.map((highlight, index) => (
+            {keyInsights.map((highlight, index) => (
               <li
                 key={index}
                 className="flex items-start gap-2 text-sm text-text-secondary"
@@ -63,7 +63,7 @@ export default function PreviewSection({
         </div>
       )}
 
-      <div className="mt-4 flex flex-wrap items-center gap-3.5 border-t border-gray-200 dark:border-gray-800 pt-4 text-sm text-text-secondary">
+    <div className="mt-4 flex flex-wrap items-center gap-3.5 border-t border-gray-200 dark:border-gray-800 pt-4 text-sm text-text-secondary">
         <Tooltip title="Published Date" arrow>
           <span className="flex items-center gap-1 cursor-pointer">
             <CalendarTodayIcon fontSize="small" />

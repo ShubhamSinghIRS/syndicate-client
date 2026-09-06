@@ -21,7 +21,7 @@ const LINK_ITEMS: { to: string; label: string; icon: React.ReactNode }[] = [
 const NAV_ITEMS: { tab: ProfileTab; label: string; icon: React.ReactNode }[] = [
   { tab: "profile", label: "My Profile", icon: <PersonOutlineIcon fontSize="small" /> },
   { tab: "purchases", label: "Purchases", icon: <ShoppingBagOutlinedIcon fontSize="small" /> },
-  { tab: "invoice", label: "Invoice", icon: <ReceiptLongIcon fontSize="small" /> },
+  { tab: "invoice", label: "Receipt", icon: <ReceiptLongIcon fontSize="small" /> },
   { tab: "requestedTopics", label: "Requested Topics", icon: <LightbulbOutlinedIcon fontSize="small" /> },
 ];
 

@@ -28,12 +28,8 @@ import { usePasswordVisibility } from "../components/auth-dialog/usePasswordVisi
 import PasswordRequirements from "../components/auth-dialog/PasswordRequirements";
 import { useAuthDialog } from "../context/AuthDialogContext";
 import { authDialogPaperSx } from "../components/auth-dialog/AuthDialog.styles";
+import { PASSWORD_MAX_LENGTH, RESET_PASSWORD_DEFAULT_VALUES } from "../constants";
 import type { ResetPasswordFormValues } from "../types";
-
-const defaultValues: ResetPasswordFormValues = {
-  password: "",
-  confirmPassword: "",
-};
 
 function ResetPasswordFields() {
   const { registerState, watch } =
@@ -51,6 +47,10 @@ function ResetPasswordFields() {
             value: 8,
             message: "Password must be at least 8 characters",
           },
+          maxLength: {
+            value: PASSWORD_MAX_LENGTH,
+            message: `Password must be at most ${PASSWORD_MAX_LENGTH} characters`,
+          },
           pattern: {
             value: validRegex("password"),
             message:
@@ -62,6 +62,7 @@ function ResetPasswordFields() {
           label: "New password",
           required: true,
           autoComplete: "new-password",
+          inputProps: { maxLength: PASSWORD_MAX_LENGTH },
           ...passwordVisibility,
         }}
         gridProps={{ xs: 12 }}
@@ -119,7 +120,9 @@ export default function ResetPassword() {
     setFalse: closeWarning,
   } = useBoolean();
 
-  const methods = useForm<ResetPasswordFormValues>({ defaultValues });
+  const methods = useForm<ResetPasswordFormValues>({
+    defaultValues: RESET_PASSWORD_DEFAULT_VALUES,
+  });
 
   const onSubmit = async ({ password }: ResetPasswordFormValues) => {
     if (!token) return;
@@ -132,8 +135,14 @@ export default function ResetPassword() {
       enqueueSnackbar("Password reset successful.", { variant: "success" });
     } catch (error) {
       const message = (error as Error).message;
-      setSubmitError(message);
-      enqueueSnackbar(message, { variant: "error" });
+      // A rejected password is a form issue, not a broken link - keep the form open.
+      if (/password/i.test(message)) {
+        methods.setError("password", { message });
+        enqueueSnackbar(message, { variant: "error" });
+      } else {
+        setSubmitError(message);
+        enqueueSnackbar(message, { variant: "error" });
+      }
     } finally {
       setLoading(false);
     }
@@ -230,9 +239,6 @@ export default function ResetPassword() {
                     <CheckCircleIcon
                       sx={{ fontSize: 40, color: COLORS.accent2 }}
                     />
-                    <p className="mt-3 text-sm font-semibold text-text-primary">
-                      Password reset
-                    </p>
                     <p className="mt-1 text-sm text-text-secondary">
                       Your password has been reset successfully. You can now
                       sign in with your new password.

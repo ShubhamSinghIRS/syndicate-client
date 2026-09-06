@@ -62,7 +62,7 @@ const Component = <T extends FieldValues>({
     ...rest
   } = textFieldProps;
 
-  const { trimWhitespaceOnBlur = false, triggerErrorOnBlur = false } = config;
+  const { trimWhitespaceOnBlur = true, triggerErrorOnBlur = false } = config;
 
   const onChangeRef = React.useRef(onChange);
   const onBlurRef = React.useRef(onBlur);

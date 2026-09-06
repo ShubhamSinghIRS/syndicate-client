@@ -1,9 +1,7 @@
 import { useEffect } from "react";
 import { useCart } from "../hooks/useCart";
 
-// Hydrates the cart from the server on load - for a signed-in user via their
-// account cart, for a guest via their guest_id cookie. The database is the
-// only source of truth for cart contents, so this always runs.
+// Hydrates the cart from the server on load (account cart, or guest via cookie).
 export default function CartSync() {
   const { loadCart } = useCart();
 

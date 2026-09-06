@@ -6,6 +6,11 @@ import { validRegex } from "../../../../utils/isValidType";
 import { commonInputStyles } from "../../../../common/input-styles";
 import { usePasswordVisibility } from "./usePasswordVisibility";
 import PasswordRequirements from "./PasswordRequirements";
+import {
+  COMPANY_NAME_MAX_LENGTH,
+  FULL_NAME_MAX_LENGTH,
+  PASSWORD_MAX_LENGTH,
+} from "../../constants";
 import type { RegisterFormValues } from "../../types";
 
 type RegisterFieldsProps = {
@@ -23,12 +28,19 @@ export default function RegisterFields({
     <Grid container spacing={2} mt="1px">
       <HookTextField
         {...registerState("fullName")}
-        rules={{ required: { value: true, message: "This field is required" } }}
+        rules={{
+          required: { value: true, message: "This field is required" },
+          maxLength: {
+            value: FULL_NAME_MAX_LENGTH,
+            message: `Name must be at most ${FULL_NAME_MAX_LENGTH} characters`,
+          },
+        }}
         textFieldProps={{
           ...commonInputStyles,
           label: "Full name",
           required: true,
           autoComplete: "name",
+          inputProps: { maxLength: FULL_NAME_MAX_LENGTH },
         }}
         gridProps={{ xs: 12 }}
       />
@@ -57,6 +69,10 @@ export default function RegisterFields({
             value: 8,
             message: "Password must be at least 8 characters",
           },
+          maxLength: {
+            value: PASSWORD_MAX_LENGTH,
+            message: `Password must be at most ${PASSWORD_MAX_LENGTH} characters`,
+          },
           pattern: {
             value: validRegex("password"),
             message:
@@ -68,6 +84,7 @@ export default function RegisterFields({
           label: "Password",
           required: true,
           autoComplete: "new-password",
+          inputProps: { maxLength: PASSWORD_MAX_LENGTH },
           ...passwordVisibility,
         }}
         gridProps={{ xs: 12 }}
@@ -77,10 +94,17 @@ export default function RegisterFields({
       </Grid>
       <HookTextField
         {...registerState("companyName")}
+        rules={{
+          maxLength: {
+            value: COMPANY_NAME_MAX_LENGTH,
+            message: `Company name must be at most ${COMPANY_NAME_MAX_LENGTH} characters`,
+          },
+        }}
         textFieldProps={{
           ...commonInputStyles,
           label: "Company name",
           autoComplete: "company_name",
+          inputProps: { maxLength: COMPANY_NAME_MAX_LENGTH },
         }}
         gridProps={{ xs: 12 }}
       />

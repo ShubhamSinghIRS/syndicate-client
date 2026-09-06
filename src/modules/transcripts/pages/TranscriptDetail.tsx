@@ -16,10 +16,7 @@ import PurchaseCard from "../components/detail/PurchaseCard";
 import ExpertCard from "../components/detail/ExpertCard";
 import RelatedTranscripts from "../components/detail/RelatedTranscripts";
 import TranscriptDetailSkeleton from "../components/detail/TranscriptDetailSkeleton";
-
-// Ids are either the legacy plain-number form or the backend's UUID form.
-const TRANSCRIPT_ID_PATTERN =
-  /^(\d+|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
+import { TRANSCRIPT_ID_PATTERN } from "../constants";
 
 export default function TranscriptDetail() {
   const { id } = useParams<{ id: string }>();
@@ -38,10 +35,7 @@ export default function TranscriptDetail() {
 
     if (!id) return;
 
-    // :id matches any path segment, so a made-up route like /transcripts/checkout
-    // would otherwise be sent to the backend and come back as a "not found
-    // transcript" - it isn't a real id at all, so treat it the same as any
-    // other nonexistent route instead of pretending a lookup happened.
+    // A made-up route like /transcripts/checkout isn't a real id; treat it as not-found.
     if (!TRANSCRIPT_ID_PATTERN.test(id)) {
       navigate(APP_ROUTES.home, { replace: true });
       return;
@@ -104,7 +98,7 @@ export default function TranscriptDetail() {
                 preview={transcript.preview}
                 date={transcript.date}
                 geography={transcript.geography}
-                coverageHighlights={transcript.coverageHighlights}
+                keyInsights={transcript.keyInsights}
                 onBuyClick={handleBuyNow}
                 isPurchased={isPurchased}
                 pdfUrl={pdfUrl}

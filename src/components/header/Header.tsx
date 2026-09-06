@@ -6,7 +6,7 @@ import { useAuthDialog } from "../../modules/auth/context/AuthDialogContext";
 import AccountMenu from "./AccountMenu";
 import ThemeToggle from "../theme-toggle/ThemeToggle";
 import SearchBar from "../searchbar/SearchBar";
-import { isLoggedIn } from "../../utils/authUtils";
+import { isLoggedIn, useIsLoggedIn } from "../../utils/authUtils";
 import { getStorageItem } from "../../utils/storageUtils";
 import { useCart } from "../../modules/cart/hooks/useCart";
 
@@ -28,8 +28,10 @@ export default function Header({
   component,
 }: HeaderProps) {
   const { openAuthDialog } = useAuthDialog();
-  // Read fresh every render so auth changes elsewhere aren't shown stale.
-  const loggedIn = isLoggedIn();
+  // Reactive - re-renders the instant login state changes elsewhere (e.g.
+  // logout), rather than only reflecting it whenever this component happens
+  // to next re-render for some unrelated reason.
+  const loggedIn = useIsLoggedIn();
   const userName = getStorageItem<string>("userName");
   const { items: cartItems } = useCart();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -51,11 +53,11 @@ export default function Header({
   return (
     <header className="sticky top-0 z-50 bg-header-background border-b border-gray-100 dark:border-gray-800">
       <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 lg:flex-nowrap lg:gap-6 lg:px-6">
-        <Link to={APP_ROUTES.home} className="flex shrink-0 items-center lg:pl-4">
+        <Link to={APP_ROUTES.home} className="flex shrink-0 items-center pl-4 lg:pl-24">
           <img
             src="/assets/logo_hd.png"
             alt="Infollion"
-            className="h-10 w-auto md:h-14"
+            className="h-12 w-auto md:h-18"
           />
         </Link>
 

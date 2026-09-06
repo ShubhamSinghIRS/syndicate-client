@@ -8,10 +8,7 @@ import { API_ENDPOINTS } from "../../../../constants/apiEndpoints";
 import { RequestServer } from "../../../../utils/services";
 import { commonInputStyles } from "../../../../common/input-styles";
 import type { RequestTopicFormValues } from "./types";
-
-const MIN_DOMAINS = 2;
-const MAX_DOMAINS = 200;
-const DOMAIN_MAX_LENGTH = 100;
+import { MIN_DOMAINS, MAX_DOMAINS, DOMAIN_MAX_LENGTH } from "../../constants";
 
 type DomainFieldProps = {
   control: Control<RequestTopicFormValues>;

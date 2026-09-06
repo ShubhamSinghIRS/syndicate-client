@@ -1,6 +1,6 @@
 import axios from "axios";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
-import { isLoggedIn, logout, processToken } from "./authUtils";
+import { isLoggedIn, logout, persistUserSession } from "./authUtils";
 import { API_ENDPOINTS } from "../constants/apiEndpoints";
 
 // TODO: add a separate branch here once a dev/staging domain exists.
@@ -71,6 +71,30 @@ const request = async (config: AxiosRequestConfig): Promise<AxiosResponse> => {
 // Deduped so several requests 401ing at once share one refresh.
 let refreshPromise: Promise<boolean> | null = null;
 
+// Proactive refresh: scheduled a bit before the access token's real expiry
+// (reported by the backend - the token itself is httpOnly, so the frontend
+// can't read its `exp` claim directly) so most requests never see a 401 in
+// the first place. RequestServer's reactive 401-then-refresh-then-retry
+// stays as the safety net for whatever this timer misses (clock drift, the
+// laptop sleeping through it, a tab that was backgrounded, etc.).
+const REFRESH_BUFFER_SECONDS = 60;
+let refreshTimer: ReturnType<typeof setTimeout> | null = null;
+
+export const scheduleTokenRefresh = (expiresInSeconds: number): void => {
+  if (refreshTimer) clearTimeout(refreshTimer);
+  const delaySeconds = Math.max(expiresInSeconds - REFRESH_BUFFER_SECONDS, 5);
+  refreshTimer = setTimeout(() => {
+    void refreshAccessToken();
+  }, delaySeconds * 1000);
+};
+
+export const clearScheduledTokenRefresh = (): void => {
+  if (refreshTimer) {
+    clearTimeout(refreshTimer);
+    refreshTimer = null;
+  }
+};
+
 export const refreshAccessToken = (): Promise<boolean> => {
   if (!refreshPromise) {
     refreshPromise = request({
@@ -81,9 +105,12 @@ export const refreshAccessToken = (): Promise<boolean> => {
       .then((response) => {
         if (response.status < 200 || response.status >= 300) return false;
         const data = response.data?.data as
-          | Parameters<typeof processToken>[0]
+          | { user?: Parameters<typeof persistUserSession>[0]; accessTokenExpiresIn?: number }
           | undefined;
-        processToken(data);
+        persistUserSession(data?.user);
+        // Re-schedule off the new token's own lifetime rather than assuming
+        // it matches the one that just expired.
+        if (data?.accessTokenExpiresIn) scheduleTokenRefresh(data.accessTokenExpiresIn);
         return true;
       })
       .catch(() => false)
@@ -114,8 +141,15 @@ export const RequestServer = async <T>(
   const wasLoggedIn = isLoggedIn();
   let response = await send();
 
-  if (response.status === 401 && wasLoggedIn) {
-    // Token may have just expired - try a silent refresh before logging out.
+  // Retried on ANY 401, not just when the client already believed it was
+  // logged in. isLoggedIn() is only set after RootLayout's own session check
+  // resolves - on a fresh page load, calls that fire before that (cart, me)
+  // would otherwise skip this retry precisely when they need it most, since
+  // wasLoggedIn is still false at that point even for a genuinely logged-in
+  // user whose access token just expired. refreshAccessToken is deduped and
+  // fails fast with no refresh cookie, so this is harmless for a truly
+  // anonymous caller too.
+  if (response.status === 401) {
     const refreshed = await refreshAccessToken();
     if (refreshed) {
       response = await send();
@@ -157,7 +191,9 @@ export const RequestServerBlob = async (
   const wasLoggedIn = isLoggedIn();
   let response = await send();
 
-  if (response.status === 401 && wasLoggedIn) {
+  // See the identical comment in RequestServer - retried on any 401, not
+  // gated on wasLoggedIn, which is unreliable this early in the page's life.
+  if (response.status === 401) {
     const refreshed = await refreshAccessToken();
     if (refreshed) {
       response = await send();

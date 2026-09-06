@@ -13,13 +13,8 @@ export const signIn = async (data: SignInFormValues): Promise<AuthResponse> =>
     password: data.password,
   });
 
-// Stores the full signup record immediately (including the password) and
-// triggers an OTP send. The account exists but is unverified until
-// verifyRegistrationOtp succeeds. Identity for the rest of the verification
-// flow is carried by the returned pending token, not by resending
-// email/password - this is what lets a lapsed OTP be recovered later from
-// the sign-in screen (see signIn's 403/pendingToken path) without needing
-// the full signup form data again.
+// Stores the signup record and triggers an OTP send; account is unverified until
+// verifyRegistrationOtp succeeds, identified by the returned pending token.
 export const register = async (
   data: RegisterFormValues,
 ): Promise<PendingAuthResponse> =>

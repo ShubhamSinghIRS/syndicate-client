@@ -14,9 +14,12 @@ import ExpandMoreIcon from "../../../../icons/ExpandMore/ExpandMore";
 import DeleteIcon from "../../../../icons/Delete/Delete";
 import DomainField from "./DomainField";
 import type { RequestTopicFormValues } from "./types";
-
-const TOPIC_MAX_LENGTH = 300;
-const REMARK_MAX_LENGTH = 2000;
+import {
+  TOPIC_MAX_LENGTH,
+  REMARK_MAX_LENGTH,
+  EXPERT_NAME_MAX_LENGTH,
+  EXPERT_LINKEDIN_MAX_LENGTH,
+} from "../../constants";
 
 type FieldsProps = {
   handleClose: () => void;
@@ -169,6 +172,7 @@ export default function Fields({ handleClose, showEmail }: FieldsProps) {
                   textFieldProps={{
                     ...commonInputStyles,
                     placeholder: "Expert name",
+                    inputProps: { maxLength: EXPERT_NAME_MAX_LENGTH },
                   }}
                 />
                 <HookTextField
@@ -176,6 +180,7 @@ export default function Fields({ handleClose, showEmail }: FieldsProps) {
                   textFieldProps={{
                     ...commonInputStyles,
                     placeholder: "LinkedIn profile URL",
+                    inputProps: { maxLength: EXPERT_LINKEDIN_MAX_LENGTH },
                   }}
                 />
                 <Tooltip title="Remove expert">

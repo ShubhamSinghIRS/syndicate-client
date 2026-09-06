@@ -4,11 +4,7 @@ import { RequestServerBlob } from "../../../utils/services";
 
 export type PdfStatus = "idle" | "loading" | "ready" | "error";
 
-// Fetches a purchased transcript's actual PDF as a blob from the backend (which
-// streams it straight from storage) and exposes a same-origin object URL the
-// browser can render inline. Because the bytes come through our own API - not a
-// cross-origin storage link - no storage-bucket CORS config is involved, and the
-// blob URL renders in an <iframe> with the browser's native PDF viewer.
+// Fetches the PDF as a blob from our own API and exposes an object URL for an <iframe>.
 export const useTranscriptPdf = (
   id: string | undefined,
   enabled: boolean,

@@ -1,5 +1,6 @@
 import { useCart } from "./hooks/useCart";
 import CartItem from "./components/cart-item/CartItem";
+import CartItemSkeleton from "./components/cart-item/CartItemSkeleton";
 import CartSummary from "./components/cart-summary/CartSummary";
 import EmptyCart from "./components/empty-cart/EmptyCart";
 import Header from "../../components/header/Header";
@@ -8,7 +9,7 @@ import BackButton from "../../components/back-button/BackButton";
 import { APP_ROUTES } from "../../constants/appRoutes";
 
 export default function Cart() {
-  const { items, total, removeFromCart } = useCart();
+  const { items, total, removeFromCart, isLoaded } = useCart();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -21,7 +22,14 @@ export default function Cart() {
             Transcript Cart
           </h1>
 
-          {items.length === 0 ? (
+          {!isLoaded ? (
+            <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-12">
+              <div className="flex flex-col gap-4 lg:col-span-8">
+                <CartItemSkeleton />
+                <CartItemSkeleton />
+              </div>
+            </div>
+          ) : items.length === 0 ? (
             <div className="mt-6">
               <EmptyCart />
             </div>

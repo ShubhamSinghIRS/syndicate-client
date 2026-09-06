@@ -1,4 +1,11 @@
 import Button from "../../../../components/button/Button";
+import {
+  CURRENCY_CODE,
+  PAY_NOW_LABEL,
+  PURCHASE_SUMMARY_HEADING,
+  subtotalLabel,
+  TOTAL_LABEL,
+} from "../../constants";
 
 type OrderSummaryProps = {
   itemCount: number;
@@ -19,19 +26,17 @@ export default function OrderSummary({
 }: OrderSummaryProps) {
   return (
     <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-6 lg:sticky lg:top-6">
-      <h2 className="text-lg font-bold text-text-primary">Purchase summary</h2>
+      <h2 className="text-lg font-bold text-text-primary">{PURCHASE_SUMMARY_HEADING}</h2>
 
       <div className="mt-4 flex items-center justify-between text-text-secondary">
-        <span>
-          Subtotal ({itemCount} {itemCount === 1 ? "transcript" : "transcripts"})
-        </span>
+        <span>{subtotalLabel(itemCount)}</span>
         <span>${subtotal}</span>
       </div>
 
       <div className="mt-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-800 pt-4">
-        <span className="font-semibold text-text-primary">Total</span>
+        <span className="font-semibold text-text-primary">{TOTAL_LABEL}</span>
         <span className="text-lg font-bold text-accent-2">
-          USD ${total}
+          {CURRENCY_CODE} ${total}
         </span>
       </div>
 
@@ -42,7 +47,7 @@ export default function OrderSummary({
       <div className="mt-4">
         <Button
           variant="contained"
-          label={isSubmitting ? "Processing..." : "Pay Now"}
+          label={PAY_NOW_LABEL}
           onClick={onPay}
           disabled={isSubmitting}
           className="w-full"

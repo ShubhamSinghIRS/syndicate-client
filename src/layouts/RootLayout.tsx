@@ -2,27 +2,37 @@ import { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import FloatingSupport from "../components/support/FloatingSupport";
 import { AuthDialogProvider } from "../modules/auth/context/AuthDialogContext";
-import { processToken, setLoggedIn } from "../utils/authUtils";
+import { hasStoredSession, persistUserSession, setLoggedIn } from "../utils/authUtils";
 import { fetchProfile } from "../modules/profile/profileService";
-import { refreshAccessToken } from "../utils/services";
+import { scheduleTokenRefresh } from "../utils/services";
 
 export default function RootLayout() {
   const location = useLocation();
   const [authChecked, setAuthChecked] = useState(false);
 
-  // Ask the server who we are on load; retry once via refresh before giving up.
+  // Restore session on load. fetchProfile already retries once internally
+  // after a refresh attempt on a 401 (see RequestServer in services.ts), so
+  // reaching the catch here means the session is genuinely gone - no need
+  // to try refreshing a second time.
   useEffect(() => {
     let cancelled = false;
     const restoreSession = async () => {
+      // No point calling the server at all if this browser has never logged
+      // in (or already logged out) - hasStoredSession is a cheap local hint
+      // that skips a guaranteed-to-fail /me (and the refresh attempt behind
+      // it) for the common case of a genuinely anonymous visitor.
+      if (!hasStoredSession()) {
+        if (!cancelled) setAuthChecked(true);
+        return;
+      }
       try {
         const profile = await fetchProfile();
-        if (!cancelled) processToken(profile);
+        if (!cancelled) {
+          persistUserSession(profile);
+          scheduleTokenRefresh(profile.accessTokenExpiresIn);
+        }
       } catch {
-        // refreshAccessToken is deduped across concurrent callers (see
-        // services.ts) so StrictMode's double-mount in dev doesn't fire two
-        // separate refresh requests here.
-        const refreshed = await refreshAccessToken();
-        if (!cancelled && !refreshed) setLoggedIn(false);
+        if (!cancelled) setLoggedIn(false);
       } finally {
         if (!cancelled) setAuthChecked(true);
       }

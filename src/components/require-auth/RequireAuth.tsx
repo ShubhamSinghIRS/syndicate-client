@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { isLoggedIn } from "../../utils/authUtils";
+import { useIsLoggedIn } from "../../utils/authUtils";
 import { APP_ROUTES } from "../../constants/appRoutes";
 import type { ReactNode } from "react";
 
@@ -9,8 +9,13 @@ type RequireAuthProps = {
 
 export default function RequireAuth({ children }: RequireAuthProps) {
   const location = useLocation();
+  // Reactive - if the user logs out while sitting on a page that needs
+  // auth (checkout, profile), this re-renders and redirects them away the
+  // instant that happens, rather than only noticing on some later,
+  // unrelated re-render (or never, if none happens to occur).
+  const loggedIn = useIsLoggedIn();
 
-  if (!isLoggedIn()) {
+  if (!loggedIn) {
     const redirectUrl = encodeURIComponent(location.pathname + location.search);
     return (
       <Navigate

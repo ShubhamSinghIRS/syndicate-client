@@ -19,8 +19,7 @@ export const usePurchasedTranscriptIds = (): string[] => {
 
     load();
 
-    // Login happens in a dialog without a page reload, so this component may
-    // already be mounted (and have cached "logged out") by the time it succeeds.
+    // Login happens without a page reload, so a mounted component may have a stale "logged out".
     window.addEventListener(AUTH_CHANGED_EVENT, load);
     return () => window.removeEventListener(AUTH_CHANGED_EVENT, load);
   }, []);
