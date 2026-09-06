@@ -29,7 +29,7 @@ import type {
 export default function TranscriptsList() {
   const { transcripts, total, isLoading, error, loadTranscripts, loadPurchasedTranscripts } =
     useTranscripts();
-  const purchasedIds = usePurchasedTranscriptIds();
+  const { purchasedIds } = usePurchasedTranscriptIds();
   const filterOptions = useFilterOptions();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("q") ?? "");

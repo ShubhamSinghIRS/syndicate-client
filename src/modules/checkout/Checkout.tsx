@@ -83,7 +83,7 @@ export default function Checkout() {
   const { items: cartItems, clearCart, removeFromCart } = useCart();
   const { addOrder } = useOrders();
   const { email, userName } = useCurrentUser();
-  const purchasedIds = usePurchasedTranscriptIds();
+  const { purchasedIds, isLoading: isPurchasedIdsLoading } = usePurchasedTranscriptIds();
   const { value: isOrderConfirmed, setTrue: confirmOrder } = useBoolean();
   const [isSubmitting, setIsSubmitting] = useState(false);
   // Overlay only covers the gaps around Razorpay's own modal, not the whole isSubmitting window.
@@ -109,6 +109,9 @@ export default function Checkout() {
   );
 
   useEffect(() => {
+    // Ownership isn't known yet, so this would fire on a false "not owned" read.
+    if (isPurchasedIdsLoading) return;
+
     if (alreadyOwnedCount > 0) {
       enqueueSnackbar(
         alreadyOwnedCount === 1
@@ -116,12 +119,30 @@ export default function Checkout() {
           : alreadyOwnedPluralMessage(alreadyOwnedCount),
         { variant: "info" },
       );
+
+      // A refresh mid-payment can strand an already-purchased item here (finishOrder
+      // never ran to clean it up), so it re-triggers this same screen on every future
+      // visit until it's actually removed from storage rather than just filtered out.
+      if (buyNowItem && purchasedIds.includes(buyNowItem.id)) {
+        clearBuyNowItem();
+      }
+      cartItems.forEach((item) => {
+        if (purchasedIds.includes(item.id)) {
+          removeFromCart(item.id);
+        }
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [alreadyOwnedCount]);
+  }, [isPurchasedIdsLoading, alreadyOwnedCount]);
 
   if (isOrderConfirmed && confirmedOrder) {
     return <OrderConfirmation order={confirmedOrder} />;
+  }
+
+  // Ownership must be confirmed before rendering, otherwise an already-owned item
+  // briefly looks payable again on every refresh until the fetch settles.
+  if (isPurchasedIdsLoading) {
+    return <PaymentProcessing active variant="spinner" />;
   }
 
   if (items.length === 0) {

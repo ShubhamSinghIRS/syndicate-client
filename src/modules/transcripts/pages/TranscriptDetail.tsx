@@ -25,7 +25,7 @@ export default function TranscriptDetail() {
   const buyNow = useBuyNow();
   const [transcript, setTranscript] = useState<Transcript | null>(null);
   const [notFound, setNotFound] = useState(false);
-  const purchasedIds = usePurchasedTranscriptIds();
+  const { purchasedIds } = usePurchasedTranscriptIds();
   const isPurchased = !!id && purchasedIds.includes(id);
   const { url: pdfUrl, status: pdfStatus } = useTranscriptPdf(id, isPurchased);
 

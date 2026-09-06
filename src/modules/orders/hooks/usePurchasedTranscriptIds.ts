@@ -2,19 +2,29 @@ import { useEffect, useState } from "react";
 import { AUTH_CHANGED_EVENT, isLoggedIn } from "../../../utils/authUtils";
 import { fetchPurchasedTranscriptIds } from "../../transcripts/transcriptsService";
 
-export const usePurchasedTranscriptIds = (): string[] => {
+type PurchasedTranscriptIds = {
+  purchasedIds: string[];
+  // True until the first fetch settles, so callers can avoid treating "not yet loaded" as "not owned".
+  isLoading: boolean;
+};
+
+export const usePurchasedTranscriptIds = (): PurchasedTranscriptIds => {
   const [purchasedIds, setPurchasedIds] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const load = () => {
       if (!isLoggedIn()) {
         setPurchasedIds([]);
+        setIsLoading(false);
         return;
       }
 
+      setIsLoading(true);
       fetchPurchasedTranscriptIds()
         .then(setPurchasedIds)
-        .catch(() => setPurchasedIds([]));
+        .catch(() => setPurchasedIds([]))
+        .finally(() => setIsLoading(false));
     };
 
     load();
@@ -24,5 +34,5 @@ export const usePurchasedTranscriptIds = (): string[] => {
     return () => window.removeEventListener(AUTH_CHANGED_EVENT, load);
   }, []);
 
-  return purchasedIds;
+  return { purchasedIds, isLoading };
 };
