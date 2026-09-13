@@ -1,39 +1,43 @@
 import Chip from "../../../../components/chip/Chip";
 import DownloadButton from "../../../../components/download-button/DownloadButton";
 import { formatDate } from "../../../../utils/dateUtils";
-import { viewOrderReceipt } from "../../../orders/ordersService";
+import { downloadOrderReceipt } from "../../../orders/ordersService";
 import { paidChipSx } from "./InvoiceList.styles";
 import type { Order } from "../../../orders/types";
+import InvoiceListSkeleton from "./InvoiceListSkeleton";
 
 type InvoiceListProps = {
   orders: Order[];
+  isLoading?: boolean;
 };
 
 const invoiceNumber = (orderId: string): string =>
-  `#INV-${orderId.slice(-8).toUpperCase()}`;
+  `#RCP-${orderId.slice(-8).toUpperCase()}`;
 
-export default function InvoiceList({ orders }: InvoiceListProps) {
+export default function InvoiceList({ orders, isLoading = false }: InvoiceListProps) {
   const rows = orders.flatMap((order) =>
     order.items.map((item) => ({ order, item })),
   );
 
   return (
     <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-6">
-      <h2 className="text-xl font-bold text-text-primary">Invoices</h2>
+      <h2 className="text-xl font-bold text-text-primary">Receipts</h2>
       <p className="mt-1 text-sm text-text-secondary">
         Billing history for all transcripts purchased
       </p>
 
-      {rows.length === 0 ? (
+      {isLoading ? (
+        <InvoiceListSkeleton />
+      ) : rows.length === 0 ? (
         <p className="mt-6 border-t border-gray-200 dark:border-gray-800 pt-6 text-sm text-text-secondary">
-          No invoices yet.
+          No receipts yet.
         </p>
       ) : (
         <div className="mt-4 overflow-x-auto border-t border-gray-200 dark:border-gray-800">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
-                <th className="py-3 pr-4 font-semibold">Invoice</th>
+                <th className="py-3 pr-4 font-semibold">Receipt</th>
                 <th className="py-3 pr-4 font-semibold">Transcript</th>
                 <th className="py-3 pr-4 font-semibold">Purchased</th>
                 <th className="py-3 pr-4 font-semibold">Amount</th>
@@ -62,11 +66,11 @@ export default function InvoiceList({ orders }: InvoiceListProps) {
                   </td>
                   <td className="py-3 pr-0 text-right">
                     <DownloadButton
-                      label="PDF"
+                      label="Download"
                       styles={{ padding: "0 14px", height: "30px", fontSize: "12px" }}
                       onClick={() =>
-                        viewOrderReceipt(order.id).catch((err) =>
-                          console.error("Failed to load receipt:", err),
+                        downloadOrderReceipt(order.id).catch((err) =>
+                          console.error("Failed to download receipt:", err),
                         )
                       }
                     />

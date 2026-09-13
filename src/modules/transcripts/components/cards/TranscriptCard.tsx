@@ -24,10 +24,7 @@ type TranscriptCardProps = {
   isPurchased?: boolean;
 };
 
-// The chip's label is CSS-truncated (domainChipSx: maxWidth + ellipsis), so
-// whether it's actually cut off depends on rendered text width, not
-// character count. Measure the label's scrollWidth vs clientWidth so the
-// tooltip only appears when the domain name is genuinely truncated.
+// Measure scrollWidth vs clientWidth so the tooltip only shows when actually truncated.
 function DomainChip({ label }: { label: string }) {
   const chipRef = useRef<HTMLDivElement>(null);
   const [isTruncated, setIsTruncated] = useState(false);
@@ -61,9 +58,9 @@ export default function TranscriptCard({
   const [suppressCartTooltip, setSuppressCartTooltip] = useState(false);
 
   // Show at most 4 tags; the rest collapse into "+N more".
-  const visibleCount = Math.min(4, transcript.tags.length);
-  const visibleTags = transcript.tags.slice(0, visibleCount);
-  const remainingTags = transcript.tags.slice(visibleCount);
+  const visibleCount = Math.min(4, transcript.domains.length);
+  const visibleTags = transcript.domains.slice(0, visibleCount);
+  const remainingTags = transcript.domains.slice(visibleCount);
   const remainingTagCount = remainingTags.length;
 
   const previewText = transcript.preview.endsWith("...")

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { useTranscripts } from "../hooks/useTranscripts";
-import { useFilterBounds } from "../hooks/useFilterBounds";
+import { useFilterOptions } from "../hooks/useFilterOptions";
 import { usePurchasedTranscriptIds } from "../../orders/hooks/usePurchasedTranscriptIds";
 import { buildTranscriptsFilterPayload } from "../transcriptsService";
 import TranscriptCard from "../components/cards/TranscriptCard";
@@ -19,20 +19,18 @@ import FilterAltIcon from "../../../icons/FilterAlt/FilterAlt";
 import { useFormCloseWarning } from "../../../utils/hooks/useFormCloseWarning";
 import { useBoolean } from "../../../utils/hooks/useBoolean";
 import { DEFAULT_SIDEBAR_FILTERS } from "../components/filter-sidebar/constants";
-import { PAGE_SIZE } from "./constants";
+import { PAGE_SIZE, SEARCH_DEBOUNCE_MS } from "../constants";
 import type {
   PriceFilterValue,
   PublishedDateFilterValue,
   SidebarFilterPayload,
 } from "../types";
 
-const SEARCH_DEBOUNCE_MS = 300;
-
 export default function TranscriptsList() {
   const { transcripts, total, isLoading, error, loadTranscripts, loadPurchasedTranscripts } =
     useTranscripts();
-  const purchasedIds = usePurchasedTranscriptIds();
-  const filterBounds = useFilterBounds();
+  const { purchasedIds } = usePurchasedTranscriptIds();
+  const filterOptions = useFilterOptions();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("q") ?? "");
   const [debouncedSearch, setDebouncedSearch] = useState(search);
@@ -66,8 +64,7 @@ export default function TranscriptsList() {
     setPage(1);
   };
 
-  // Debounced so typing doesn't fire a network request per keystroke now
-  // that search runs server-side instead of filtering an in-memory array.
+  // Debounced so typing doesn't fire a network request per keystroke.
   useEffect(() => {
     const timeout = setTimeout(() => setDebouncedSearch(search), SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(timeout);
@@ -89,10 +86,12 @@ export default function TranscriptsList() {
     setSearchParams(params, { replace: true });
   }, [search, sidebarFilters, page, setSearchParams]);
 
-  // filterBounds only affects the payload when a price bucket is selected
-  // (see unionPriceRange) - ignoring it otherwise stops the async bounds
-  // fetch resolving from re-triggering an identical transcripts request.
-  const priceRelevantBounds = sidebarFilters.price.length ? filterBounds : null;
+  // Only depend on filterOptions when a price/date bucket is selected, to avoid
+  // re-triggering an identical request once it loads.
+  const payloadRelevantOptions =
+    sidebarFilters.price.length || sidebarFilters.publishedDate.length
+      ? filterOptions
+      : null;
 
   useEffect(() => {
     if (purchasedOnly) {
@@ -104,12 +103,12 @@ export default function TranscriptsList() {
           sidebarFilters,
           page,
           PAGE_SIZE,
-          priceRelevantBounds,
+          payloadRelevantOptions,
         ),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [purchasedOnly, debouncedSearch, sidebarFilters, page, priceRelevantBounds]);
+  }, [purchasedOnly, debouncedSearch, sidebarFilters, page, payloadRelevantOptions]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
@@ -138,7 +137,7 @@ export default function TranscriptsList() {
       />
 
       <div className="flex-1">
-        <div className="mx-auto max-w-[1400px] px-6 py-10">
+        <div className="mx-auto max-w-[1440px] px-6 sm:px-12 lg:px-20 pt-20 pb-10">
           <div className="flex flex-col gap-8 lg:flex-row">
             <div className="hidden lg:block">
               <FilterSidebar
@@ -152,7 +151,7 @@ export default function TranscriptsList() {
                   setPurchasedOnly(value);
                   setPage(1);
                 }}
-                bounds={filterBounds}
+                options={filterOptions}
               />
             </div>
 
@@ -227,7 +226,7 @@ export default function TranscriptsList() {
                 setPurchasedOnly(value);
                 setPage(1);
               }}
-              bounds={filterBounds}
+              options={filterOptions}
             />
             <Button
               variant="contained"

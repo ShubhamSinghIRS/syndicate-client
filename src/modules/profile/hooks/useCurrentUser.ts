@@ -1,6 +1,6 @@
 import { getStorageItem } from "../../../utils/storageUtils";
 
-// Sourced from JWT claims cached at sign-in (see authUtils.processToken).
+// Sourced from JWT claims cached at sign-in (see authUtils.persistUserSession).
 export const useCurrentUser = () => {
   return {
     userId: getStorageItem<string>("userId"),

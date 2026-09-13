@@ -3,12 +3,14 @@ import Button from "../../../../components/button/Button";
 import DownloadTranscriptButton from "../../../transcripts/components/download-transcript-button/DownloadTranscriptButton";
 import { APP_ROUTES } from "../../../../constants/appRoutes";
 import type { Order } from "../../../orders/types";
+import PurchaseHistorySkeleton from "./PurchaseHistorySkeleton";
 
 type PurchaseHistoryProps = {
   orders: Order[];
+  isLoading?: boolean;
 };
 
-export default function PurchaseHistory({ orders }: PurchaseHistoryProps) {
+export default function PurchaseHistory({ orders, isLoading = false }: PurchaseHistoryProps) {
   const rows = orders.flatMap((order) =>
     order.items.map((item) => ({ order, item })),
   );
@@ -20,7 +22,9 @@ export default function PurchaseHistory({ orders }: PurchaseHistoryProps) {
         Transcripts you've bought
       </p>
 
-      {rows.length === 0 ? (
+      {isLoading ? (
+        <PurchaseHistorySkeleton />
+      ) : rows.length === 0 ? (
         <div className="mt-6 border-t border-gray-200 dark:border-gray-800 pt-6 text-center">
           <p className="text-text-secondary">
             You haven't purchased any transcripts yet.

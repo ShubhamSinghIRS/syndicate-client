@@ -9,9 +9,7 @@ type DetailHeaderProps = {
   transcript: Transcript;
 };
 
-// Callers that link here (CartItem, PurchaseHistory, ...) can pass
-// { backTo, backLabel } via router state so "Back" returns to wherever the
-// user actually came from instead of always landing on the transcripts list.
+// Callers can pass { backTo, backLabel } via router state to control where "Back" goes.
 export type BackNavigationState = {
   backTo?: string;
   backLabel?: string;
@@ -21,9 +19,7 @@ export default function DetailHeader({ transcript }: DetailHeaderProps) {
   const location = useLocation();
   const { backTo, backLabel } = (location.state as BackNavigationState) ?? {};
 
-  const allTags = Array.from(
-    new Set([transcript.domain, ...transcript.tags]),
-  );
+  const allTags = Array.from(new Set(transcript.domains));
 
   const containerRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);

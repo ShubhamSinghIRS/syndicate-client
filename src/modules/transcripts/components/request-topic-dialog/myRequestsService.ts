@@ -4,7 +4,7 @@ import { RequestServer } from "../../../../utils/services";
 export type TopicRequestStatus = "open" | "in_progress" | "resolved" | "rejected";
 
 export type RawTopicRequestItem = {
-  id: number;
+  id: string;
   topic: string | null;
   domains: string[];
   status: TopicRequestStatus;
@@ -12,11 +12,25 @@ export type RawTopicRequestItem = {
 };
 
 export type TopicRequestItem = {
-  id: number;
+  id: string;
   topic: string;
   domains: string[];
   status: TopicRequestStatus;
   createdAt: string | null;
+};
+
+// GET /api/v1/topics/:id - the same fields the request was submitted with
+// (see request-topic-dialog/fields.tsx), for the "view request" dialog.
+type RawTopicRequestDetail = RawTopicRequestItem & {
+  remark: string | null;
+  suggestedExpertName: string | null;
+  suggestedExpertLinkedin: string | null;
+};
+
+export type TopicRequestDetail = TopicRequestItem & {
+  remark: string | null;
+  suggestedExpertName: string | null;
+  suggestedExpertLinkedin: string | null;
 };
 
 type RawPage<T> = {
@@ -31,8 +45,7 @@ export type TopicRequestsPage = {
   limit: number;
 };
 
-// Backend only tracks open/in_progress/resolved/rejected - "Live" here means
-// the requested topic was fulfilled.
+// "Live" here means the requested topic was fulfilled (backend calls it "resolved").
 export const TOPIC_REQUEST_STATUS_DISPLAY: Record<
   TopicRequestStatus,
   { label: string; className: string }
@@ -78,4 +91,14 @@ export const fetchMyTopicRequests = async (
     page: raw.meta.page,
     limit: raw.meta.limit,
   };
+};
+
+export const fetchTopicRequestDetail = async (
+  id: string,
+): Promise<TopicRequestDetail> => {
+  const raw = await RequestServer<RawTopicRequestDetail>(
+    API_ENDPOINTS.topicRequestDetail.replace(":id", id),
+    "GET",
+  );
+  return { ...raw, topic: raw.topic ?? "" };
 };

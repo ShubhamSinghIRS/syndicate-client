@@ -5,8 +5,7 @@ import { isLoggedIn } from "../../../utils/authUtils";
 import { APP_ROUTES } from "../../../constants/appRoutes";
 import type { Transcript } from "../../transcripts/types";
 
-// Shared by every "Buy Transcript"/"Buy Now" entry point (transcript card,
-// transcript detail) - bypasses the cart entirely via sessionStorage.
+// Shared by every "Buy Now" entry point; bypasses the cart via sessionStorage.
 export function useBuyNow() {
   const navigate = useNavigate();
   const { openAuthDialog } = useAuthDialog();

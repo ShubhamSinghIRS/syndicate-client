@@ -10,14 +10,13 @@ export type Expert = {
 export type Transcript = {
   id: string;
   title: string;
-  domain: string;
-  tags: string[];
+  domains: string[];
   preview: string;
   price: number;
   readMinutes: number;
   date: string;
   geography: string;
-  coverageHighlights: string[];
+  keyInsights: string[];
   expert: Expert;
 };
 
@@ -33,16 +32,22 @@ export type SidebarFilterPayload = {
   publishedDate: PublishedDateFilterValue[];
 };
 
+export type PriceRange = {
+  minPrice?: number;
+  maxPrice?: number;
+};
+
 // Body payload for POST /api/transcripts/filter.
 export type TranscriptsFilterPayload = {
   page: number;
   pageSize: number;
   domains?: string[];
-  // General text search (topic, preview, domain, geography) - what the main
-  // search bar sends.
+  // General text search (topic, preview, domain, geography).
   search?: string;
-  minPrice?: number;
-  maxPrice?: number;
+  // One entry per selected price bucket, OR'd together server-side - not one
+  // min-to-max span, which would wrongly include whatever sits between two
+  // non-adjacent selected buckets (e.g. "Free" + "$170-$340").
+  priceRanges?: PriceRange[];
   publishedAfter?: string;
 };
 
@@ -53,12 +58,22 @@ export type TranscriptsApiResponse = {
   pageSize: number;
 };
 
-// GET /api/transcripts/filter-bounds - min/max price and published date
-// across active transcripts, used to size the price/date filter options
-// with real numbers instead of guessed ones.
-export type FilterBounds = {
+// GET /api/transcripts/filter-options - server-computed price filter buckets.
+export type PriceFilterOption = {
+  value: PriceFilterValue;
+  label: string;
   minPrice: number | null;
   maxPrice: number | null;
-  minPublishedAt: string | null;
-  maxPublishedAt: string | null;
+};
+
+export type PublishedDateFilterOption = {
+  value: PublishedDateFilterValue;
+  label: string;
+  // ISO cutoff from the server's clock, sent back as-is in publishedAfter.
+  after: string;
+};
+
+export type FilterOptions = {
+  priceOptions: PriceFilterOption[];
+  publishedDateOptions: PublishedDateFilterOption[];
 };

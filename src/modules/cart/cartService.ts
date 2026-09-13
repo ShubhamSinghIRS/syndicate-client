@@ -3,8 +3,7 @@ import { API_ENDPOINTS } from "../../constants/apiEndpoints";
 import { mapTranscript, type RawTranscript } from "../transcripts/transcriptsService";
 import type { CartItem } from "./types";
 
-// The backend issues the guest cart id itself (set via cookie, sent with
-// credentials: "include"), so requests don't need to carry one.
+// The backend issues the guest cart id via cookie, so requests don't carry one.
 export const fetchCart = async (): Promise<CartItem[] | null> => {
   const { items } = await RequestServer<{ items: RawTranscript[] }>(
     API_ENDPOINTS.cart,
@@ -13,23 +12,16 @@ export const fetchCart = async (): Promise<CartItem[] | null> => {
   return items.map(mapTranscript);
 };
 
-// Each mutation returns the server's authoritative cart so the UI never has
-// to guess at state - it just renders whatever the database says.
-export const syncAddCartItem = async (item: CartItem): Promise<CartItem[]> => {
-  const { items } = await RequestServer<{ items: RawTranscript[] }>(
-    `${API_ENDPOINTS.cart}/items`,
-    "POST",
-    { transcriptId: item.id },
-  );
-  return items.map(mapTranscript);
+// Backend just confirms success; frontend already updated state optimistically (see useCart.ts).
+export const syncAddCartItem = async (item: CartItem): Promise<void> => {
+  await RequestServer<null>(`${API_ENDPOINTS.cart}/items`, "POST", {
+    transcriptId: item.id,
+  });
 };
 
-export const syncRemoveCartItem = async (id: string): Promise<CartItem[]> => {
-  const { items } = await RequestServer<{ items: RawTranscript[] }>(
-    `${API_ENDPOINTS.cart}/items/${id}`,
-    "DELETE",
-  );
-  return items.map(mapTranscript);
+// Backend just confirms success; frontend updates state locally (see cartSlice).
+export const syncRemoveCartItem = async (id: string): Promise<void> => {
+  await RequestServer<null>(`${API_ENDPOINTS.cart}/items/${id}`, "DELETE");
 };
 
 export const syncClearCart = async (): Promise<CartItem[]> => {

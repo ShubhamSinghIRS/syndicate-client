@@ -17,15 +17,10 @@ type BackendOrderSummary = {
   id: string;
   transcripts?: string[];
   amount: number;
-  status: "created" | "paid" | "failed";
   createdAt: string;
 };
 
-// Builds an order's items from an already-fetched purchased-transcripts
-// lookup, rather than fetching each transcript individually - both faster
-// (no N calls per order) and more correct: myPurchased already excludes
-// items whose access was later revoked (e.g. a refund), which the order's
-// own "paid" status alone wouldn't catch.
+// Builds items from the already-fetched purchased lookup - faster, and excludes revoked access.
 const buildOrderFromPurchased = (
   order: BackendOrderSummary,
   purchasedById: Map<string, Transcript>,
@@ -48,18 +43,12 @@ export const fetchOrders = async (): Promise<Order[]> => {
   );
 
   return backendOrders
-    .filter((order) => order.status === "paid")
     .map((order) => buildOrderFromPurchased(order, purchasedById))
     .filter((order) => order.items.length > 0);
 };
 
-// Authoritative order record straight from the backend - called right after
-// a payment verifies, so the confirmation screen shows what was actually
-// recorded (amount, items) instead of whatever the client had in state.
-// Hydrates directly from the order's own transcript ids (not the purchased
-// list above) since this fires the instant a payment completes and there's
-// no batch of historic orders to cross-reference against - a bad/deleted id
-// shouldn't hide the rest of the order.
+// Authoritative order record fetched right after payment verifies, so confirmation
+// shows what was actually recorded rather than client state.
 export const fetchOrderById = async (orderId: string): Promise<Order> => {
   const backendOrder = await RequestServer<BackendOrderSummary>(
     API_ENDPOINTS.orderDetail.replace(":id", orderId),
@@ -80,9 +69,7 @@ export const fetchOrderById = async (orderId: string): Promise<Order> => {
   };
 };
 
-// idempotencyKey should be generated once per checkout attempt (see
-// Checkout.tsx) so a double-click or retried request reuses the same order
-// instead of creating a duplicate.
+// idempotencyKey is generated once per checkout attempt (see Checkout.tsx).
 export const createRazorpayOrder = async (
   payload: CreateRazorpayOrderPayload,
   idempotencyKey: string,
@@ -94,20 +81,15 @@ export const verifyRazorpayPayment = async (
 ): Promise<VerifyPaymentResponse> =>
   RequestServer(API_ENDPOINTS.orderVerify, "POST", payload);
 
-export const viewOrderReceipt = async (orderId: string): Promise<void> => {
-  // Open the tab synchronously (still inside the click's user-gesture
-  // window) and point it at the blob once it's fetched - opening a new
-  // tab only after the awaited fetch resolves gets silently blocked by
-  // popup blockers since it's no longer tied to the user gesture.
-  const receiptWindow = window.open("", "_blank");
+export const downloadOrderReceipt = async (orderId: string): Promise<void> => {
   const blob = await RequestServerBlob(
     API_ENDPOINTS.orderReceipt.replace(":id", orderId),
     "Failed to load receipt",
   );
   const url = URL.createObjectURL(blob);
-  if (receiptWindow) {
-    receiptWindow.location.href = url;
-  } else {
-    window.open(url, "_blank");
-  }
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `invoice-${orderId}.pdf`;
+  anchor.click();
+  URL.revokeObjectURL(url);
 };

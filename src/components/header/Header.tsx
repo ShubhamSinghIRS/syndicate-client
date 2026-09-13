@@ -6,7 +6,7 @@ import { useAuthDialog } from "../../modules/auth/context/AuthDialogContext";
 import AccountMenu from "./AccountMenu";
 import ThemeToggle from "../theme-toggle/ThemeToggle";
 import SearchBar from "../searchbar/SearchBar";
-import { isLoggedIn } from "../../utils/authUtils";
+import { isLoggedIn, useIsLoggedIn } from "../../utils/authUtils";
 import { getStorageItem } from "../../utils/storageUtils";
 import { useCart } from "../../modules/cart/hooks/useCart";
 
@@ -28,8 +28,10 @@ export default function Header({
   component,
 }: HeaderProps) {
   const { openAuthDialog } = useAuthDialog();
-  // Read fresh every render so auth changes elsewhere aren't shown stale.
-  const loggedIn = isLoggedIn();
+  // Reactive - re-renders the instant login state changes elsewhere (e.g.
+  // logout), rather than only reflecting it whenever this component happens
+  // to next re-render for some unrelated reason.
+  const loggedIn = useIsLoggedIn();
   const userName = getStorageItem<string>("userName");
   const { items: cartItems } = useCart();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -49,13 +51,18 @@ export default function Header({
   }, [searchParams]);
 
   return (
-    <header className="sticky top-0 z-50 bg-header-background border-b border-gray-100 dark:border-gray-800">
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 lg:flex-nowrap lg:gap-6 lg:px-6">
-        <Link to={APP_ROUTES.home} className="flex shrink-0 items-center lg:pl-4">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-white dark:bg-[#1c1f2b] border-b border-gray-100 dark:border-gray-800/60 shadow-sm">
+      <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-3 px-6 py-2 sm:px-12 lg:flex-nowrap lg:gap-6 lg:px-20">
+        <Link to={APP_ROUTES.home} className="flex shrink-0 items-center">
           <img
             src="/assets/logo_hd.png"
             alt="Infollion"
-            className="h-10 w-auto md:h-14"
+            className="h-8 w-auto dark:hidden md:h-10"
+          />
+          <img
+            src="/assets/logo_hd_dark_mode.png"
+            alt="Infollion"
+            className="hidden h-8 w-auto dark:block md:h-10"
           />
         </Link>
 
@@ -92,7 +99,7 @@ export default function Header({
               fill="none"
               stroke="currentColor"
               strokeWidth={1.5}
-              className="h-6 w-6"
+              className="h-7 w-7"
             >
               <path
                 strokeLinecap="round"
@@ -115,7 +122,7 @@ export default function Header({
               />
             </svg>
             {cartItems.length > 0 && (
-              <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-accent-2 text-[10px] font-semibold text-white">
+              <span className="absolute right-0 top-0 flex h-5 w-5 items-center justify-center rounded-full bg-accent-2 text-[11px] font-semibold text-white">
                 {cartItems.length}
               </span>
             )}

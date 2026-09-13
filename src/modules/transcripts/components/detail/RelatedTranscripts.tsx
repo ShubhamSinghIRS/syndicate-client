@@ -5,9 +5,7 @@ import { fetchSimilarTranscripts } from "../../transcriptsService";
 import type { Transcript } from "../../types";
 import ExpandLessIcon from "../../../../icons/ExpandLess/ExpandLess";
 import ExpandMoreIcon from "../../../../icons/ExpandMore/ExpandMore";
-
-const RELATED_COUNT = 10;
-const SCROLL_STEP = 160;
+import { RELATED_COUNT, SCROLL_STEP } from "../../constants";
 
 type RelatedTranscriptsProps = {
   excludeId: string;

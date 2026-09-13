@@ -6,6 +6,7 @@ import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
 import MessageIcon from "@mui/icons-material/Message";
 import ExpandMoreIcon from "../../icons/ExpandMore/ExpandMore";
 import HeadsetIcon from "../../icons/Headset/Headset";
+import ChatBubbleIcon from "../../icons/ChatBubble/ChatBubble";
 import AccessTimeIcon from "../../icons/AccessTime/AccessTime";
 import EmailOutlinedIcon from "../../icons/EmailOutlined/EmailOutlined";
 import { COLORS } from "../../constants/colors";
@@ -153,7 +154,7 @@ export default function FloatingSupport() {
           {isOpen ? (
             <CloseIcon sx={{ fontSize: 26, color: COLORS.mainBackground }} />
           ) : (
-            <HeadsetIcon sx={{ fontSize: 28, color: COLORS.mainBackground }} />
+            <ChatBubbleIcon sx={{ fontSize: 28, color: COLORS.mainBackground }} />
           )}
         </button>
       </div>

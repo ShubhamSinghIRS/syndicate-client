@@ -40,8 +40,15 @@ export type AuthResponse = {
     email: string;
     companyName?: string | null;
   };
+  // Seconds until the access token (httpOnly cookie) expires; used to schedule a refresh.
+  accessTokenExpiresIn: number;
 };
 
 export type PendingAuthResponse = {
   tempToken: string;
+};
+
+export type PasswordRequirement = {
+  label: string;
+  test: (value: string) => boolean;
 };

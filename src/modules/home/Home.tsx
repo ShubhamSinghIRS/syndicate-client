@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useThemeMode } from "../../context/ThemeModeContext";
 import Button from "../../components/button/Button";
 import SearchBar from "../../components/searchbar/SearchBar";
 import Header from "../../components/header/Header";
@@ -20,11 +19,6 @@ export default function Home() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const requestTopicDialog = useFormCloseWarning();
-  const { mode } = useThemeMode();
-  const heroImageSrc =
-    mode === "dark"
-      ? "/assets/bg_image_side_dark_mod.png"
-      : "/assets/bg_image_side_light_mod.png";
 
   const handleSearch = (text: string) => {
     if (!text.trim()) return;
@@ -32,22 +26,21 @@ export default function Home() {
   };
 
   return (
-    <div
-      className={`${styles.heroBackground} bg-main-background min-h-screen flex flex-col`}
-    >
+    <div className="bg-main-background min-h-screen flex flex-col">
       <Header />
 
-      <div className="flex-1">
-        <div className={`${styles.fullBleedRow} flex flex-col md:flex-row items-center gap-10 py-12 md:py-16 relative`}>
+      {/* Hero main section - full viewport height */}
+      <section className={`${styles.heroBackground} min-h-screen flex flex-col justify-center pt-16 pb-12 md:pt-20 md:pb-16 relative overflow-hidden`}>
+        <div className="mx-auto flex w-full max-w-[1440px] flex-col md:flex-row items-center justify-between gap-10 px-6 sm:px-12 lg:px-20 relative z-10">
           {/* Hero copy */}
-          <div className={`${styles.heroTextCol} flex-1 flex flex-col gap-6 text-left`}>
+          <div className="flex-1 flex flex-col gap-6 text-left">
             <div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
                 <span className="text-text-primary">Real Expertise. </span>
                 <br />
                 <span className="text-accent-2">Verified and Ready.</span>
               </h1>
-              <p className="mt-6 text-lg text-text-secondary leading-relaxed max-w-xl">
+              <p className="mt-6 text-lg text-text-secondary leading-relaxed max-w-xl font-medium">
                Every transcript comes from a real expert sharing their expertise on a topic the market is actively asking about. Search, filter, and get straight to the insight you need.
               </p>
             </div>
@@ -90,32 +83,33 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Hero visual - bleeds to the viewport's right edge; no crop, no
-              card border, edges dissolve via the mask in heroImage. */}
-          <div className="hidden md:block flex-[1.15] w-full pr-6 md:pr-0">
+          {/* Hero visual - right side image */}
+          <div className="hidden md:block flex-[1.15] w-full">
             <img
-              src={heroImageSrc}
+              src="/assets/bg5.png"
               alt="Expert sharing insights on a video call"
-              className={`${styles.heroImage} w-full h-auto max-h-[480px] object-contain`}
+              draggable={false}
+              className={`${styles.heroImage} w-full h-auto max-h-[500px] object-contain`}
             />
           </div>
         </div>
+      </section>
 
-        {/* Features section (three separate cards) */}
-        <div className="mx-auto mt-8 max-w-[1440px] px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {FEATURE_CARDS.slice(0, 3).map((card) => (
-              <FeatureCard key={card.title} {...card} />
-            ))}
-          </div>
+      {/* Features section (three separate cards) */}
+      <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-12 lg:px-20 pt-16 pb-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {FEATURE_CARDS.slice(0, 3).map((card) => (
+            <FeatureCard key={card.title} {...card} />
+          ))}
         </div>
-
-        <div className="mx-auto max-w-[1440px] px-6 pb-32 pt-40 md:pb-40">
-          <ForExperts />
-        </div>
-
-        <FaqSection />
       </div>
+
+      {/* For Experts section */}
+      <div className="mx-auto max-w-[1440px] px-6 sm:px-12 lg:px-20 pb-32 pt-16 md:pb-40">
+        <ForExperts />
+      </div>
+
+      <FaqSection />
 
       <Footer style={{ backgroundColor: "transparent", borderTop: "none" }} />
 

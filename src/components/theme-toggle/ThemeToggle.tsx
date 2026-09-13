@@ -18,7 +18,7 @@ export default function ThemeToggle() {
           fill="none"
           stroke="currentColor"
           strokeWidth={1.5}
-          className="h-5 w-5"
+          className="h-6 w-6"
         >
           <path
             strokeLinecap="round"
@@ -33,7 +33,7 @@ export default function ThemeToggle() {
           fill="none"
           stroke="currentColor"
           strokeWidth={1.5}
-          className="h-5 w-5"
+          className="h-6 w-6"
         >
           <path
             strokeLinecap="round"

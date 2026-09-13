@@ -23,7 +23,7 @@ export default function OrderCard({ order }: OrderCardProps) {
               >
                 {item.title}
               </Link>
-              <p className="text-xs text-text-secondary">{item.domain}</p>
+              <p className="text-xs text-text-secondary">{item.domains.join(", ")}</p>
             </div>
             <div className="flex shrink-0 items-center gap-3">
               <span className="text-sm text-text-secondary">${item.price}</span>

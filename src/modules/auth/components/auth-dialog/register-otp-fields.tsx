@@ -4,6 +4,7 @@ import { HookTextField } from "../../../../components/form-fields/SLFieldTextFie
 import Button from "../../../../components/button/Button";
 import { useHookFormContext } from "../../../../utils/hooks/useHookFormContext";
 import { commonInputStyles } from "../../../../common/input-styles";
+import { OTP_RESEND_SECONDS } from "../../constants";
 import type { RegisterOtpFormValues } from "../../types";
 
 type RegisterOtpFieldsProps = {
@@ -13,8 +14,6 @@ type RegisterOtpFieldsProps = {
   submitLabel?: string;
 };
 
-const RESEND_SECONDS = 60;
-
 export default function RegisterOtpFields({
   email,
   onResend,
@@ -22,7 +21,7 @@ export default function RegisterOtpFields({
   submitLabel = "Verify",
 }: RegisterOtpFieldsProps) {
   const { registerState } = useHookFormContext<RegisterOtpFormValues>();
-  const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
+  const [secondsLeft, setSecondsLeft] = useState(OTP_RESEND_SECONDS);
 
   useEffect(() => {
     if (secondsLeft <= 0) return;
@@ -33,7 +32,7 @@ export default function RegisterOtpFields({
   }, [secondsLeft]);
 
   const handleResend = () => {
-    setSecondsLeft(RESEND_SECONDS);
+    setSecondsLeft(OTP_RESEND_SECONDS);
     onResend();
   };
 

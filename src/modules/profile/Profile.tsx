@@ -25,6 +25,8 @@ export default function Profile() {
   const { userName, email, companyName } = useCurrentUser();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [topicRequests, setTopicRequests] = useState<TopicRequestItem[]>([]);
+  const [isOrdersLoading, setIsOrdersLoading] = useState(true);
+  const [isTopicRequestsLoading, setIsTopicRequestsLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const sectionParam = searchParams.get("section");
   const [activeTab, setActiveTab] = useState<ProfileTab>(
@@ -34,13 +36,16 @@ export default function Profile() {
   );
 
   useEffect(() => {
-    loadOrders().catch((err) => console.error("Failed to load orders:", err));
+    loadOrders()
+      .catch((err) => console.error("Failed to load orders:", err))
+      .finally(() => setIsOrdersLoading(false));
     fetchProfile()
       .then(setProfile)
       .catch((err) => console.error("Failed to load profile:", err));
     fetchMyTopicRequests(1, 50, "")
       .then((page) => setTopicRequests(page.items))
-      .catch((err) => console.error("Failed to load topic requests:", err));
+      .catch((err) => console.error("Failed to load topic requests:", err))
+      .finally(() => setIsTopicRequestsLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -60,10 +65,17 @@ export default function Profile() {
                   companyName={profile?.companyName ?? companyName}
                 />
               )}
-              {activeTab === "purchases" && <PurchaseHistory orders={orders} />}
-              {activeTab === "invoice" && <InvoiceList orders={orders} />}
+              {activeTab === "purchases" && (
+                <PurchaseHistory orders={orders} isLoading={isOrdersLoading} />
+              )}
+              {activeTab === "invoice" && (
+                <InvoiceList orders={orders} isLoading={isOrdersLoading} />
+              )}
               {activeTab === "requestedTopics" && (
-                <RequestedTopics items={topicRequests} />
+                <RequestedTopics
+                  items={topicRequests}
+                  isLoading={isTopicRequestsLoading}
+                />
               )}
             </div>
           </div>

@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
-import CircularProgress from "@mui/material/CircularProgress";
 import Button from "../../../../components/button/Button";
 import SearchBar from "../../../../components/searchbar/SearchBar";
 import EmailOutlinedIcon from "../../../../icons/EmailOutlined/EmailOutlined";
-import { isLoggedIn } from "../../../../utils/authUtils";
-import { formatDate } from "../../../../utils/dateUtils";
+import { useIsLoggedIn } from "../../../../utils/authUtils";
 import { useAuthDialog } from "../../../auth/context/AuthDialogContext";
-import {
-  fetchMyTopicRequests,
-  TOPIC_REQUEST_STATUS_DISPLAY,
-} from "./myRequestsService";
+import { fetchMyTopicRequests } from "./myRequestsService";
 import type { TopicRequestItem } from "./myRequestsService";
+import TopicRequestDetailsDialog from "./TopicRequestDetailsDialog";
+import TopicRequestCardSkeleton from "./TopicRequestCardSkeleton";
+import TopicRequestCard from "./TopicRequestCard";
 
 type MyRequestsTabProps = {
   onSwitchToRequestTab: () => void;
@@ -20,11 +18,17 @@ export default function MyRequestsTab({
   onSwitchToRequestTab,
 }: MyRequestsTabProps) {
   const { openAuthDialog } = useAuthDialog();
-  const [loggedIn, setLoggedIn] = useState(isLoggedIn());
+  // Reactive - was previously local state only ever set true (on login
+  // success), never back to false on logout, so this tab kept showing the
+  // logged-in view if the user signed out while it was still mounted.
+  const loggedIn = useIsLoggedIn();
   const [search, setSearch] = useState("");
   const [items, setItems] = useState<TopicRequestItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<TopicRequestItem | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!loggedIn) return;
@@ -63,16 +67,12 @@ export default function MyRequestsTab({
           <Button
             variant="contained"
             label="Login"
-            onClick={() =>
-              openAuthDialog("signin", () => setLoggedIn(true))
-            }
+            onClick={() => openAuthDialog("signin")}
           />
           <Button
             variant="outlined"
             label="Sign up"
-            onClick={() =>
-              openAuthDialog("register", () => setLoggedIn(true))
-            }
+            onClick={() => openAuthDialog("register")}
           />
         </div>
         <div className="mt-4 flex w-full items-center gap-3">
@@ -106,8 +106,10 @@ export default function MyRequestsTab({
       />
 
       {isLoading && (
-        <div className="flex justify-center py-8">
-          <CircularProgress size={22} />
+        <div className="flex flex-col gap-3">
+          <TopicRequestCardSkeleton />
+          <TopicRequestCardSkeleton />
+          <TopicRequestCardSkeleton />
         </div>
       )}
 
@@ -125,37 +127,18 @@ export default function MyRequestsTab({
 
       {!isLoading &&
         !error &&
-        items.map((item) => {
-          const statusDisplay = TOPIC_REQUEST_STATUS_DISPLAY[item.status];
-          return (
-            <div
-              key={item.id}
-              className="rounded-xl border border-gray-200 dark:border-gray-800 bg-section-background p-4"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <h4
-                  className="line-clamp-2 min-w-0 break-words font-semibold text-text-primary"
-                  title={item.topic}
-                >
-                  {item.topic}
-                </h4>
-                <div className="flex items-center gap-2 shrink-0">
-                  <span
-                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusDisplay.className}`}
-                  >
-                    {statusDisplay.label}
-                  </span>
-                </div>
-              </div>
-              <p className="mt-1 line-clamp-1 break-words text-sm text-text-secondary">
-                {item.domains.join(", ")}
-              </p>
-              <p className="mt-2 text-xs text-text-secondary">
-                Requested on {formatDate(item.createdAt)}
-              </p>
-            </div>
-          );
-        })}
+        items.map((item) => (
+          <TopicRequestCard
+            key={item.id}
+            item={item}
+            onClick={() => setSelectedItem(item)}
+          />
+        ))}
+
+      <TopicRequestDetailsDialog
+        item={selectedItem}
+        handleClose={() => setSelectedItem(null)}
+      />
     </div>
   );
 }

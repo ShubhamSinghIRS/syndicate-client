@@ -9,7 +9,7 @@ import Fields from "./fields";
 import type { RequestTopicFormValues } from "./types";
 import { API_ENDPOINTS } from "../../../../constants/apiEndpoints";
 import { RequestServer } from "../../../../utils/services";
-import { isLoggedIn } from "../../../../utils/authUtils";
+import { useIsLoggedIn } from "../../../../utils/authUtils";
 import { useCurrentUser } from "../../../profile/hooks/useCurrentUser";
 
 type RequestTopicFormProps = {
@@ -40,8 +40,8 @@ export default function RequestTopicForm({
   );
   const { setLoading } = useContext(LoadingContext);
   const { enqueueSnackbar } = useSnackbar();
-  const { userId, email: currentUserEmail } = useCurrentUser();
-  const loggedIn = isLoggedIn();
+  const { userId, userName, email: currentUserEmail } = useCurrentUser();
+  const loggedIn = useIsLoggedIn();
 
   useEffect(() => {
     onDirtyChange(isDirty);
@@ -50,22 +50,35 @@ export default function RequestTopicForm({
   const onSubmit = async (data: RequestTopicFormValues) => {
     setLoading(true);
     try {
-      // Backend's topic_requests table only has one
-      // suggestedExpertName/suggestedExpertLinkedin pair, so multiple
-      // experts are joined before submission (domain is a real array column).
+      // Backend only has one expert name/linkedin pair, so multiple experts are joined.
       const experts = data.suggestedExperts.filter(
         (expert) => expert.name || expert.linkedin,
       );
+      const suggestedExpertName = experts
+        .map((expert) => expert.name)
+        .join("; ");
+      const suggestedExpertLinkedin = experts
+        .map((expert) => expert.linkedin)
+        .join("; ");
+      // Each entry is capped in fields.tsx, but check the joined length too (cap: 200/500).
+      if (
+        suggestedExpertName.length > 200 ||
+        suggestedExpertLinkedin.length > 500
+      ) {
+        const message =
+          "Suggested expert details are too long combined. Please shorten the names or LinkedIn entries, or remove one.";
+        methods.setError("root", { message });
+        enqueueSnackbar(message, { variant: "error" });
+        return;
+      }
       await RequestServer(API_ENDPOINTS.topicsRequest, "POST", {
         ...data,
-        // Logged-in users don't see the email field at all - use their
-        // account email instead of whatever's left in the form default.
+        // Logged-in users don't see the email field; use their account email instead.
         email: loggedIn ? (currentUserEmail ?? data.email) : data.email,
-        suggestedExpertName: experts.map((expert) => expert.name).join("; "),
-        suggestedExpertLinkedin: experts
-          .map((expert) => expert.linkedin)
-          .join("; "),
+        suggestedExpertName,
+        suggestedExpertLinkedin,
         ...(loggedIn && userId ? { user_id: userId } : {}),
+        ...(loggedIn && userName ? { user_name: userName } : {}),
       });
       enqueueSnackbar("Your topic request has been submitted.", {
         variant: "success",

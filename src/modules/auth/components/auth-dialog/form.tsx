@@ -5,7 +5,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { getDefaultFormTheme } from "../../../../common/defaultFormTheme";
 import { useThemeMode } from "../../../../context/ThemeModeContext";
 import { LoadingContext } from "../../../../components/loading/context";
-import { ApiError } from "../../../../utils/services";
+import { ApiError, scheduleTokenRefresh } from "../../../../utils/services";
 import {
   signIn,
   register as registerUser,
@@ -15,17 +15,25 @@ import {
   verifyRegistrationOtp,
   resendRegistrationOtp,
 } from "../../authService";
-import { processToken } from "../../../../utils/authUtils";
+import { persistUserSession } from "../../../../utils/authUtils";
 import { useCart } from "../../../cart/hooks/useCart";
 import SignInFields from "./sign-in-fields";
 import RegisterFields from "./register-fields";
 import RegisterOtpFields from "./register-otp-fields";
 import ForgotPasswordFields from "./forgot-password-fields";
 import LoginOtpFields from "./login-otp-fields";
+import {
+  FORGOT_PASSWORD_DEFAULT_VALUES,
+  LOGIN_OTP_DEFAULT_VALUES,
+  REGISTER_DEFAULT_VALUES,
+  REGISTER_OTP_DEFAULT_VALUES,
+  SIGN_IN_DEFAULT_VALUES,
+} from "../../constants";
 import type {
   AuthDialogMode,
   ForgotPasswordFormValues,
   LoginOtpFormValues,
+  PendingAuthResponse,
   RegisterFormValues,
   RegisterOtpFormValues,
   SignInFormValues,
@@ -38,22 +46,6 @@ type AuthFormProps = {
   onDirtyChange: (isDirty: boolean) => void;
 };
 
-const signInDefaultValues: SignInFormValues = { workEmail: "", password: "" };
-const registerDefaultValues: RegisterFormValues = {
-  fullName: "",
-  workEmail: "",
-  companyName: "",
-  password: "",
-};
-const forgotPasswordDefaultValues: ForgotPasswordFormValues = { email: "" };
-const registerOtpDefaultValues: RegisterOtpFormValues = { otp: "" };
-const loginOtpDefaultValues: LoginOtpFormValues = { email: "" };
-
-// The backend's 403 "email not verified" response carries a pending
-// verification token in error.data - this is what lets sign-in resume the
-// same OTP flow used at signup.
-type PendingVerificationErrorData = { tempToken: string };
-
 export default function AuthForm({
   mode,
   setMode,
@@ -61,25 +53,25 @@ export default function AuthForm({
   onDirtyChange,
 }: AuthFormProps) {
   const signInMethods = useForm<SignInFormValues>({
-    defaultValues: signInDefaultValues,
+    defaultValues: SIGN_IN_DEFAULT_VALUES,
   });
   const registerMethods = useForm<RegisterFormValues>({
-    defaultValues: registerDefaultValues,
+    defaultValues: REGISTER_DEFAULT_VALUES,
   });
   const forgotPasswordMethods = useForm<ForgotPasswordFormValues>({
-    defaultValues: forgotPasswordDefaultValues,
+    defaultValues: FORGOT_PASSWORD_DEFAULT_VALUES,
   });
   const registerOtpMethods = useForm<RegisterOtpFormValues>({
-    defaultValues: registerOtpDefaultValues,
+    defaultValues: REGISTER_OTP_DEFAULT_VALUES,
   });
   const signInOtpMethods = useForm<RegisterOtpFormValues>({
-    defaultValues: registerOtpDefaultValues,
+    defaultValues: REGISTER_OTP_DEFAULT_VALUES,
   });
   const loginOtpEmailMethods = useForm<LoginOtpFormValues>({
-    defaultValues: loginOtpDefaultValues,
+    defaultValues: LOGIN_OTP_DEFAULT_VALUES,
   });
   const loginOtpOtpMethods = useForm<RegisterOtpFormValues>({
-    defaultValues: registerOtpDefaultValues,
+    defaultValues: REGISTER_OTP_DEFAULT_VALUES,
   });
   const { mode: themeMode } = useThemeMode();
   const defaultTheme = useMemo(
@@ -90,8 +82,7 @@ export default function AuthForm({
   const { setLoading } = useContext(LoadingContext);
   const { enqueueSnackbar } = useSnackbar();
 
-  // Sign-up is two steps: store the full record + send OTP (returns a
-  // pending token), then verify the OTP using that token.
+  // Sign-up is two steps: submit details (returns pending token), then verify OTP.
   const [registerStep, setRegisterStep] = useState<"details" | "otp">(
     "details",
   );
@@ -101,17 +92,14 @@ export default function AuthForm({
   >(null);
   const [isResetLinkSent, setIsResetLinkSent] = useState(false);
 
-  // If sign-in is rejected because the account was never verified, we drop
-  // into the same OTP-entry step rather than a separate mode, using the
-  // pending token the login response handed back.
+  // Unverified sign-in drops into the same OTP-entry step, using the returned pending token.
   const [needsEmailVerification, setNeedsEmailVerification] = useState(false);
   const [pendingSignInEmail, setPendingSignInEmail] = useState("");
   const [signInPendingToken, setSignInPendingToken] = useState<string | null>(
     null,
   );
 
-  // Login-with-OTP is two steps: send an OTP to the email (returns a
-  // pending token), then verify it - mirrors the registration OTP flow.
+  // Login-with-OTP mirrors the registration OTP flow: send, then verify.
   const [loginOtpStep, setLoginOtpStep] = useState<"email" | "otp">("email");
   const [pendingLoginOtpEmail, setPendingLoginOtpEmail] = useState("");
   const [loginOtpPendingToken, setLoginOtpPendingToken] = useState<
@@ -124,30 +112,29 @@ export default function AuthForm({
       setRegisterStep("details");
       setPendingRegisterEmail("");
       setRegisterPendingToken(null);
-      registerOtpMethods.reset(registerOtpDefaultValues);
+      registerOtpMethods.reset(REGISTER_OTP_DEFAULT_VALUES);
     }
     if (mode !== "signin") {
       setNeedsEmailVerification(false);
       setPendingSignInEmail("");
       setSignInPendingToken(null);
-      signInOtpMethods.reset(registerOtpDefaultValues);
+      signInOtpMethods.reset(REGISTER_OTP_DEFAULT_VALUES);
     }
     if (mode !== "forgot-password") {
       setIsResetLinkSent(false);
-      forgotPasswordMethods.reset(forgotPasswordDefaultValues);
+      forgotPasswordMethods.reset(FORGOT_PASSWORD_DEFAULT_VALUES);
     }
     if (mode !== "otp-login") {
       setLoginOtpStep("email");
       setPendingLoginOtpEmail("");
       setLoginOtpPendingToken(null);
-      loginOtpEmailMethods.reset(loginOtpDefaultValues);
-      loginOtpOtpMethods.reset(registerOtpDefaultValues);
+      loginOtpEmailMethods.reset(LOGIN_OTP_DEFAULT_VALUES);
+      loginOtpOtpMethods.reset(REGISTER_OTP_DEFAULT_VALUES);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
-  // Only the form currently on screen can hold unsaved input worth warning
-  // about - figure out which one that is, mirroring the render logic below.
+  // Determine which visible form's dirty state to report, mirroring the render logic below.
   const activeIsDirty = (() => {
     if (mode === "signin") {
       return needsEmailVerification && signInPendingToken
@@ -175,13 +162,14 @@ export default function AuthForm({
     setLoading(true);
     try {
       const response = await signIn(data);
-      processToken(response.user);
+      persistUserSession(response.user);
+      scheduleTokenRefresh(response.accessTokenExpiresIn);
       await mergeGuestCartAfterAuth();
       enqueueSnackbar("Signed in successfully.", { variant: "success" });
       handleSubmitClose();
     } catch (error) {
       if (error instanceof ApiError && error.status === 403) {
-        const pendingToken = (error.data as PendingVerificationErrorData | undefined)
+        const pendingToken = (error.data as PendingAuthResponse | undefined)
           ?.tempToken;
         if (pendingToken) {
           setPendingSignInEmail(data.workEmail);
@@ -207,7 +195,8 @@ export default function AuthForm({
     setLoading(true);
     try {
       const response = await verifyRegistrationOtp(signInPendingToken, otp);
-      processToken(response.user);
+      persistUserSession(response.user);
+      scheduleTokenRefresh(response.accessTokenExpiresIn);
       await mergeGuestCartAfterAuth();
       enqueueSnackbar("Signed in successfully.", { variant: "success" });
       handleSubmitClose();
@@ -230,7 +219,8 @@ export default function AuthForm({
       enqueueSnackbar("OTP sent to your email.", { variant: "success" });
     } catch (error) {
       const message = (error as Error).message;
-      registerMethods.setError("workEmail", { message });
+      const field = /password/i.test(message) ? "password" : "workEmail";
+      registerMethods.setError(field, { message });
       enqueueSnackbar(message, { variant: "error" });
     } finally {
       setLoading(false);
@@ -243,7 +233,8 @@ export default function AuthForm({
     setLoading(true);
     try {
       const response = await verifyRegistrationOtp(registerPendingToken, otp);
-      processToken(response.user);
+      persistUserSession(response.user);
+      scheduleTokenRefresh(response.accessTokenExpiresIn);
       await mergeGuestCartAfterAuth();
       enqueueSnackbar("Registration successful.", { variant: "success" });
       handleSubmitClose();
@@ -296,7 +287,8 @@ export default function AuthForm({
     setLoading(true);
     try {
       const response = await verifyLoginOtp(loginOtpPendingToken, otp);
-      processToken(response.user);
+      persistUserSession(response.user);
+      scheduleTokenRefresh(response.accessTokenExpiresIn);
       await mergeGuestCartAfterAuth();
       enqueueSnackbar("Signed in successfully.", { variant: "success" });
       handleSubmitClose();
@@ -407,7 +399,7 @@ export default function AuthForm({
             >
               <RegisterOtpFields
                 email={pendingLoginOtpEmail}
-                submitLabel="Verify & Login"
+                submitLabel="Verify"
                 onResend={() => {
                   sendLoginOtp(pendingLoginOtpEmail)
                     .then((response) => {

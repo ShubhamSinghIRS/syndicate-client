@@ -9,8 +9,19 @@ import DescriptionIcon from "../../../../icons/Description/Description";
 import EmailOutlinedIcon from "../../../../icons/EmailOutlined/EmailOutlined";
 import { APP_ROUTES } from "../../../../constants/appRoutes";
 import { COLORS } from "../../../../constants/colors";
-import { viewOrderReceipt } from "../../../orders/ordersService";
+import { downloadOrderReceipt } from "../../../orders/ordersService";
 import { smallActionButtonStyle } from "../../Checkout.styles";
+import {
+  AMOUNT_PAID_LABEL,
+  CURRENCY_CODE,
+  DATE_LABEL,
+  DOWNLOAD_RECEIPT_LABEL,
+  ORDER_CONFIRMED_HEADING,
+  ORDER_DATE_LOCALE,
+  RECEIPT_EMAILED_MESSAGE,
+  VIEW_MY_PURCHASE_LABEL,
+  VIEW_TRANSCRIPT_LABEL,
+} from "../../constants";
 import type { Order } from "../../../orders/types";
 
 type OrderConfirmationProps = {
@@ -18,7 +29,7 @@ type OrderConfirmationProps = {
 };
 
 export default function OrderConfirmation({ order }: OrderConfirmationProps) {
-  const orderDate = new Date(order.createdAt).toLocaleDateString("en-US", {
+  const orderDate = new Date(order.createdAt).toLocaleDateString(ORDER_DATE_LOCALE, {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -37,7 +48,7 @@ export default function OrderConfirmation({ order }: OrderConfirmationProps) {
           </div>
 
           <h1 className="mt-4 text-3xl font-bold text-text-primary">
-            Purchase Confirmed
+            {ORDER_CONFIRMED_HEADING}
           </h1>
           <p className="mt-2 text-text-secondary">
             Order #{order.id} · {orderDate}
@@ -59,7 +70,7 @@ export default function OrderConfirmation({ order }: OrderConfirmationProps) {
                     </p>
                     <p className="mt-1 flex items-center gap-1 text-sm text-text-secondary">
                       <CalendarTodayIcon fontSize="inherit" />
-                      <span className="font-medium">Date</span>
+                      <span className="font-medium">{DATE_LABEL}</span>
                       <span>{item.date}</span>
                     </p>
                   </div>
@@ -67,10 +78,10 @@ export default function OrderConfirmation({ order }: OrderConfirmationProps) {
 
                 <div className="mt-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-800 pt-4">
                   <span className="font-semibold text-text-primary">
-                    Amount Paid
+                    {AMOUNT_PAID_LABEL}
                   </span>
                   <span className="text-lg font-bold text-text-primary">
-                    USD ${item.price}
+                    {CURRENCY_CODE} ${item.price}
                   </span>
                 </div>
 
@@ -79,24 +90,24 @@ export default function OrderConfirmation({ order }: OrderConfirmationProps) {
                     <EmailOutlinedIcon fontSize="small" />
                   </div>
                   <p className="text-sm text-text-primary">
-                    A receipt has been sent to your email.
+                    {RECEIPT_EMAILED_MESSAGE}
                   </p>
                 </div>
 
                 <div className="mt-4 flex flex-wrap justify-center gap-3 border-t border-gray-200 dark:border-gray-800 pt-4">
                   <DownloadButton
-                    label="View Receipt"
+                    label={DOWNLOAD_RECEIPT_LABEL}
                     styles={smallActionButtonStyle}
                     onClick={() =>
-                      viewOrderReceipt(order.id).catch((err) =>
-                        console.error("Failed to load receipt:", err),
+                      downloadOrderReceipt(order.id).catch((err) =>
+                        console.error("Failed to download receipt:", err),
                       )
                     }
                   />
                   <Link to={APP_ROUTES.transcriptDetail.replace(":id", item.id)}>
                     <Button
                       variant="outlined"
-                      label="View Transcript"
+                      label={VIEW_TRANSCRIPT_LABEL}
                       startIcon={<DescriptionIcon fontSize="small" />}
                       styles={smallActionButtonStyle}
                     />
@@ -108,7 +119,7 @@ export default function OrderConfirmation({ order }: OrderConfirmationProps) {
 
           <div className="mt-8">
             <Link to={`${APP_ROUTES.profile}?section=purchases`}>
-              <Button variant="contained" label="View My Purchase" />
+              <Button variant="contained" label={VIEW_MY_PURCHASE_LABEL} />
             </Link>
           </div>
         </div>

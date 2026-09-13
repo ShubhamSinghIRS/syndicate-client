@@ -15,7 +15,7 @@ const downloadBlob = (blob: Blob, fileName: string) => {
 };
 
 export const useDownloadTranscript = (
-  transcript: Pick<Transcript, "id" | "title" | "domain" | "preview">,
+  transcript: Pick<Transcript, "id" | "title" | "domains" | "preview">,
 ) => {
   const handleDownload = async () => {
     const blob = await RequestServerBlob(

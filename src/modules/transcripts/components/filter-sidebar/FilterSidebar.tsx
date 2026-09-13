@@ -2,12 +2,11 @@ import Switch from "@mui/material/Switch";
 import CustomCheckbox from "../../../../components/checkbox/CustomCheckbox";
 import FilterSection from "./FilterSection";
 import DomainAutocomplete from "./DomainAutocomplete";
-import { isLoggedIn } from "../../../../utils/authUtils";
-import { DEFAULT_SIDEBAR_FILTERS, PUBLISHED_DATE_OPTIONS } from "./constants";
-import { buildPriceOptions } from "../../transcriptsService";
+import { useIsLoggedIn } from "../../../../utils/authUtils";
+import { DEFAULT_SIDEBAR_FILTERS } from "./constants";
 import { purchasedOnlySwitchSx } from "./filter-sidebar.styles";
 import type {
-  FilterBounds,
+  FilterOptions,
   PriceFilterValue,
   PublishedDateFilterValue,
   SidebarFilterPayload,
@@ -24,7 +23,7 @@ type FilterSidebarProps = {
   setFilters: (filters: SidebarFilterPayload) => void;
   purchasedOnly: boolean;
   setPurchasedOnly: (purchasedOnly: boolean) => void;
-  bounds: FilterBounds | null;
+  options: FilterOptions | null;
 };
 
 export default function FilterSidebar({
@@ -32,9 +31,11 @@ export default function FilterSidebar({
   setFilters,
   purchasedOnly,
   setPurchasedOnly,
-  bounds,
+  options,
 }: FilterSidebarProps) {
-  const priceOptions = buildPriceOptions(bounds);
+  const priceOptions = options?.priceOptions ?? [];
+  const publishedDateOptions = options?.publishedDateOptions ?? [];
+  const loggedIn = useIsLoggedIn();
   return (
     <div className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-6 lg:w-80 lg:shrink-0">
       <div className="flex items-center justify-between">
@@ -48,7 +49,7 @@ export default function FilterSidebar({
         </button>
       </div>
 
-      {isLoggedIn() && (
+      {loggedIn && (
         <div className="mt-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-4">
           <span className="text-sm font-medium text-text-primary">
             Purchased only
@@ -91,7 +92,7 @@ export default function FilterSidebar({
 
       <FilterSection title="Published date">
         <div className="flex flex-col">
-          {PUBLISHED_DATE_OPTIONS.map((option) => (
+          {publishedDateOptions.map((option) => (
             <CustomCheckbox
               key={option.value}
               label={option.label}

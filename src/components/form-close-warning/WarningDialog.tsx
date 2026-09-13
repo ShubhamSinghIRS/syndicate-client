@@ -30,6 +30,9 @@ const WarningDialog = (props: Props) => {
       aria-labelledby="alert-dialog-title"
       maxWidth="xs"
       fullWidth
+      PaperProps={{
+        sx: { borderRadius: "16px", maxWidth: "360px" },
+      }}
     >
       <DialogTitle
         id="alert-dialog-title"
