@@ -137,7 +137,7 @@ export default function TranscriptsList() {
       />
 
       <div className="flex-1">
-        <div className="mx-auto max-w-[1400px] px-6 py-10">
+        <div className="mx-auto max-w-[1440px] px-6 sm:px-12 lg:px-20 pt-20 pb-10">
           <div className="flex flex-col gap-8 lg:flex-row">
             <div className="hidden lg:block">
               <FilterSidebar

@@ -51,13 +51,18 @@ export default function Header({
   }, [searchParams]);
 
   return (
-    <header className="sticky top-0 z-50 bg-header-background border-b border-gray-100 dark:border-gray-800">
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 lg:flex-nowrap lg:gap-6 lg:px-6">
-        <Link to={APP_ROUTES.home} className="flex shrink-0 items-center pl-4 lg:pl-24">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-white dark:bg-[#1c1f2b] border-b border-gray-100 dark:border-gray-800/60 shadow-sm">
+      <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-3 px-6 py-2 sm:px-12 lg:flex-nowrap lg:gap-6 lg:px-20">
+        <Link to={APP_ROUTES.home} className="flex shrink-0 items-center">
           <img
             src="/assets/logo_hd.png"
             alt="Infollion"
-            className="h-12 w-auto md:h-18"
+            className="h-8 w-auto dark:hidden md:h-10"
+          />
+          <img
+            src="/assets/logo_hd_dark_mode.png"
+            alt="Infollion"
+            className="hidden h-8 w-auto dark:block md:h-10"
           />
         </Link>
 

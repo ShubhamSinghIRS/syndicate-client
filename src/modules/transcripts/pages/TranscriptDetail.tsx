@@ -89,7 +89,7 @@ export default function TranscriptDetail() {
     <div className="flex min-h-screen flex-col">
       <Header />
       <div className="flex-1">
-        <div className="mx-auto max-w-[1400px] px-6 py-10">
+        <div className="mx-auto max-w-[1440px] px-6 sm:px-12 lg:px-20 pt-20 pb-10">
           <DetailHeader transcript={transcript} />
 
           <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-12">

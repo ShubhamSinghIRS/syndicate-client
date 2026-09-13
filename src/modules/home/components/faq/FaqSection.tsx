@@ -7,7 +7,7 @@ export default function FaqSection() {
 
   return (
     <div id="faq" className="w-full bg-[#FAF7F2] dark:bg-layout-background py-16 md:py-20">
-      <div className="mx-auto max-w-[1440px] px-6">
+      <div className="mx-auto max-w-[1440px] px-6 sm:px-12 lg:px-20">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-[#23211F] dark:text-text-primary sm:text-4xl tracking-tight">
             Frequently asked questions

@@ -28,7 +28,7 @@ export default function Footer({ style }: FooterProps) {
       style={style}
     >
       {/* Upper Footer: Multi-column Links */}
-      <div className="mx-auto max-w-[1400px] px-6 pt-16 pb-12">
+      <div className="mx-auto max-w-[1440px] px-6 sm:px-12 lg:px-20 pt-16 pb-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Column 1: Brand Info */}
           <div className="flex flex-col gap-4">
@@ -36,7 +36,12 @@ export default function Footer({ style }: FooterProps) {
               <img
                 src="/assets/logo_hd.png"
                 alt="Infollion"
-                className="h-10 w-auto animate-fade-in"
+                className="h-10 w-auto animate-fade-in dark:hidden"
+              />
+              <img
+                src="/assets/logo_hd_dark_mode.png"
+                alt="Infollion"
+                className="hidden h-10 w-auto animate-fade-in dark:block"
               />
             </Link>
             <p className="text-base text-text-secondary leading-relaxed max-w-xs">
@@ -136,7 +141,7 @@ export default function Footer({ style }: FooterProps) {
 
       {/* Bottom Footer: Copyright bar */}
       <div className="border-t border-[#E9E4DC] dark:border-gray-800">
-        <div className="mx-auto max-w-[1400px] px-6 py-5 flex flex-col sm:flex-row items-center justify-between text-xs text-text-secondary gap-4">
+        <div className="mx-auto max-w-[1440px] px-6 sm:px-12 lg:px-20 py-5 flex flex-col sm:flex-row items-center justify-between text-xs text-text-secondary gap-4">
           <span>© {new Date().getFullYear()} Infollion. On-Demand Experts. All rights reserved.</span>
         </div>
       </div>

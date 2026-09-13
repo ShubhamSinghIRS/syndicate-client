@@ -29,8 +29,9 @@ const STEPS: { icon: SvgIconComponent; title: string; subtitle: string }[] = [
 
 export default function ForExperts() {
   return (
-    <div className="flex flex-col gap-8 py-10 md:flex-row md:items-stretch">
-      <div className="w-full flex-1">
+    <div className="flex flex-col md:flex-row items-center justify-between gap-10 lg:gap-14 py-8 md:py-12">
+      {/* Left Column: Copy & Actions */}
+      <div className="w-full flex-1 md:max-w-lg lg:max-w-xl">
         <div className="mb-4 flex items-center gap-2">
           <span
             className="h-4 w-1 rounded-full"
@@ -43,17 +44,18 @@ export default function ForExperts() {
             For Experts
           </span>
         </div>
-        <h2 className="text-balance text-3xl font-bold text-text-primary sm:text-4xl">
+        <h2 className="text-balance text-3xl font-extrabold tracking-tight text-text-primary sm:text-4xl lg:text-5xl leading-[1.15]">
           Turn your expertise
           <br />
           <span style={{ color: COLORS.accent2 }}>into impact and income.</span>
         </h2>
-        <p className="mt-4 max-w-2xl text-lg text-text-secondary leading-relaxed">
+        <p className="mt-5 text-base sm:text-lg text-text-secondary leading-relaxed max-w-lg">
           Share a recorded session or upload a document. Once reviewed, your
           expertise goes live on the Syndicate marketplace and earns every
           time it's accessed.
         </p>
-        <div className="mt-6 flex flex-wrap items-start gap-6">
+
+        <div className="mt-8 flex flex-wrap items-start gap-6">
           <div className="flex flex-col items-center gap-2 text-center">
             <Link
               href={CONTRIBUTOR_SIGNUP_URL}
@@ -63,13 +65,14 @@ export default function ForExperts() {
             >
               <Button
                 variant="contained"
-                label="Join as an Expert"
+                label="Join As An Expert"
                 endIcon={<ArrowForwardIcon fontSize="small" />}
-                styles={{ fontWeight: 600, fontSize: "14px", height: "42px", padding: "0 28px" }}
+                styles={{ fontWeight: 600, fontSize: "14px", height: "46px", padding: "0 28px", borderRadius: "9999px" }}
               />
             </Link>
             <span className="text-xs text-text-secondary">New to Infollion?</span>
           </div>
+
           <div className="flex flex-col items-center gap-2 text-center">
             <Link
               href={CONTRIBUTOR_LOGIN_URL}
@@ -79,9 +82,9 @@ export default function ForExperts() {
             >
               <Button
                 variant="outlined-accent"
-                label="Sign in to Share"
+                label="Sign In To Share"
                 endIcon={<ArrowForwardIcon fontSize="small" />}
-                styles={{ fontWeight: 600, fontSize: "14px", height: "42px", padding: "0 28px" }}
+                styles={{ fontWeight: 600, fontSize: "14px", height: "46px", padding: "0 28px", borderRadius: "9999px" }}
               />
             </Link>
             <span className="text-xs text-text-secondary">
@@ -90,68 +93,36 @@ export default function ForExperts() {
           </div>
         </div>
       </div>
-      <div className="relative hidden flex-[1.45] md:block min-h-[350px]">
-        <TranscriptWaveform />
-        <div className="absolute inset-0 px-0">
-          <div className="relative w-full h-full">
-            {/* Dashed connector segments */}
-            {/* Segment 1: Green line between Step 1 and Step 2 */}
-            <div
-              className="absolute top-[58%] -translate-y-1/2"
-              style={{
-                left: "calc(12.5% + 46px)",
-                right: "calc(62.5% + 46px)",
-                height: "1.5px",
-                backgroundImage: `linear-gradient(to right, ${COLORS.accent2} 50%, transparent 50%)`,
-                backgroundSize: "8px 100%",
-                backgroundRepeat: "repeat-x",
-              }}
-            />
-            {/* Segment 2: Green line between Step 2 and Step 3 */}
-            <div
-              className="absolute top-[58%] -translate-y-1/2"
-              style={{
-                left: "calc(37.5% + 46px)",
-                right: "calc(37.5% + 46px)",
-                height: "1.5px",
-                backgroundImage: `linear-gradient(to right, ${COLORS.accent2} 50%, transparent 50%)`,
-                backgroundSize: "8px 100%",
-                backgroundRepeat: "repeat-x",
-              }}
-            />
-            {/* Segment 3: Orange line between Step 3 and Step 4 */}
-            <div
-              className="absolute top-[58%] -translate-y-1/2"
-              style={{
-                left: "calc(62.5% + 46px)",
-                right: "calc(12.5% + 46px)",
-                height: "1.5px",
-                backgroundImage: `linear-gradient(to right, ${COLORS.accent2} 50%, transparent 50%)`,
-                backgroundSize: "8px 100%",
-                backgroundRepeat: "repeat-x",
-              }}
-            />
 
-            <div className="absolute top-[58%] -translate-y-8 left-0 right-0 flex justify-between">
-              {STEPS.map(({ icon: Icon, title, subtitle }) => (
-                <div
-                  key={title}
-                  className="relative z-10 flex w-1/4 flex-col items-center text-center px-1"
-                >
-                  <div
-                    className="flex h-16 w-16 items-center justify-center rounded-full bg-main-background shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-gray-100/30 dark:border-zinc-800/50"
-                  >
-                    <Icon style={{ color: COLORS.accent2, fontSize: "28px" }} />
-                  </div>
-                  <span className="mt-4 whitespace-nowrap text-[11px] font-extrabold uppercase tracking-wider text-text-primary">
-                    {title}
-                  </span>
-                  <span className="mt-1.5 text-[11px] text-text-secondary leading-normal max-w-[120px]">
-                    {subtitle}
-                  </span>
+      {/* Right Column: Waveform & 4 Process Steps (Matching Reference Image) */}
+      <div className="relative w-full md:flex-[1.4] lg:flex-[1.5] min-h-[320px] sm:min-h-[380px] flex items-center">
+        <TranscriptWaveform />
+
+        <div className="relative z-10 w-full px-2">
+          {/* Dashed connector line passing through circle centers */}
+          <div
+            className="absolute top-8 left-[12.5%] right-[12.5%] h-[0px] border-t-2 border-dashed pointer-events-none"
+            style={{ borderColor: COLORS.accent2 }}
+          />
+
+          {/* 4 Process Step Nodes */}
+          <div className="relative z-10 flex justify-between">
+            {STEPS.map(({ icon: Icon, title, subtitle }) => (
+              <div
+                key={title}
+                className="flex w-1/4 flex-col items-center text-center px-1"
+              >
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-main-background shadow-[0_10px_30px_rgba(0,0,0,0.12)] border border-gray-100/50 dark:border-zinc-800">
+                  <Icon style={{ color: COLORS.accent2, fontSize: "28px" }} />
                 </div>
-              ))}
-            </div>
+                <span className="mt-4 text-center text-[11px] font-extrabold uppercase tracking-wider text-text-primary leading-tight max-w-[120px]">
+                  {title}
+                </span>
+                <span className="mt-1.5 text-center text-[11px] text-text-secondary leading-normal max-w-[125px]">
+                  {subtitle}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

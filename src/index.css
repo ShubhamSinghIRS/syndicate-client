@@ -19,14 +19,14 @@
 
 .dark {
   color-scheme: dark;
-  --color-main-background: #121212;
+  --color-main-background: #12131c;
   --color-accent: #fbb017;
   --color-accent-2: #ec9324;
-  --color-section-background: #1e1e1e;
+  --color-section-background: #191b26;
   --color-text-primary: #f3f4f6;
   --color-text-secondary: #a3a3a3;
-  --color-header-background: #121212;
-  --color-layout-background: #0a0a0a;
+  --color-header-background: #1c1f2b;
+  --color-layout-background: #0e0f17;
 }
 
 *,
