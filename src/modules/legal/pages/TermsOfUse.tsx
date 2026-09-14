@@ -10,8 +10,8 @@ export default function TermsOfUse() {
   return (
     <div className="bg-main-background min-h-screen flex flex-col">
       <Header />
-      <div className="flex-1">
-        <div className="mx-auto max-w-3xl px-6 py-16">
+      <main className="flex-1 flex flex-col pt-16 sm:pt-20">
+        <div className="mx-auto w-full max-w-3xl px-6 py-12 flex-1">
           <h1 className="text-3xl font-bold text-text-primary sm:text-4xl">
             {TERMS_OF_USE_TITLE}
           </h1>
@@ -47,8 +47,8 @@ export default function TermsOfUse() {
             ))}
           </div>
         </div>
-      </div>
-      <Footer />
+        <Footer />
+      </main>
     </div>
   );
 }

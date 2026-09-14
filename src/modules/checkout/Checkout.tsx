@@ -149,8 +149,8 @@ export default function Checkout() {
     return (
       <div className="flex min-h-screen flex-col">
         <Header />
-        <div className="flex-1">
-          <div className="mx-auto max-w-[1400px] px-6 py-10">
+        <main className="flex-1 flex flex-col pt-16 sm:pt-20">
+          <div className="mx-auto w-full max-w-[1400px] px-6 py-8 flex-1">
             <BackButton
               label={buyNowItem ? BACK_TO_TRANSCRIPTS_LABEL : BACK_TO_CART_LABEL}
               to={buyNowItem ? APP_ROUTES.transcripts : APP_ROUTES.cart}
@@ -185,8 +185,8 @@ export default function Checkout() {
               </div>
             </div>
           </div>
-        </div>
-        <Footer />
+          <Footer />
+        </main>
       </div>
     );
   }
@@ -282,8 +282,8 @@ export default function Checkout() {
       <PaymentProcessing active={isCreatingOrder} variant="spinner" />
       <PaymentProcessing active={isVerifying} variant="message" />
       <Header />
-      <div className="flex-1">
-        <div className="mx-auto max-w-[1400px] px-6 py-10">
+      <main className="flex-1 flex flex-col pt-16 sm:pt-20">
+        <div className="mx-auto w-full max-w-[1400px] px-6 py-8 flex-1">
           <BackButton
             label={buyNowItem ? BACK_TO_TRANSCRIPTS_LABEL : BACK_TO_CART_LABEL}
             to={buyNowItem ? APP_ROUTES.transcripts : APP_ROUTES.cart}
@@ -309,8 +309,8 @@ export default function Checkout() {
             </div>
           </div>
         </div>
-      </div>
-      <Footer />
+        <Footer />
+      </main>
     </div>
   );
 }
