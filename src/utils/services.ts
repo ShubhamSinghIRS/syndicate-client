@@ -8,7 +8,7 @@ const getApiBaseUrl = (): string => {
   if (window.location.href.includes("localhost")) {
     return "http://localhost:8000";
   }
-  return "https://syndicate-transcript-backend-ac3k.onrender.com";
+  return "https://syndicate-dev-be.infollion.com";
 };
 
 const API_BASE_URL = getApiBaseUrl();
