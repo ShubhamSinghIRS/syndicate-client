@@ -40,6 +40,7 @@ body {
   overflow-x: hidden;
   background-color: var(--color-layout-background);
   color: var(--color-text-primary);
+  font-family: "Inter", sans-serif;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 

@@ -1,5 +1,8 @@
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import TwitterIcon from "@mui/icons-material/Twitter";
+import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
+import PhoneOutlinedIcon from "@mui/icons-material/PhoneOutlined";
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import { useSnackbar } from "notistack";
 import { Link } from "react-router-dom";
 import { APP_ROUTES } from "../../constants/appRoutes";
@@ -47,6 +50,35 @@ export default function Footer({ style }: FooterProps) {
             <p className="text-base text-text-secondary leading-relaxed max-w-xs">
               On-Demand Experts. High-quality firsthand business research and curated transcripts.
             </p>
+
+            {/* Address & Contact Info */}
+            <div className="flex flex-col gap-2.5 text-sm text-text-secondary">
+              <a
+                href="https://maps.app.goo.gl/4x3XKsEZaLujzgrL8"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-2 hover:text-accent-2 transition-colors duration-200 leading-relaxed max-w-xs group"
+              >
+                <LocationOnOutlinedIcon fontSize="small" className="shrink-0 mt-0.5 group-hover:text-accent-2" />
+                <span>5th Floor, Tower C, Unitech Cyberpark, Sector 39, Gurugram, Haryana 122002</span>
+              </a>
+              <a
+                href="tel:+911244272967"
+                className="flex items-center gap-2 hover:text-accent-2 transition-colors duration-200 group"
+              >
+                <PhoneOutlinedIcon fontSize="small" className="shrink-0 group-hover:text-accent-2" />
+                <span>+91 (124) 427-2967</span>
+              </a>
+              <a
+                href={`mailto:${SUPPORT_EMAIL}`}
+                onClick={handleCopyEmail}
+                className="flex items-center gap-2 hover:text-accent-2 transition-colors duration-200 group"
+              >
+                <EmailOutlinedIcon fontSize="small" className="shrink-0 group-hover:text-accent-2" />
+                <span>{SUPPORT_EMAIL}</span>
+              </a>
+            </div>
+
             <div className="flex items-center gap-4 mt-2">
               <a
                 href="https://www.linkedin.com/company/infollion/"

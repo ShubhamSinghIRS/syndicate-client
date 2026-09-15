@@ -88,8 +88,8 @@ export default function TranscriptDetail() {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
-      <div className="flex-1">
-        <div className="mx-auto max-w-[1440px] px-6 sm:px-12 lg:px-20 pt-20 pb-10">
+      <main className="flex-1 flex flex-col pt-16 sm:pt-20">
+        <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-12 lg:px-20 py-8 flex-1">
           <DetailHeader transcript={transcript} />
 
           <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-12">
@@ -125,8 +125,8 @@ export default function TranscriptDetail() {
             </div>
           </div>
         </div>
-      </div>
-      <Footer />
+        <Footer />
+      </main>
     </div>
   );
 }
