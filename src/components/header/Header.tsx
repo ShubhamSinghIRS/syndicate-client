@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { APP_ROUTES } from "../../constants/appRoutes";
@@ -36,6 +36,29 @@ export default function Header({
   const { items: cartItems } = useCart();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const headerRef = useRef<HTMLElement>(null);
+
+  // The header is `fixed`, so pages reserve space for it with padding-top.
+  // Its real height varies (search bar wrapping onto its own row below `lg`,
+  // a long account name wrapping the nav row below `sm`, etc.), so a static
+  // Tailwind value goes stale the moment that content changes - this keeps
+  // --header-height in sync with whatever actually renders.
+  useLayoutEffect(() => {
+    const node = headerRef.current;
+    if (!node) return;
+
+    const setHeightVar = () => {
+      document.documentElement.style.setProperty(
+        "--header-height",
+        `${node.offsetHeight}px`,
+      );
+    };
+    setHeightVar();
+
+    const observer = new ResizeObserver(setHeightVar);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (searchParams.get("authRequired") && !isLoggedIn()) {
@@ -51,7 +74,10 @@ export default function Header({
   }, [searchParams]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-white dark:bg-[#1c1f2b] border-b border-gray-100 dark:border-gray-800/60 shadow-sm">
+    <header
+      ref={headerRef}
+      className="fixed top-0 left-0 right-0 z-50 w-full bg-white dark:bg-[#1c1f2b] border-b border-gray-100 dark:border-gray-800/60 shadow-sm"
+    >
       <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-3 px-6 py-2 sm:px-12 lg:flex-nowrap lg:gap-6 lg:px-20">
         <Link to={APP_ROUTES.home} className="flex shrink-0 items-center">
           <img

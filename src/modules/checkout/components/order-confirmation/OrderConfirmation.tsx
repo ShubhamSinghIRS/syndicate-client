@@ -39,7 +39,7 @@ export default function OrderConfirmation({ order }: OrderConfirmationProps) {
     <div className="flex min-h-screen flex-col">
       <Header />
       <div className="flex-1">
-        <div className="mx-auto max-w-[800px] px-6 pt-24 md:pt-28 pb-16 text-center">
+        <div className="mx-auto max-w-[800px] px-6 pt-(--header-height) pb-16 text-center">
           <div className="relative mx-auto flex h-24 w-24 items-center justify-center">
             <div className="absolute inset-0 rounded-full bg-accent-2/30 blur-xl" />
             <div className="relative flex h-20 w-20 items-center justify-center rounded-full border-4 border-accent-2 bg-main-background">

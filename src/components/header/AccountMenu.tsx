@@ -38,19 +38,21 @@ export default function AccountMenu({ userName }: AccountMenuProps) {
   return (
     <div ref={dropdownRef} className="relative">
       <div
-        className="flex cursor-pointer items-center rounded-full bg-white dark:bg-section-background py-1 pl-1 pr-4"
+        className="flex cursor-pointer items-center rounded-full bg-white dark:bg-section-background py-1 pl-1 pr-2 sm:pr-4"
         style={triggerContainerStyle}
         onClick={() => setIsOpen((prev) => !prev)}
       >
         <div
-          className="mr-2 flex h-10 w-10 items-center justify-center rounded-full bg-[#333333] dark:bg-accent-2"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#333333] dark:bg-accent-2 sm:mr-2"
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
             <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
           </svg>
         </div>
+        {/* Full name only from sm up - on a phone it's what pushes the nav
+            row off the logo's line, wrapping the header onto two rows. */}
         <span
-          className="mr-1 text-base font-medium text-[#333333] dark:text-text-primary"
+          className="mr-1 hidden text-base font-medium text-[#333333] dark:text-text-primary sm:inline"
         >
           {userName || "User"}
         </span>

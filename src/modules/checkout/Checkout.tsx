@@ -149,7 +149,7 @@ export default function Checkout() {
     return (
       <div className="flex min-h-screen flex-col">
         <Header />
-        <main className="flex-1 flex flex-col pt-16 sm:pt-20">
+        <main className="flex-1 flex flex-col pt-(--header-height)">
           <div className="mx-auto w-full max-w-[1400px] px-6 py-8 flex-1">
             <BackButton
               label={buyNowItem ? BACK_TO_TRANSCRIPTS_LABEL : BACK_TO_CART_LABEL}
@@ -282,7 +282,7 @@ export default function Checkout() {
       <PaymentProcessing active={isCreatingOrder} variant="spinner" />
       <PaymentProcessing active={isVerifying} variant="message" />
       <Header />
-      <main className="flex-1 flex flex-col pt-16 sm:pt-20">
+      <main className="flex-1 flex flex-col pt-(--header-height)">
         <div className="mx-auto w-full max-w-[1400px] px-6 py-8 flex-1">
           <BackButton
             label={buyNowItem ? BACK_TO_TRANSCRIPTS_LABEL : BACK_TO_CART_LABEL}

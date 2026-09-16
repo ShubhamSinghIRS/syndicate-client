@@ -25,7 +25,7 @@ export default function OrderSummary({
   error,
 }: OrderSummaryProps) {
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-6 lg:sticky lg:top-6">
+    <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-6 lg:sticky lg:top-[calc(var(--header-height)+1.5rem)]">
       <h2 className="text-lg font-bold text-text-primary">{PURCHASE_SUMMARY_HEADING}</h2>
 
       <div className="mt-4 flex items-center justify-between text-text-secondary">

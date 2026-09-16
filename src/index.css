@@ -15,6 +15,10 @@
 
 :root {
   color-scheme: light;
+  /* Fallback only - Header measures its own real height and overwrites this
+     (see src/components/header/Header.tsx), since the header's height
+     varies with login state and content wrapping. */
+  --header-height: 96px;
 }
 
 .dark {
@@ -37,7 +41,11 @@
 
 html,
 body {
-  overflow-x: hidden;
+  /* clip, not hidden: hidden turns the box into a scroll container, which
+     breaks position:sticky for every descendant (e.g. the checkout page's
+     order summary sidebar). clip suppresses the horizontal overflow without
+     that side effect. */
+  overflow-x: clip;
   background-color: var(--color-layout-background);
   color: var(--color-text-primary);
   font-family: "Inter", sans-serif;
