@@ -4,6 +4,7 @@ import TextField from "@mui/material/TextField";
 import Checkbox from "../../../../components/checkbox/Checkbox";
 import { API_ENDPOINTS } from "../../../../constants/apiEndpoints";
 import { RequestServer } from "../../../../utils/services";
+import type { DomainOption } from "../../types";
 import {
   domainCheckboxSx,
   domainTextFieldSx,
@@ -22,8 +23,8 @@ export default function DomainAutocomplete({
   const [showAllTags, setShowAllTags] = useState(false);
 
   useEffect(() => {
-    RequestServer<string[]>(API_ENDPOINTS.domains, "GET")
-      .then(setOptions)
+    RequestServer<DomainOption[]>(API_ENDPOINTS.domains, "GET")
+      .then((domains) => setOptions(domains.map((domain) => domain.name)))
       .catch(() => setOptions([]));
   }, []);
 
