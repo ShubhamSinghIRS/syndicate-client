@@ -14,7 +14,7 @@ export default function Cart() {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
-      <main className="flex-1 flex flex-col pt-16 sm:pt-20">
+      <main className="flex-1 flex flex-col pt-(--header-height)">
         <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-12 lg:px-20 py-8 flex-1">
           <BackButton label="Back To Transcripts" to={APP_ROUTES.transcripts} />
 
