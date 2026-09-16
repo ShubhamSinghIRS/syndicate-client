@@ -1,3 +1,13 @@
+// Shape returned by GET /transcripts/domains (proxied from the Infollion domains API).
+export type DomainOption = {
+  id: number;
+  name: string;
+  parent_id: number | null;
+  level: string;
+  created_at: string | null;
+  updated_at: string | null;
+};
+
 export type Expert = {
   name: string;
   title: string;

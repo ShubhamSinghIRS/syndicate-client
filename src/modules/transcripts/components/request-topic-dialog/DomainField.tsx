@@ -8,6 +8,7 @@ import { API_ENDPOINTS } from "../../../../constants/apiEndpoints";
 import { RequestServer } from "../../../../utils/services";
 import { commonInputStyles } from "../../../../common/input-styles";
 import type { RequestTopicFormValues } from "./types";
+import type { DomainOption } from "../../types";
 import { MIN_DOMAINS, MAX_DOMAINS, DOMAIN_MAX_LENGTH } from "../../constants";
 
 type DomainFieldProps = {
@@ -18,8 +19,8 @@ export default function DomainField({ control }: DomainFieldProps) {
   const [options, setOptions] = useState<string[]>([]);
 
   useEffect(() => {
-    RequestServer<string[]>(API_ENDPOINTS.domains, "GET")
-      .then(setOptions)
+    RequestServer<DomainOption[]>(API_ENDPOINTS.domains, "GET")
+      .then((domains) => setOptions(domains.map((domain) => domain.name)))
       .catch(() => {});
   }, []);
 
