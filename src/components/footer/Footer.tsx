@@ -27,7 +27,7 @@ export default function Footer({ style }: FooterProps) {
 
   return (
     <footer
-      className="bg-[#F8F6F3] dark:bg-section-background border-t border-[#E9E4DC] dark:border-gray-800"
+      className="bg-[#F8F6F3] dark:bg-section-background border-t border-[#E9E4DC] dark:border-gray-800 mt-auto w-full shrink-0"
       style={style}
     >
       {/* Upper Footer: Multi-column Links */}

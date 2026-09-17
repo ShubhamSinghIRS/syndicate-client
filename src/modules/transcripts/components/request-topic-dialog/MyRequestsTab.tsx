@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Button from "../../../../components/button/Button";
 import SearchBar from "../../../../components/searchbar/SearchBar";
-import EmailOutlinedIcon from "../../../../icons/EmailOutlined/EmailOutlined";
 import { useIsLoggedIn } from "../../../../utils/authUtils";
 import { useAuthDialog } from "../../../auth/context/AuthDialogContext";
 import { fetchMyTopicRequests } from "./myRequestsService";
@@ -10,13 +9,7 @@ import TopicRequestDetailsDialog from "./TopicRequestDetailsDialog";
 import TopicRequestCardSkeleton from "./TopicRequestCardSkeleton";
 import TopicRequestCard from "./TopicRequestCard";
 
-type MyRequestsTabProps = {
-  onSwitchToRequestTab: () => void;
-};
-
-export default function MyRequestsTab({
-  onSwitchToRequestTab,
-}: MyRequestsTabProps) {
+export default function MyRequestsTab() {
   const { openAuthDialog } = useAuthDialog();
   // Reactive - was previously local state only ever set true (on login
   // success), never back to false on logout, so this tab kept showing the
@@ -75,22 +68,6 @@ export default function MyRequestsTab({
             onClick={() => openAuthDialog("register")}
           />
         </div>
-        <div className="mt-4 flex w-full items-center gap-3">
-          <span className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
-          <span className="text-xs text-text-secondary">or</span>
-          <span className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
-        </div>
-        <button
-          type="button"
-          onClick={onSwitchToRequestTab}
-          className="mt-1 flex items-center gap-1.5 text-sm text-text-secondary cursor-pointer"
-        >
-          <EmailOutlinedIcon fontSize="small" />
-          Don't have an account?{" "}
-          <span className="font-medium text-accent-2">
-            Request new topic
-          </span>
-        </button>
       </div>
     );
   }

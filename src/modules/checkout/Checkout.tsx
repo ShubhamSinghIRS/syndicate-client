@@ -149,8 +149,8 @@ export default function Checkout() {
     return (
       <div className="flex min-h-screen flex-col">
         <Header />
-        <main className="flex-1 flex flex-col pt-(--header-height)">
-          <div className="mx-auto w-full max-w-[1400px] px-6 py-8 flex-1">
+        <main className="flex-1 flex flex-col pt-[var(--header-height)]">
+          <div className="mx-auto w-full max-w-[1400px] px-6 py-8 flex-1 min-h-[calc(100vh-var(--header-height))]">
             <BackButton
               label={buyNowItem ? BACK_TO_TRANSCRIPTS_LABEL : BACK_TO_CART_LABEL}
               to={buyNowItem ? APP_ROUTES.transcripts : APP_ROUTES.cart}
@@ -282,8 +282,8 @@ export default function Checkout() {
       <PaymentProcessing active={isCreatingOrder} variant="spinner" />
       <PaymentProcessing active={isVerifying} variant="message" />
       <Header />
-      <main className="flex-1 flex flex-col pt-(--header-height)">
-        <div className="mx-auto w-full max-w-[1400px] px-6 py-8 flex-1">
+      <main className="flex-1 flex flex-col pt-[var(--header-height)]">
+        <div className="mx-auto w-full max-w-[1400px] px-6 py-8 flex-1 min-h-[calc(100vh-var(--header-height))]">
           <BackButton
             label={buyNowItem ? BACK_TO_TRANSCRIPTS_LABEL : BACK_TO_CART_LABEL}
             to={buyNowItem ? APP_ROUTES.transcripts : APP_ROUTES.cart}

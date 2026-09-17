@@ -30,17 +30,17 @@ export default function Home() {
       <Header />
 
       {/* Hero main section - full viewport height */}
-      <section className={`${styles.heroBackground} min-h-screen flex flex-col justify-center pt-24 pb-12 md:pt-28 md:pb-16 relative overflow-hidden`}>
-        <div className="mx-auto flex w-full max-w-[1440px] flex-col items-center justify-center gap-10 px-6 sm:px-12 lg:px-20 relative z-10">
+      <section className={`${styles.heroBackground} min-h-screen flex flex-col justify-center pt-16 pb-12 md:pt-20 md:pb-16 relative overflow-hidden`}>
+        <div className="mx-auto flex w-full max-w-[1440px] flex-col md:flex-row items-center justify-between gap-10 px-6 sm:px-12 lg:px-20 relative z-10">
           {/* Hero copy */}
-          <div className="flex-1 flex flex-col items-center gap-6 text-center">
+          <div className="flex-1 flex flex-col gap-6 text-left">
             <div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
                 <span className="text-text-primary">Real Expertise. </span>
                 <br />
                 <span className="text-accent-2">Verified and Ready.</span>
               </h1>
-              <p className="mt-6 text-lg text-text-secondary leading-relaxed max-w-xl mx-auto font-medium">
+              <p className="mt-6 text-lg text-text-secondary leading-relaxed max-w-xl font-medium">
                Every transcript comes from a real expert sharing their expertise on a topic the market is actively asking about. Search, filter, and get straight to the insight you need.
               </p>
             </div>
@@ -66,8 +66,8 @@ export default function Home() {
             </div>
 
             {/* Buttons */}
-            <div className="flex flex-wrap justify-center gap-4 mt-2">
-              <Link to={APP_ROUTES.transcripts}>
+            <div className="flex flex-wrap justify-center sm:justify-start gap-4 mt-2">
+              <Link to={APP_ROUTES.transcripts} className="flex justify-center">
                 <Button
                   variant="contained"
                   label="Browse transcripts"
@@ -81,6 +81,16 @@ export default function Home() {
                 styles={heroButtonStyle}
               />
             </div>
+          </div>
+
+          {/* Hero visual - right side image */}
+          <div className="hidden md:block flex-[1.15] w-full">
+            <img
+              src="/assets/bg5.png"
+              alt="Expert sharing insights on a video call"
+              draggable={false}
+              className={`${styles.heroImage} w-full h-auto max-h-[500px] object-contain`}
+            />
           </div>
         </div>
       </section>

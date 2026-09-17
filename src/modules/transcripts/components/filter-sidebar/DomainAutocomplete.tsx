@@ -4,6 +4,7 @@ import TextField from "@mui/material/TextField";
 import Checkbox from "../../../../components/checkbox/Checkbox";
 import { API_ENDPOINTS } from "../../../../constants/apiEndpoints";
 import { RequestServer } from "../../../../utils/services";
+import { filterByPrefixThenSubstring } from "../../../../utils/autocompleteFilters";
 import type { DomainOption } from "../../types";
 import {
   domainCheckboxSx,
@@ -51,12 +52,9 @@ export default function DomainAutocomplete({
       value={selectedDomains}
       onChange={(_event, value) => setSelectedDomains(value)}
       getOptionLabel={(option) => option}
-      filterOptions={(options, { inputValue }) => {
-        const inputValueLowercased = inputValue.toLowerCase();
-        return options.filter((option) =>
-          option.toLowerCase().includes(inputValueLowercased),
-        );
-      }}
+      filterOptions={(options, { inputValue }) =>
+        filterByPrefixThenSubstring(options, inputValue)
+      }
       renderOption={(props, option, { selected }) => (
         <li {...props} key={option}>
           <Checkbox checked={selected} sx={domainCheckboxSx} />

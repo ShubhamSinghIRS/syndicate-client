@@ -85,7 +85,7 @@ export const TERMS_OF_USE_SECTIONS: TermsOfUseSection[] = [
   {
     heading: "Permitted Use",
     body: [
-      "You may access Content for your own research and internal decision making. You may view Content through the Platform and retain a personal copy for your own reference. You shall not republish, redistribute, resell, or make Content available to third parties, and you shall not use Content for any purpose beyond your own individual or organizational research use, except as expressly permitted here.",
+      "You may access Content for your own research and internal decision making. You may view Content through the Platform and retain a copy for your internal business or organizational use, subject to these Terms. You shall not republish, redistribute, resell, or make Content available to third parties, and you shall not use Content for any purpose beyond your own individual or organizational research use, except as expressly permitted here.",
       "Unless you've received our prior written approval, you also may not use Content with any third-party artificial intelligence tool, machine learning model, large language model, or similar automated system, including for training, processing, summarizing, or repackaging the Content.",
     ],
   },
@@ -100,6 +100,15 @@ export const TERMS_OF_USE_SECTIONS: TermsOfUseSection[] = [
     body: [
       "Content on the Platform reflects the views and experience of individual experts and is provided for informational purposes only. It is not a substitute for professional, financial, legal, or investment advice, and should be treated as one input among others in your own research and decision-making.",
     ],
+  },
+  {heading:"Disclaimer",
+    body:[
+      "Any review conducted by Infollion is intended to assess compliance with Infollion's applicable content and publication standards. This review does not constitute verification, certification or endorsement of the accuracy, completeness or reliability of the Content.",
+      "Infollion does not endorse the opinions expressed by an expert.",
+      "You must not use or disclose Content in violation of applicable law or contractual obligations.",
+      "Customers must not use the Platform or Content for any unlawful securities trading, market manipulation or other prohibited activity."
+    ]
+
   },
   {
     heading: "Third-Party Links",

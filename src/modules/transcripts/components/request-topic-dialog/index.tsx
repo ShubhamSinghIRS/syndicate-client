@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "../../../../components/tooltip/Tooltip";
 import DialogModal from "../../../../components/dialog/DialogModal";
+import WarningDialog from "../../../../components/form-close-warning/WarningDialog";
+import { useBoolean } from "../../../../utils/hooks/useBoolean";
 import InfoOutlined from "../../../../icons/InfoOutlined/InfoOutlined";
 import RequestTopicForm from "./form";
 import MyRequestsTab from "./MyRequestsTab";
@@ -22,10 +24,44 @@ export default function RequestTopicDialog({
   handleSubmitClose,
 }: RequestTopicDialogProps) {
   const [activeTab, setActiveTab] = useState<DialogTab>("request");
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const {
+    value: isSwitchWarningOpen,
+    setTrue: openSwitchWarning,
+    setFalse: closeSwitchWarning,
+  } = useBoolean();
 
   useEffect(() => {
-    if (isOpen) setActiveTab("request");
+    if (isOpen) {
+      setActiveTab("request");
+      setIsFormDirty(false);
+    }
   }, [isOpen]);
+
+  // Switching away from "Request a topic" unmounts the form, silently
+  // discarding whatever the user typed - so it gets the same confirmation
+  // as closing the dialog with unsaved changes, rather than switching tabs
+  // for free.
+  const handleTabClick = (tab: DialogTab) => {
+    if (tab === activeTab) return;
+    if (activeTab === "request" && isFormDirty) {
+      openSwitchWarning();
+      return;
+    }
+    setActiveTab(tab);
+  };
+
+  const handleFormDirtyChange = (dirty: boolean) => {
+    setIsFormDirty(dirty);
+    onDirtyChange(dirty);
+  };
+
+  const confirmTabSwitch = () => {
+    closeSwitchWarning();
+    setIsFormDirty(false);
+    onDirtyChange(false);
+    setActiveTab("myRequests");
+  };
 
   return (
     <DialogModal
@@ -65,7 +101,7 @@ export default function RequestTopicDialog({
           <button
             key={tab.key}
             type="button"
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => handleTabClick(tab.key)}
             className={`relative -mb-px cursor-pointer pb-2.5 text-sm font-medium ${
               activeTab === tab.key
                 ? "text-accent-2"
@@ -83,12 +119,19 @@ export default function RequestTopicDialog({
       {activeTab === "request" ? (
         <RequestTopicForm
           handleClose={handleClose}
-          onDirtyChange={onDirtyChange}
+          onDirtyChange={handleFormDirtyChange}
           handleSubmitClose={handleSubmitClose}
         />
       ) : (
-        <MyRequestsTab onSwitchToRequestTab={() => setActiveTab("request")} />
+        <MyRequestsTab />
       )}
+
+      <WarningDialog
+        open={isSwitchWarningOpen}
+        handleClose={closeSwitchWarning}
+        handleYesClick={confirmTabSwitch}
+        text="Switching tabs will discard your unsaved topic request. Continue?"
+      />
     </DialogModal>
   );
 }
