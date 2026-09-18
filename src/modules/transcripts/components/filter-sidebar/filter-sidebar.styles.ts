@@ -14,6 +14,13 @@ export const domainTextFieldSx: SxProps<Theme> = {
       borderColor: COLORS.accent2,
     },
   },
+  // Tags wrap and grow the input's height; MUI's default endAdornment
+  // is vertically centered on the whole box, which lands it mid-stack
+  // once there are enough chips. Pin it to the top-right instead.
+  "& .MuiAutocomplete-endAdornment": {
+    top: "9px",
+    transform: "none",
+  },
 };
 
 export const purchasedOnlySwitchSx: SxProps<Theme> = {

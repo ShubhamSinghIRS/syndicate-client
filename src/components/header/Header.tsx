@@ -228,7 +228,9 @@ export default function Header({
               maxWidth="100%"
               height="40px"
             />
-            {isExtraComponent && component}
+            {isExtraComponent && (
+              <div className="self-end">{component}</div>
+            )}
           </div>
         )}
       </div>

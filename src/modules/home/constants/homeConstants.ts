@@ -124,6 +124,14 @@ export const TERMS_OF_USE_SECTIONS: TermsOfUseSection[] = [
     ],
   },
   {
+    heading:"Non-Solicitation and No-Contact",
+    body:[
+      "You shall not use the Content, including any information identifying or relating to an expert, such as their name, profile, professional experience, or other information made available through the Platform, to directly or indirectly contact, solicit, engage, or otherwise establish a business relationship with such expert outside the Platform, without our prior written consent."
+    ]
+
+  }
+  ,
+  {
     heading: "Governing Law",
     body: [
       "This Agreement is governed by the laws of India, and any disputes arising from it are subject to the exclusive jurisdiction of the courts of Gurugram, Haryana. If any provision of this Agreement is found unenforceable, the rest of the Agreement remains in effect.",

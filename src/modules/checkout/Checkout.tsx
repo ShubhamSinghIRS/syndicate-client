@@ -160,28 +160,30 @@ export default function Checkout() {
               {CHECKOUT_HEADING}
             </h1>
 
-            <div className="mx-auto mt-10 flex max-w-md flex-col items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-10 text-center">
-              {buyNowItem ? (
-                <CheckCircleIcon
-                  sx={{ fontSize: 48 }}
-                  className="text-text-secondary"
-                />
-              ) : (
-                <ShoppingCartIcon
-                  sx={{ fontSize: 48 }}
-                  className="text-text-secondary"
-                />
-              )}
-              <h2 className="text-xl font-bold text-text-primary">
-                {buyNowItem ? BUY_NOW_OWNED_HEADING : CART_EMPTY_HEADING}
-              </h2>
-              <p className="text-sm text-text-secondary">
-                {buyNowItem ? BUY_NOW_OWNED_BODY : CART_EMPTY_BODY}
-              </p>
-              <div className="mt-3">
-                <Link to={APP_ROUTES.transcripts}>
-                  <Button variant="contained" label={BROWSE_TRANSCRIPTS_LABEL} />
-                </Link>
+            <div className="mt-6">
+              <div className="mx-auto flex max-w-lg flex-col items-center gap-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-main-background p-14 text-center">
+                {buyNowItem ? (
+                  <CheckCircleIcon
+                    sx={{ fontSize: 96 }}
+                    className="text-text-secondary"
+                  />
+                ) : (
+                  <ShoppingCartIcon
+                    sx={{ fontSize: 96 }}
+                    className="text-text-secondary"
+                  />
+                )}
+                <h1 className="text-2xl font-bold text-text-primary">
+                  {buyNowItem ? BUY_NOW_OWNED_HEADING : CART_EMPTY_HEADING}
+                </h1>
+                <p className="text-base text-text-secondary">
+                  {buyNowItem ? BUY_NOW_OWNED_BODY : CART_EMPTY_BODY}
+                </p>
+                <div className="mt-4">
+                  <Link to={APP_ROUTES.transcripts}>
+                    <Button variant="contained" label={BROWSE_TRANSCRIPTS_LABEL} />
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
