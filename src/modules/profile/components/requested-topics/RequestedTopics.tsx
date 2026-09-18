@@ -15,11 +15,9 @@ export default function RequestedTopics({ items, isLoading = false }: RequestedT
   );
 
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-6">
+    <div className="h-full rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-6">
       <h2 className="text-xl font-bold text-text-primary">Requested Topics</h2>
-      <p className="mt-1 text-sm text-text-secondary">
-        Topics you've asked us to source
-      </p>
+
 
       {isLoading ? (
         <div className="mt-4 flex flex-col gap-3 border-t border-gray-200 dark:border-gray-800 pt-4">

@@ -40,16 +40,25 @@
 }
 
 html,
+body,
+#root {
+  background-color: var(--color-layout-background);
+  color: var(--color-text-primary);
+  font-family: "Inter", sans-serif;
+  min-height: 100vh;
+}
+
 body {
   /* clip, not hidden: hidden turns the box into a scroll container, which
      breaks position:sticky for every descendant (e.g. the checkout page's
      order summary sidebar). clip suppresses the horizontal overflow without
-     that side effect. */
+     that side effect.
+     Set on body only, not html: the UA only propagates body's overflow to
+     the viewport (which is what makes MUI's dialog scroll-lock - it sets
+     overflow:hidden on body - actually stop the page from scrolling) when
+     html's own overflow stays "visible". Putting this on html too breaks
+     that propagation and silently defeats every scroll lock in the app. */
   overflow-x: clip;
-  background-color: var(--color-layout-background);
-  color: var(--color-text-primary);
-  font-family: "Inter", sans-serif;
-  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Orange scrollbar styles */

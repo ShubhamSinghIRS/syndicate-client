@@ -20,7 +20,7 @@ export default function InvoiceList({ orders, isLoading = false }: InvoiceListPr
   );
 
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-6">
+    <div className="h-full rounded-lg border border-gray-200 dark:border-gray-800 bg-main-background p-6">
       <h2 className="text-xl font-bold text-text-primary">Receipts</h2>
       <p className="mt-1 text-sm text-text-secondary">
         Billing history for all transcripts purchased

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
+import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
 import Checkbox from "../../../../components/checkbox/Checkbox";
 import { API_ENDPOINTS } from "../../../../constants/apiEndpoints";
 import { RequestServer } from "../../../../utils/services";
+import { filterByPrefixThenSubstring } from "../../../../utils/autocompleteFilters";
 import type { DomainOption } from "../../types";
 import {
   domainCheckboxSx,
@@ -33,30 +35,50 @@ export default function DomainAutocomplete({
       multiple
       disableCloseOnSelect
       size="small"
-      limitTags={showAllTags ? -1 : 2}
-      getLimitTagsText={(more) => (
-        <span
-          onMouseDown={(event) => event.stopPropagation()}
-          onClick={(event) => {
-            event.stopPropagation();
-            setShowAllTags(true);
-          }}
-          className="cursor-pointer hover:underline"
-        >
-          +{more} more
-        </span>
-      )}
+      renderTags={(tagValue, getTagProps) => {
+        const visibleCount = showAllTags ? tagValue.length : Math.min(tagValue.length, 2);
+        const hiddenCount = tagValue.length - visibleCount;
+        return (
+          <>
+            {tagValue.slice(0, visibleCount).map((option, index) => {
+              const { key, ...tagProps } = getTagProps({ index });
+              return <Chip key={key} label={option} {...tagProps} />;
+            })}
+            {hiddenCount > 0 && (
+              <span
+                onMouseDown={(event) => event.stopPropagation()}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setShowAllTags(true);
+                }}
+                className="cursor-pointer hover:underline"
+              >
+                +{hiddenCount} more
+              </span>
+            )}
+            {showAllTags && tagValue.length > 2 && (
+              <span
+                onMouseDown={(event) => event.stopPropagation()}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setShowAllTags(false);
+                }}
+                className="cursor-pointer hover:underline"
+              >
+                Show less
+              </span>
+            )}
+          </>
+        );
+      }}
       sx={{ "& .MuiAutocomplete-tag": { maxWidth: "none" } }}
       options={options}
       value={selectedDomains}
       onChange={(_event, value) => setSelectedDomains(value)}
       getOptionLabel={(option) => option}
-      filterOptions={(options, { inputValue }) => {
-        const inputValueLowercased = inputValue.toLowerCase();
-        return options.filter((option) =>
-          option.toLowerCase().includes(inputValueLowercased),
-        );
-      }}
+      filterOptions={(options, { inputValue }) =>
+        filterByPrefixThenSubstring(options, inputValue)
+      }
       renderOption={(props, option, { selected }) => (
         <li {...props} key={option}>
           <Checkbox checked={selected} sx={domainCheckboxSx} />

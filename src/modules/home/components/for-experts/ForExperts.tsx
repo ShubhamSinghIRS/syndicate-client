@@ -13,7 +13,7 @@ const CONTRIBUTOR_SIGNUP_URL = "https://webapp.infollion.com/register-user";
 const CONTRIBUTOR_LOGIN_URL = "https://webapp.infollion.com/login";
 
 const STEPS: { icon: SvgIconComponent; title: string; subtitle: string }[] = [
-  { icon: UploadFileOutlinedIcon, title: "You Share", subtitle: "Session or document" },
+  { icon: UploadFileOutlinedIcon, title: "You Share Or Record", subtitle: "Record a session or upload a documen" },
   { icon: GppGoodOutlinedIcon, title: "We Review", subtitle: "Reviewed and transcribed by Infollion" },
   {
     icon: LanguageOutlinedIcon,
@@ -115,10 +115,10 @@ export default function ForExperts() {
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-main-background shadow-[0_10px_30px_rgba(0,0,0,0.12)] border border-gray-100/50 dark:border-zinc-800">
                   <Icon style={{ color: COLORS.accent2, fontSize: "28px" }} />
                 </div>
-                <span className="mt-4 text-center text-[11px] font-extrabold uppercase tracking-wider text-text-primary leading-tight max-w-[120px]">
+                <span className="mt-6 text-center text-[11px] sm:text-[16px] font-extrabold uppercase tracking-wider text-text-primary leading-tight max-w-[120px]">
                   {title}
                 </span>
-                <span className="mt-1.5 text-center text-[11px] text-text-secondary leading-normal max-w-[125px]">
+                <span className="mt-1.5 text-center text-[10px] sm:text-[14px] text-text-secondary leading-normal max-w-[125px]">
                   {subtitle}
                 </span>
               </div>

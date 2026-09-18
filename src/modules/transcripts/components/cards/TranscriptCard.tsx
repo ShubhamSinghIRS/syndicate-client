@@ -119,47 +119,55 @@ export default function TranscriptCard({
             Purchased
           </p>
         ) : (
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
             <span className="shrink-0 text-base font-bold text-text-primary">
               USD ${transcript.price}
             </span>
-            <Tooltip
-              title={isInCart ? "Click to remove from cart" : ""}
-              arrow
-              disableHoverListener={suppressCartTooltip}
-              slotProps={{
-                tooltip: {
-                  sx: cartTooltipSx,
-                },
-              }}
-            >
-              <span onMouseLeave={() => setSuppressCartTooltip(false)} className="shrink-0">
-                <Button
-                  variant="outlined"
-                  label={isInCart ? "In Cart" : "Add to Cart"}
-                  startIcon={isInCart ? <CheckIcon fontSize="small" /> : undefined}
-                  className="whitespace-nowrap"
-                  onClick={(event: React.MouseEvent) => {
-                    event.stopPropagation();
-                    setSuppressCartTooltip(true);
-                    if (isInCart) {
-                      removeFromCart(transcript.id);
-                    } else {
-                      addToCart(transcript);
-                    }
-                  }}
-                />
-              </span>
-            </Tooltip>
-            <Button
-              variant="contained"
-              label="Buy Transcript"
-              className="shrink-0 whitespace-nowrap"
-              onClick={(event: React.MouseEvent) => {
-                event.stopPropagation();
-                handleBuyNow(transcript);
-              }}
-            />
+            {/* Below sm, this becomes the actual flex row (both buttons
+                equal-width, side by side); at sm+, `contents` removes it so
+                its children rejoin the outer row exactly as before. */}
+            <div className="flex gap-2 sm:contents">
+              <Tooltip
+                title={isInCart ? "Click to remove from cart" : ""}
+                arrow
+                disableHoverListener={suppressCartTooltip}
+                slotProps={{
+                  tooltip: {
+                    sx: cartTooltipSx,
+                  },
+                }}
+              >
+                <span
+                  onMouseLeave={() => setSuppressCartTooltip(false)}
+                  className="min-w-0 flex-1 sm:flex-none sm:shrink-0"
+                >
+                  <Button
+                    variant="outlined"
+                    label={isInCart ? "In Cart" : "Add to Cart"}
+                    startIcon={isInCart ? <CheckIcon fontSize="small" /> : undefined}
+                    className="w-full whitespace-nowrap sm:w-auto"
+                    onClick={(event: React.MouseEvent) => {
+                      event.stopPropagation();
+                      setSuppressCartTooltip(true);
+                      if (isInCart) {
+                        removeFromCart(transcript.id);
+                      } else {
+                        addToCart(transcript);
+                      }
+                    }}
+                  />
+                </span>
+              </Tooltip>
+              <Button
+                variant="contained"
+                label="Buy Transcript"
+                className="min-w-0 flex-1 w-full whitespace-nowrap sm:w-auto sm:flex-none sm:shrink-0"
+                onClick={(event: React.MouseEvent) => {
+                  event.stopPropagation();
+                  handleBuyNow(transcript);
+                }}
+              />
+            </div>
           </div>
         )}
       </div>

@@ -7,6 +7,7 @@ import Chip from "@mui/material/Chip";
 import { API_ENDPOINTS } from "../../../../constants/apiEndpoints";
 import { RequestServer } from "../../../../utils/services";
 import { commonInputStyles } from "../../../../common/input-styles";
+import { filterByPrefixThenSubstring } from "../../../../utils/autocompleteFilters";
 import type { RequestTopicFormValues } from "./types";
 import type { DomainOption } from "../../types";
 import { MIN_DOMAINS, MAX_DOMAINS, DOMAIN_MAX_LENGTH } from "../../constants";
@@ -47,6 +48,9 @@ export default function DomainField({ control }: DomainFieldProps) {
           size="small"
           options={options}
           value={value}
+          filterOptions={(opts, { inputValue }) =>
+            filterByPrefixThenSubstring(opts, inputValue)
+          }
           onChange={(_event, newValue) => onChange(newValue.slice(0, MAX_DOMAINS))}
           renderTags={(tagValue, getTagProps) =>
             tagValue.map((option, index) => (

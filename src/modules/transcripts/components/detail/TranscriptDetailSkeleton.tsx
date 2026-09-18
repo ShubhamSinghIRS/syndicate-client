@@ -5,8 +5,8 @@ export default function TranscriptDetailSkeleton() {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
-      <div className="flex-1">
-        <div className="mx-auto max-w-[1400px] px-6 pt-(--header-height) pb-10 animate-pulse">
+      <div className="flex-1 min-h-[calc(100vh-var(--header-height))]">
+        <div className="mx-auto max-w-[1400px] px-6 pt-[var(--header-height)] pb-10 animate-pulse">
           {/* Header Skeleton */}
           <div className="space-y-3">
             <div className="h-4 w-32 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />

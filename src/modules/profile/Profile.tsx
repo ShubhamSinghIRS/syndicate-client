@@ -52,9 +52,9 @@ export default function Profile() {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
-      <main className="flex-1 flex flex-col pt-(--header-height)">
-        <div className="mx-auto w-full max-w-[1800px] px-6 py-8 flex-1">
-          <div className="flex flex-col gap-8 lg:flex-row">
+      <main className="flex-1 flex flex-col pt-[var(--header-height)]">
+        <div className="mx-auto flex w-full max-w-[1800px] flex-1 flex-col px-6 py-8 min-h-[calc(100vh-var(--header-height))]">
+          <div className="flex flex-1 flex-col gap-8 lg:flex-row">
             <ProfileSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
             <div className="min-w-0 flex-1">
